@@ -1,0 +1,37 @@
+{
+  "guildId": "YOUR_GUILD_ID_HERE",
+  "channels": {
+    "welcome": "YOUR_WELCOME_CHANNEL_ID_HERE",
+    "logs": "YOUR_LOG_CHANNEL_ID_HERE",
+    "tickets": "YOUR_TICKETS_CHANNEL_ID_HERE",
+    "ticketTranscripts": "YOUR_TICKET_TRANSCRIPTS_CHANNEL_ID_HERE",
+    "applications": "YOUR_APPLICATIONS_CHANNEL_ID_HERE",
+    "suggestions": "YOUR_SUGGESTIONS_CHANNEL_ID_HERE",
+    "partnerships": "YOUR_PARTNERSHIPS_CHANNEL_ID_HERE",
+    "updates": "YOUR_UPDATES_CHANNEL_ID_HERE",
+    "resources": "YOUR_RESOURCES_CHANNEL_ID_HERE",
+    "rolePanels": "YOUR_ROLE_PANELS_CHANNEL_ID_HERE"
+  },
+  "categories": {
+    "tickets": "YOUR_TICKETS_CATEGORY_ID_HERE"
+  },
+  "roles": {
+    "staff": "YOUR_STAFF_ROLE_ID_HERE",
+    "admin": "YOUR_ADMIN_ROLE_ID_HERE",
+    "moderator": "YOUR_MODERATOR_ROLE_ID_HERE",
+    "betaTester": "YOUR_BETA_TESTER_ROLE_ID_HERE",
+    "notifications": {
+      "updates": "YOUR_UPDATES_NOTIFICATION_ROLE_ID_HERE",
+      "resources": "YOUR_RESOURCES_NOTIFICATION_ROLE_ID_HERE",
+      "partnerships": "YOUR_PARTNERSHIPS_NOTIFICATION_ROLE_ID_HERE"
+    }
+  },
+  "colors": {
+    "primary": "#5865F2",
+    "success": "#57F287",
+    "error": "#ED4245",
+    "warning": "#FEE75C",
+    "info": "#00B0F4"
+  },
+  "website": "https://howtoerlc.xyz"
+}

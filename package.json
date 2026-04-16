@@ -1,0 +1,20 @@
+{
+  "name": "howtoerlc-bot",
+  "version": "1.0.0",
+  "description": "Official Discord bot for the HowToERLC community — ERLC server management, support tickets, staff applications, suggestions, partnerships, and more.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "node deploy-commands.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "cors": "^2.8.5",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "passport": "^0.7.0",
+    "passport-discord": "^0.1.4"
+  }
+}
