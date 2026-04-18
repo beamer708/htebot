@@ -44,7 +44,7 @@ module.exports = {
     } else {
       const recent = entries.slice(-10).reverse();
       const lines = recent.map(e => {
-        const icon = TYPE_ICONS[e.type] || '📌';
+        const icon = TYPE_ICONS[e.type] || '❓';
         const date = new Date(e.timestamp).toLocaleDateString();
         return `${icon} **${e.type.toUpperCase()}** — ${e.reason}\n> by ${e.moderator} on ${date}`;
       });

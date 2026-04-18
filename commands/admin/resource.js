@@ -35,7 +35,7 @@ module.exports = {
       .setTitle(`📦 New ${type} Released!`)
       .setDescription(description)
       .addFields(
-        { name: '📎 Access Link', value: link, inline: false },
+        { name: '🔗 Access Link', value: link, inline: false },
         { name: '🏷️ Type', value: type, inline: true },
         { name: '👤 Posted By', value: interaction.user.tag, inline: true },
       )

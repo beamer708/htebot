@@ -13,7 +13,7 @@ module.exports = {
       .setTitle('🎫 HowToERLC Support')
       .setDescription('Need help? Our staff team is here for you!\n\nClick the button below to open a private support ticket. Please include as much detail as possible so we can assist you quickly.\n\n**Response times may vary. Please be patient.**')
       .addFields(
-        { name: '📌 Before You Open a Ticket', value: '• Check the FAQ and help channels first\n• One ticket per issue\n• Be respectful to staff', inline: false },
+        { name: 'ℹ️ Before You Open a Ticket', value: '• Check the FAQ and help channels first\n• One ticket per issue\n• Be respectful to staff', inline: false },
       )
       .setFooter({ text: 'HowToERLC Support • howtoerlc.xyz' })
       .setTimestamp();

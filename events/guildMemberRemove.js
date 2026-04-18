@@ -9,7 +9,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.error)
-      .setTitle('📤 Member Left')
+      .setTitle('🚪 Member Left')
       .addFields(
         { name: 'User', value: `${member.user.tag} (${member.id})`, inline: true },
         { name: 'Joined', value: member.joinedAt ? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>` : 'Unknown', inline: true },

@@ -23,7 +23,7 @@ module.exports = {
           inline: false,
         },
         {
-          name: '📢 Admin',
+          name: '🛡️ Admin',
           value: '`/announce` — Post a server announcement\n`/resource` — Post a resource release\n`/role-panel` — Create a role selection panel\n`/maintenance` — Toggle maintenance mode',
           inline: false,
         },

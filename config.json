@@ -1,29 +1,29 @@
 {
-  "guildId": "YOUR_GUILD_ID_HERE",
+  "guildId": "1205037574087770175",
   "channels": {
-    "welcome": "YOUR_WELCOME_CHANNEL_ID_HERE",
-    "logs": "YOUR_LOG_CHANNEL_ID_HERE",
+    "welcome": "1483615235154903232",
+    "logs": "1485351323816956064",
     "tickets": "YOUR_TICKETS_CHANNEL_ID_HERE",
-    "ticketTranscripts": "YOUR_TICKET_TRANSCRIPTS_CHANNEL_ID_HERE",
-    "applications": "YOUR_APPLICATIONS_CHANNEL_ID_HERE",
-    "suggestions": "YOUR_SUGGESTIONS_CHANNEL_ID_HERE",
-    "partnerships": "YOUR_PARTNERSHIPS_CHANNEL_ID_HERE",
-    "updates": "YOUR_UPDATES_CHANNEL_ID_HERE",
-    "resources": "YOUR_RESOURCES_CHANNEL_ID_HERE",
-    "rolePanels": "YOUR_ROLE_PANELS_CHANNEL_ID_HERE"
+    "ticketTranscripts": "1485352031471272156",
+    "applications": "1492992155311145103",
+    "suggestions": "1492992359477153942",
+    "partnerships": "1485744805941084301",
+    "updates": "1485008114339283174",
+    "resources": "1494468216133521418",
+    "rolePanels": "1495134864687628318"
   },
-  "categories": {
-    "tickets": "YOUR_TICKETS_CATEGORY_ID_HERE"
+"categories": {
+    "tickets": "1485344810515562557"
   },
   "roles": {
-    "staff": "YOUR_STAFF_ROLE_ID_HERE",
-    "admin": "YOUR_ADMIN_ROLE_ID_HERE",
-    "moderator": "YOUR_MODERATOR_ROLE_ID_HERE",
-    "betaTester": "YOUR_BETA_TESTER_ROLE_ID_HERE",
+    "staff": "1495136039717703921",
+    "admin": "1485009683671552010",
+    "moderator": "1494456187993718804",
+    "betaTester": "1485237738277175457",
     "notifications": {
-      "updates": "YOUR_UPDATES_NOTIFICATION_ROLE_ID_HERE",
-      "resources": "YOUR_RESOURCES_NOTIFICATION_ROLE_ID_HERE",
-      "partnerships": "YOUR_PARTNERSHIPS_NOTIFICATION_ROLE_ID_HERE"
+      "updates": "1485745951451775211",
+      "resources": "1485745906539302972",
+      "partnerships": "1495136624122527875"
     }
   },
   "colors": {
@@ -31,7 +31,8 @@
     "success": "#57F287",
     "error": "#ED4245",
     "warning": "#FEE75C",
-    "info": "#00B0F4"
+    "info": "#00B0F4",
+    "flagAlert": "#FFA500"
   },
   "website": "https://howtoerlc.xyz"
 }
