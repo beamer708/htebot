@@ -1,5 +1,11 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, UserFlags } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, UserFlags, Collection } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 const config = require('../config.json');
+
+const invitesPath = path.join(__dirname, '..', 'data', 'invites.json');
+function readInvites() { try { return JSON.parse(fs.readFileSync(invitesPath, 'utf8')); } catch { return {}; } }
+function writeInvites(data) { fs.writeFileSync(invitesPath, JSON.stringify(data, null, 2)); }
 
 module.exports = {
   name: 'guildMemberAdd',
@@ -26,13 +32,54 @@ module.exports = {
         .setStyle(ButtonStyle.Link)
         .setURL(dashboardUrl);
 
-      const row = new ActionRowBuilder().addComponents(dashboardButton);
-
       await welcomeChannel.send({
         content: `Hey <@${member.id}>, welcome to **HowToERLC**! 👋 We're glad you're here.`,
         embeds: [welcomeEmbed],
-        components: [row],
+        components: [new ActionRowBuilder().addComponents(dashboardButton)],
       });
+    }
+
+    // ── Invite tracking — diff cached vs. fresh ──────────────────
+    let inviteCode = null;
+    let inviter = null;
+
+    try {
+      const cachedUses = client.inviteCache.get(member.guild.id) || new Collection();
+      const freshInvites = await member.guild.invites.fetch();
+
+      const usedInvite = freshInvites.find(inv => {
+        const before = cachedUses.get(inv.code);
+        return before !== undefined && inv.uses > before;
+      });
+
+      // Refresh the cache
+      client.inviteCache.set(
+        member.guild.id,
+        new Collection(freshInvites.map(inv => [inv.code, inv.uses]))
+      );
+
+      if (usedInvite) {
+        inviteCode = usedInvite.code;
+        inviter = usedInvite.inviter;
+      }
+    } catch {
+      // Missing MANAGE_GUILD or fetch failed — skip tracking
+    }
+
+    if (inviter) {
+      const invites = readInvites();
+      invites[member.id] = {
+        invitedUserId: member.id,
+        invitedUsername: member.user.tag,
+        inviterId: inviter.id,
+        inviterUsername: inviter.tag,
+        inviteCode,
+        joinedAt: new Date().toISOString(),
+        retained: false,
+        retentionCheckedAt: null,
+        leftAt: null,
+      };
+      writeInvites(invites);
     }
 
     // ── Advanced join log ────────────────────────────────────────
@@ -81,6 +128,14 @@ module.exports = {
     ];
     if (displayNameDifferent) {
       logFields.splice(1, 0, { name: 'Display Name', value: member.displayName, inline: true });
+    }
+
+    if (inviter) {
+      const retentionTs = Math.floor((Date.now() + 30 * 24 * 60 * 60 * 1000) / 1000);
+      logFields.push(
+        { name: 'Invited By', value: `<@${inviter.id}> (\`${inviteCode}\`)`, inline: true },
+        { name: 'Retention Check', value: `Scheduled for <t:${retentionTs}:F>`, inline: true },
+      );
     }
 
     const logEmbed = new EmbedBuilder()

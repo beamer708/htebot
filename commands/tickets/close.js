@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { closeTicket } = require('../../utils/ticketUtils');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -7,16 +8,6 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
   async execute(interaction, client) {
-    const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-    const btn = new ButtonBuilder()
-      .setCustomId('ticket:close')
-      .setLabel('🔒 Confirm Close')
-      .setStyle(ButtonStyle.Danger);
-
-    await interaction.reply({
-      content: 'Are you sure you want to close this ticket?',
-      components: [new ActionRowBuilder().addComponents(btn)],
-      ephemeral: false,
-    });
+    return closeTicket(interaction, client);
   },
 };
