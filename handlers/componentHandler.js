@@ -1,21 +1,24 @@
-const { EmbedBuilder } = require('discord.js');
+const {
+  EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder,
+  PermissionFlagsBits,
+} = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const config = require('../config.json');
+const {
+  readTickets, writeTickets, getNextTicketNumber, formatTicketId,
+  fetchAllMessages, buildTranscript, postTranscript, closeTicket, claimTicket,
+} = require('../utils/ticketUtils');
 
 const dataPath = (file) => path.join(__dirname, '..', 'data', file);
 
-function readJSON(file) {
-  try {
-    return JSON.parse(fs.readFileSync(dataPath(file), 'utf8'));
-  } catch {
-    return [];
-  }
-}
+function readJSON(file)        { try { return JSON.parse(fs.readFileSync(dataPath(file), 'utf8')); } catch { return []; } }
+function writeJSON(file, data) { fs.writeFileSync(dataPath(file), JSON.stringify(data, null, 2)); }
 
-function writeJSON(file, data) {
-  fs.writeFileSync(dataPath(file), JSON.stringify(data, null, 2));
-}
+const invitesPath = dataPath('invites.json');
+function readInvites() { try { return JSON.parse(fs.readFileSync(invitesPath, 'utf8')); } catch { return {}; } }
+function writeInvites(d) { fs.writeFileSync(invitesPath, JSON.stringify(d, null, 2)); }
 
 async function dmUser(client, userId, embed) {
   try {
@@ -45,7 +48,7 @@ async function handleApplicationButton(interaction, client) {
   const accepted = action === 'accept';
   const staffName = interaction.user.username;
 
-  applications[idx].status = accepted ? 'accepted' : 'denied';
+  applications[idx].status     = accepted ? 'accepted' : 'denied';
   applications[idx].reviewedBy = staffName;
   applications[idx].reviewedAt = new Date().toISOString();
   writeJSON('applications.json', applications);
@@ -82,7 +85,7 @@ async function handleSuggestionButton(interaction, client) {
     const userId = interaction.user.id;
     if (!suggestions[idx].votes) suggestions[idx].votes = { up: [], down: [] };
 
-    const upIdx = suggestions[idx].votes.up.indexOf(userId);
+    const upIdx   = suggestions[idx].votes.up.indexOf(userId);
     const downIdx = suggestions[idx].votes.down.indexOf(userId);
 
     if (action === 'upvote') {
@@ -102,8 +105,7 @@ async function handleSuggestionButton(interaction, client) {
     }
 
     writeJSON('suggestions.json', suggestions);
-
-    const up = suggestions[idx].votes.up.length;
+    const up   = suggestions[idx].votes.up.length;
     const down = suggestions[idx].votes.down.length;
 
     const updatedEmbed = EmbedBuilder.from(interaction.message.embeds[0]);
@@ -118,6 +120,7 @@ async function handleSuggestionButton(interaction, client) {
     return interaction.update({ embeds: [updatedEmbed] });
   }
 
+  // Approve / decline (staff only)
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
     member.roles.cache.has(config.roles.staff) ||
@@ -128,8 +131,7 @@ async function handleSuggestionButton(interaction, client) {
 
   const accepted = action === 'approve';
   const staffName = interaction.user.username;
-
-  suggestions[idx].status = accepted ? 'approved' : 'declined';
+  suggestions[idx].status     = accepted ? 'approved' : 'declined';
   suggestions[idx].reviewedBy = staffName;
   suggestions[idx].reviewedAt = new Date().toISOString();
   writeJSON('suggestions.json', suggestions);
@@ -170,8 +172,7 @@ async function handlePartnershipButton(interaction, client) {
   const partnership = partnerships[idx];
   const accepted = action === 'approve';
   const staffName = interaction.user.username;
-
-  partnerships[idx].status = accepted ? 'approved' : 'denied';
+  partnerships[idx].status     = accepted ? 'approved' : 'denied';
   partnerships[idx].reviewedBy = staffName;
   partnerships[idx].reviewedAt = new Date().toISOString();
   writeJSON('partnerships.json', partnerships);
@@ -194,71 +195,162 @@ async function handlePartnershipButton(interaction, client) {
   await interaction.update({ embeds: [reviewedEmbed], components: [] });
 }
 
-// ── Ticket buttons (Create / Close) ───────────────────────────────────────────
+// ── Ticket buttons (Create / Close / Claim / Transcript) ─────────────────────
 async function handleTicketButton(interaction, client) {
   const [, action] = interaction.customId.split(':');
 
   if (action === 'create') {
-    const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
     const modal = new ModalBuilder()
       .setCustomId('ticket_modal')
       .setTitle('Open a Support Ticket');
 
-    const reasonInput = new TextInputBuilder()
-      .setCustomId('ticket_reason')
-      .setLabel('What do you need help with?')
-      .setStyle(TextInputStyle.Paragraph)
-      .setPlaceholder('Describe your issue in detail...')
-      .setRequired(true)
-      .setMaxLength(1000);
-
-    modal.addComponents(new ActionRowBuilder().addComponents(reasonInput));
+    modal.addComponents(
+      new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+          .setCustomId('ticket_subject')
+          .setLabel('Subject')
+          .setStyle(TextInputStyle.Short)
+          .setPlaceholder('Brief summary of your issue')
+          .setRequired(true)
+          .setMaxLength(100)
+      ),
+      new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+          .setCustomId('ticket_description')
+          .setLabel('Description')
+          .setStyle(TextInputStyle.Paragraph)
+          .setPlaceholder('Describe your issue in as much detail as possible')
+          .setRequired(true)
+          .setMaxLength(1000)
+      ),
+      new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+          .setCustomId('ticket_priority')
+          .setLabel('Priority')
+          .setStyle(TextInputStyle.Short)
+          .setPlaceholder('Low / Medium / High')
+          .setRequired(false)
+          .setMaxLength(10)
+      ),
+    );
     return interaction.showModal(modal);
   }
 
-  if (action === 'close') {
-    const ticketsData = JSON.parse(fs.readFileSync(dataPath('tickets.json'), 'utf8') || '{}');
-    const ticket = Object.values(ticketsData).find(t => t.channelId === interaction.channel.id && t.status === 'open');
+  if (action === 'close')      return closeTicket(interaction, client);
+  if (action === 'claim')      return claimTicket(interaction, client);
+  if (action === 'transcript') return handleTicketTranscript(interaction, client);
+}
 
-    if (!ticket) return interaction.reply({ content: 'No open ticket found for this channel.', ephemeral: true });
-
-    const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
-    const isStaff = member && (
-      member.roles.cache.has(config.roles.staff) ||
-      member.roles.cache.has(config.roles.admin) ||
-      member.permissions.has('ManageChannels')
-    );
-    const isOwner = ticket.userId === interaction.user.id;
-
-    if (!isStaff && !isOwner) {
-      return interaction.reply({ content: 'Only the ticket creator or staff can close this ticket.', ephemeral: true });
-    }
-
-    await interaction.reply({ content: 'Closing ticket in 5 seconds...' });
-
-    ticketsData[ticket.id].status = 'closed';
-    ticketsData[ticket.id].closedAt = new Date().toISOString();
-    ticketsData[ticket.id].closedBy = interaction.user.username;
-    fs.writeFileSync(dataPath('tickets.json'), JSON.stringify(ticketsData, null, 2));
-
-    const transcriptChannel = interaction.guild.channels.cache.get(config.channels.ticketTranscripts);
-    if (transcriptChannel) {
-      const transcriptEmbed = new EmbedBuilder()
-        .setColor(config.colors.info)
-        .setTitle('Ticket Closed')
-        .addFields(
-          { name: 'Ticket ID', value: ticket.id, inline: true },
-          { name: 'Opened By', value: `<@${ticket.userId}>`, inline: true },
-          { name: 'Closed By', value: interaction.user.username, inline: true },
-          { name: 'Reason', value: ticket.reason || 'No reason provided', inline: false },
-        )
-        .setFooter({ text: 'HowToERLC Support' })
-        .setTimestamp();
-      await transcriptChannel.send({ embeds: [transcriptEmbed] });
-    }
-
-    setTimeout(() => interaction.channel.delete().catch(() => {}), 5000);
+async function handleTicketTranscript(interaction, client) {
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  const isStaff = member && (
+    member.roles.cache.has(config.roles.staff) ||
+    member.roles.cache.has(config.roles.admin) ||
+    member.permissions.has('ManageChannels')
+  );
+  if (!isStaff) {
+    return interaction.reply({ content: 'Only staff can generate transcripts.', ephemeral: true });
   }
+
+  const ticketsData = readTickets();
+  const ticket = Object.values(ticketsData).find(t => t.channelId === interaction.channel.id);
+  if (!ticket) {
+    return interaction.reply({ content: 'No ticket found for this channel.', ephemeral: true });
+  }
+
+  await interaction.deferReply({ ephemeral: true });
+
+  const messages = await fetchAllMessages(interaction.channel).catch(() => []);
+  const transcriptText = buildTranscript(ticket, messages);
+  const attachment = new AttachmentBuilder(Buffer.from(transcriptText), { name: `${ticket.id}.txt` });
+
+  await interaction.editReply({
+    content: `Transcript for **${ticket.id}** (${messages.length} messages):`,
+    files: [attachment],
+  });
+
+  const closedBy = ticket.closedBy || interaction.user.tag;
+  await postTranscript(interaction.guild, ticket, messages, closedBy);
+}
+
+// ── Ticket modal submit ───────────────────────────────────────────────────────
+async function handleTicketModal(interaction, client) {
+  const subject     = interaction.fields.getTextInputValue('ticket_subject');
+  const description = interaction.fields.getTextInputValue('ticket_description');
+  const priorityRaw = interaction.fields.getTextInputValue('ticket_priority').trim();
+  const priority    = ['low', 'medium', 'high'].includes(priorityRaw.toLowerCase())
+    ? priorityRaw.charAt(0).toUpperCase() + priorityRaw.slice(1).toLowerCase()
+    : 'Medium';
+
+  const guild = interaction.guild;
+  const user  = interaction.user;
+
+  const ticketsData = readTickets();
+
+  const existing = Object.values(ticketsData).find(
+    t => t.userId === user.id && t.status !== 'closed'
+  );
+  if (existing) {
+    return interaction.reply({
+      content: `You already have an open ticket: <#${existing.channelId}>`,
+      ephemeral: true,
+    });
+  }
+
+  const ticketNum = getNextTicketNumber(ticketsData);
+  const ticketId  = formatTicketId(ticketNum);
+
+  const channel = await guild.channels.create({
+    name: ticketId,
+    parent: config.categories.tickets || null,
+    permissionOverwrites: [
+      { id: guild.id,           deny:  [PermissionFlagsBits.ViewChannel] },
+      { id: user.id,            allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages,
+                                        PermissionFlagsBits.AttachFiles,  PermissionFlagsBits.ReadMessageHistory] },
+      { id: config.roles.staff, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages,
+                                        PermissionFlagsBits.AttachFiles,  PermissionFlagsBits.ReadMessageHistory,
+                                        PermissionFlagsBits.ManageMessages] },
+    ],
+  });
+
+  const now = new Date().toISOString();
+  ticketsData[ticketId] = {
+    id: ticketId, number: ticketNum, channelId: channel.id,
+    userId: user.id, username: user.tag,
+    subject, description, priority,
+    status: 'open', claimedBy: null, claimedAt: null,
+    openedAt: now, closedAt: null, closedBy: null, messages: [],
+  };
+  writeTickets(ticketsData);
+
+  const ticketEmbed = new EmbedBuilder()
+    .setColor(config.colors.primary)
+    .setTitle(`Ticket #${String(ticketNum).padStart(4, '0')} — ${subject}`)
+    .setDescription(description)
+    .addFields(
+      { name: 'Opened By', value: `<@${user.id}> (${user.id})`,                             inline: true },
+      { name: 'Priority',  value: priority,                                                   inline: true },
+      { name: 'Opened At', value: `<t:${Math.floor(new Date(now).getTime() / 1000)}:F>`,     inline: true },
+      { name: 'Ticket ID', value: ticketId,                                                   inline: true },
+    )
+    .setFooter({ text: 'HowToERLC Support — use the buttons below to manage this ticket' })
+    .setTimestamp();
+
+  const row1 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('ticket:close').setLabel('Close Ticket').setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId('ticket:claim').setLabel('Claim Ticket').setStyle(ButtonStyle.Primary),
+  );
+  const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('ticket:transcript').setLabel('Transcript').setStyle(ButtonStyle.Secondary),
+  );
+
+  await channel.send({
+    content: `<@${user.id}> <@&${config.roles.staff}> — New ticket opened`,
+    embeds: [ticketEmbed],
+    components: [row1, row2],
+  });
+
+  await interaction.reply({ content: `Your ticket has been created: ${channel}`, ephemeral: true });
 }
 
 // ── Role panel buttons ────────────────────────────────────────────────────────
@@ -273,69 +365,6 @@ async function handleRolePanelButton(interaction) {
     await member.roles.add(roleId);
     return interaction.reply({ content: `Added role <@&${roleId}>.`, ephemeral: true });
   }
-}
-
-// ── Ticket modal submit ───────────────────────────────────────────────────────
-async function handleTicketModal(interaction, client) {
-  const reason = interaction.fields.getTextInputValue('ticket_reason');
-  const guild = interaction.guild;
-  const user = interaction.user;
-
-  const ticketsData = JSON.parse(fs.readFileSync(dataPath('tickets.json'), 'utf8') || '{}');
-
-  const existing = Object.values(ticketsData).find(t => t.userId === user.id && t.status === 'open');
-  if (existing) {
-    return interaction.reply({
-      content: `You already have an open ticket: <#${existing.channelId}>`,
-      ephemeral: true,
-    });
-  }
-
-  const ticketId = `ticket-${Date.now()}`;
-  const { PermissionFlagsBits } = require('discord.js');
-
-  const channel = await guild.channels.create({
-    name: `ticket-${user.username}`,
-    parent: config.categories.tickets || null,
-    permissionOverwrites: [
-      { id: guild.id, deny: [PermissionFlagsBits.ViewChannel] },
-      { id: user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
-      { id: config.roles.staff, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
-    ],
-  });
-
-  ticketsData[ticketId] = {
-    id: ticketId,
-    channelId: channel.id,
-    userId: user.id,
-    username: user.username,
-    reason,
-    status: 'open',
-    createdAt: new Date().toISOString(),
-  };
-  fs.writeFileSync(dataPath('tickets.json'), JSON.stringify(ticketsData, null, 2));
-
-  const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-  const ticketEmbed = new EmbedBuilder()
-    .setColor(config.colors.primary)
-    .setTitle('Support Ticket')
-    .setDescription(`Hello <@${user.id}>. A staff member will be with you shortly.\n\n**Your issue:** ${reason}`)
-    .addFields({ name: 'Opened', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true })
-    .setFooter({ text: 'HowToERLC Support — use the button below to close this ticket' })
-    .setTimestamp();
-
-  const closeBtn = new ButtonBuilder()
-    .setCustomId('ticket:close')
-    .setLabel('Close Ticket')
-    .setStyle(ButtonStyle.Danger);
-
-  await channel.send({
-    content: `<@${user.id}> <@&${config.roles.staff}>`,
-    embeds: [ticketEmbed],
-    components: [new ActionRowBuilder().addComponents(closeBtn)],
-  });
-
-  await interaction.reply({ content: `Your ticket has been created: ${channel}`, ephemeral: true });
 }
 
 // ── Dashboard info select menu ────────────────────────────────────────────────
@@ -415,16 +444,34 @@ async function handleRoleSelect(interaction) {
   await interaction.reply({ content: `Your notification roles have been updated.\n${lines.join('\n')}`, ephemeral: true });
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
+// ── Invite reset confirm button ──────────────────────────────────────────────
+async function handleInviteResetButton(interaction) {
+  const targetId = interaction.customId.split(':')[1];
+  const invites  = readInvites();
+
+  for (const [key, entry] of Object.entries(invites)) {
+    if (entry.inviterId === targetId) delete invites[key];
+  }
+  writeInvites(invites);
+
+  await interaction.update({
+    content: `All tracked invite records for <@${targetId}> have been reset.`,
+    embeds: [],
+    components: [],
+  });
+}
+
+// ── Main router ───────────────────────────────────────────────────────────────
 module.exports = async (interaction, client) => {
   try {
     if (interaction.isButton()) {
       const prefix = interaction.customId.split(':')[0];
-      if (prefix === 'app') return handleApplicationButton(interaction, client);
-      if (prefix === 'suggestion') return handleSuggestionButton(interaction, client);
+      if (prefix === 'app')         return handleApplicationButton(interaction, client);
+      if (prefix === 'suggestion')  return handleSuggestionButton(interaction, client);
       if (prefix === 'partnership') return handlePartnershipButton(interaction, client);
-      if (prefix === 'ticket') return handleTicketButton(interaction, client);
-      if (prefix === 'role') return handleRolePanelButton(interaction);
+      if (prefix === 'ticket')      return handleTicketButton(interaction, client);
+      if (prefix === 'role')        return handleRolePanelButton(interaction);
+      if (prefix === 'invitereset') return handleInviteResetButton(interaction);
     }
 
     if (interaction.isStringSelectMenu()) {
