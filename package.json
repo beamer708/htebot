@@ -4,7 +4,7 @@
   "description": "Official Discord bot for the HowToERLC community — ERLC server management, support tickets, staff applications, suggestions, partnerships, and more.",
   "main": "index.js",
   "scripts": {
-    "start": "node deploy-commands.js && node index.js",
+    "start": "node index.js",
     "deploy": "node deploy-commands.js"
   },
   "dependencies": {
