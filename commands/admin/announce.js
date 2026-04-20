@@ -21,14 +21,14 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.primary)
-      .setTitle(`📢 ${title}`)
+      .setTitle(title)
       .setDescription(message)
-      .setAuthor({ name: 'HowToERLC Announcement', iconURL: interaction.guild.iconURL() })
-      .setFooter({ text: `Posted by ${interaction.user.tag} • HowToERLC` })
+      .setAuthor({ name: 'HowToERLC', iconURL: interaction.guild.iconURL() })
+      .setFooter({ text: `Posted by ${interaction.user.username} — HowToERLC` })
       .setTimestamp();
 
     const content = pingRole ? `<@&${pingRole}>` : '';
     await targetChannel.send({ content, embeds: [embed] });
-    await interaction.reply({ content: `✅ Announcement posted in ${targetChannel}.`, ephemeral: true });
+    await interaction.reply({ content: `Announcement posted in ${targetChannel}.`, ephemeral: true });
   },
 };

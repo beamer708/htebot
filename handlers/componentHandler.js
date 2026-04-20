@@ -22,44 +22,54 @@ async function dmUser(client, userId, embed) {
     const user = await client.users.fetch(userId);
     await user.send({ embeds: [embed] });
   } catch {
-    // User has DMs disabled — silently ignore
+    // User has DMs disabled
   }
 }
 
+// ── Application buttons (Accept / Deny) ───────────────────────────────────────
 async function handleApplicationButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const applications = readJSON('applications.json');
   const idx = applications.findIndex(a => a.id === submissionId);
   if (idx === -1) return interaction.reply({ content: 'Application not found.', ephemeral: true });
 
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  const isStaff = member && (
+    member.roles.cache.has(config.roles.staff) ||
+    member.roles.cache.has(config.roles.admin) ||
+    member.permissions.has('ManageGuild')
+  );
+  if (!isStaff) return interaction.reply({ content: 'Only staff can review applications.', ephemeral: true });
+
   const app = applications[idx];
-  const staffTag = interaction.user.tag;
   const accepted = action === 'accept';
+  const staffName = interaction.user.username;
 
   applications[idx].status = accepted ? 'accepted' : 'denied';
-  applications[idx].reviewedBy = staffTag;
+  applications[idx].reviewedBy = staffName;
   applications[idx].reviewedAt = new Date().toISOString();
   writeJSON('applications.json', applications);
 
   const resultEmbed = new EmbedBuilder()
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setTitle(accepted ? '✅ Application Accepted' : '❌ Application Denied')
+    .setTitle(accepted ? 'Application Accepted' : 'Application Denied')
     .setDescription(accepted
-      ? `Your staff application for the **HowToERLC** Discord has been **accepted**!\nA staff member will be in touch with further steps.`
-      : `Your staff application for the **HowToERLC** Discord has been **denied**.\nYou may re-apply in the future.`)
+      ? 'Your staff application for **HowToERLC** has been accepted. A staff member will be in touch with further steps.'
+      : 'Your staff application for **HowToERLC** has been denied. You are welcome to re-apply in the future.')
     .addFields({ name: 'Role Applied For', value: app.roleApplying || 'Unknown' })
-    .setFooter({ text: `Reviewed by ${staffTag}` })
+    .setFooter({ text: `Reviewed by ${staffName} — HowToERLC` })
     .setTimestamp();
 
   await dmUser(client, app.discordId, resultEmbed);
 
   const reviewedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setFooter({ text: `${accepted ? 'Accepted' : 'Denied'} by ${staffTag} • ${new Date().toLocaleString()}` });
+    .setFooter({ text: `${accepted ? 'Accepted' : 'Denied'} by ${staffName} — ${new Date().toLocaleString()}` });
 
   await interaction.update({ embeds: [reviewedEmbed], components: [] });
 }
 
+// ── Suggestion buttons (Upvote / Downvote / Approve / Decline) ───────────────
 async function handleSuggestionButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const suggestions = readJSON('suggestions.json');
@@ -98,17 +108,16 @@ async function handleSuggestionButton(interaction, client) {
 
     const updatedEmbed = EmbedBuilder.from(interaction.message.embeds[0]);
     const fields = updatedEmbed.data.fields || [];
-    const voteFieldIdx = fields.findIndex(f => f.name === '📊 Votes');
+    const voteFieldIdx = fields.findIndex(f => f.name === 'Votes');
     if (voteFieldIdx !== -1) {
-      fields[voteFieldIdx].value = `👍 ${up}  •  👎 ${down}`;
+      fields[voteFieldIdx].value = `${up} up  •  ${down} down`;
     } else {
-      fields.push({ name: '📊 Votes', value: `👍 ${up}  •  👎 ${down}`, inline: false });
+      fields.push({ name: 'Votes', value: `${up} up  •  ${down} down`, inline: false });
     }
 
     return interaction.update({ embeds: [updatedEmbed] });
   }
 
-  // Approve or decline (staff only)
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
     member.roles.cache.has(config.roles.staff) ||
@@ -118,31 +127,32 @@ async function handleSuggestionButton(interaction, client) {
   if (!isStaff) return interaction.reply({ content: 'Only staff can approve or decline suggestions.', ephemeral: true });
 
   const accepted = action === 'approve';
-  const staffTag = interaction.user.tag;
+  const staffName = interaction.user.username;
 
   suggestions[idx].status = accepted ? 'approved' : 'declined';
-  suggestions[idx].reviewedBy = staffTag;
+  suggestions[idx].reviewedBy = staffName;
   suggestions[idx].reviewedAt = new Date().toISOString();
   writeJSON('suggestions.json', suggestions);
 
   const resultEmbed = new EmbedBuilder()
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setTitle(accepted ? '✅ Suggestion Approved' : '❌ Suggestion Declined')
+    .setTitle(accepted ? 'Suggestion Approved' : 'Suggestion Declined')
     .setDescription(accepted
-      ? `Your suggestion **"${suggestion.title}"** has been **approved** by the HowToERLC staff team!`
-      : `Your suggestion **"${suggestion.title}"** has been **declined** by the HowToERLC staff team.`)
-    .setFooter({ text: `Reviewed by ${staffTag}` })
+      ? `Your suggestion **"${suggestion.title}"** has been approved by the HowToERLC staff team.`
+      : `Your suggestion **"${suggestion.title}"** has been declined by the HowToERLC staff team.`)
+    .setFooter({ text: `Reviewed by ${staffName} — HowToERLC` })
     .setTimestamp();
 
   await dmUser(client, suggestion.discordId, resultEmbed);
 
   const reviewedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setFooter({ text: `${accepted ? 'Approved' : 'Declined'} by ${staffTag} • ${new Date().toLocaleString()}` });
+    .setFooter({ text: `${accepted ? 'Approved' : 'Declined'} by ${staffName} — ${new Date().toLocaleString()}` });
 
   await interaction.update({ embeds: [reviewedEmbed], components: [] });
 }
 
+// ── Partnership buttons (Approve / Deny) ──────────────────────────────────────
 async function handlePartnershipButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const partnerships = readJSON('partnerships.json');
@@ -159,31 +169,32 @@ async function handlePartnershipButton(interaction, client) {
 
   const partnership = partnerships[idx];
   const accepted = action === 'approve';
-  const staffTag = interaction.user.tag;
+  const staffName = interaction.user.username;
 
   partnerships[idx].status = accepted ? 'approved' : 'denied';
-  partnerships[idx].reviewedBy = staffTag;
+  partnerships[idx].reviewedBy = staffName;
   partnerships[idx].reviewedAt = new Date().toISOString();
   writeJSON('partnerships.json', partnerships);
 
   const resultEmbed = new EmbedBuilder()
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setTitle(accepted ? '🤝 Partnership Approved' : '❌ Partnership Denied')
+    .setTitle(accepted ? 'Partnership Approved' : 'Partnership Denied')
     .setDescription(accepted
-      ? `Your partnership request for **${partnership.serverName}** has been **approved** by HowToERLC!\nA staff member will reach out with next steps.`
-      : `Your partnership request for **${partnership.serverName}** has been **denied** by HowToERLC.`)
-    .setFooter({ text: `Reviewed by ${staffTag}` })
+      ? `Your partnership request for **${partnership.serverName}** has been approved by HowToERLC. A staff member will reach out with next steps.`
+      : `Your partnership request for **${partnership.serverName}** has been denied by HowToERLC.`)
+    .setFooter({ text: `Reviewed by ${staffName} — HowToERLC` })
     .setTimestamp();
 
   if (partnership.contactId) await dmUser(client, partnership.contactId, resultEmbed);
 
   const reviewedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setFooter({ text: `${accepted ? 'Approved' : 'Denied'} by ${staffTag} • ${new Date().toLocaleString()}` });
+    .setFooter({ text: `${accepted ? 'Approved' : 'Denied'} by ${staffName} — ${new Date().toLocaleString()}` });
 
   await interaction.update({ embeds: [reviewedEmbed], components: [] });
 }
 
+// ── Ticket buttons (Create / Close) ───────────────────────────────────────────
 async function handleTicketButton(interaction, client) {
   const [, action] = interaction.customId.split(':');
 
@@ -191,7 +202,7 @@ async function handleTicketButton(interaction, client) {
     const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
     const modal = new ModalBuilder()
       .setCustomId('ticket_modal')
-      .setTitle('Create a Support Ticket');
+      .setTitle('Open a Support Ticket');
 
     const reasonInput = new TextInputBuilder()
       .setCustomId('ticket_reason')
@@ -223,24 +234,25 @@ async function handleTicketButton(interaction, client) {
       return interaction.reply({ content: 'Only the ticket creator or staff can close this ticket.', ephemeral: true });
     }
 
-    await interaction.reply({ content: '🔒 Closing ticket in 5 seconds...' });
+    await interaction.reply({ content: 'Closing ticket in 5 seconds...' });
 
     ticketsData[ticket.id].status = 'closed';
     ticketsData[ticket.id].closedAt = new Date().toISOString();
-    ticketsData[ticket.id].closedBy = interaction.user.tag;
+    ticketsData[ticket.id].closedBy = interaction.user.username;
     fs.writeFileSync(dataPath('tickets.json'), JSON.stringify(ticketsData, null, 2));
 
     const transcriptChannel = interaction.guild.channels.cache.get(config.channels.ticketTranscripts);
     if (transcriptChannel) {
       const transcriptEmbed = new EmbedBuilder()
         .setColor(config.colors.info)
-        .setTitle('🎫 Ticket Closed')
+        .setTitle('Ticket Closed')
         .addFields(
           { name: 'Ticket ID', value: ticket.id, inline: true },
           { name: 'Opened By', value: `<@${ticket.userId}>`, inline: true },
-          { name: 'Closed By', value: interaction.user.tag, inline: true },
+          { name: 'Closed By', value: interaction.user.username, inline: true },
           { name: 'Reason', value: ticket.reason || 'No reason provided', inline: false },
         )
+        .setFooter({ text: 'HowToERLC Support' })
         .setTimestamp();
       await transcriptChannel.send({ embeds: [transcriptEmbed] });
     }
@@ -249,19 +261,21 @@ async function handleTicketButton(interaction, client) {
   }
 }
 
+// ── Role panel buttons ────────────────────────────────────────────────────────
 async function handleRolePanelButton(interaction) {
   const [, roleId] = interaction.customId.split(':');
   const member = interaction.member;
 
   if (member.roles.cache.has(roleId)) {
     await member.roles.remove(roleId);
-    return interaction.reply({ content: `✅ Removed role <@&${roleId}>.`, ephemeral: true });
+    return interaction.reply({ content: `Removed role <@&${roleId}>.`, ephemeral: true });
   } else {
     await member.roles.add(roleId);
-    return interaction.reply({ content: `✅ Added role <@&${roleId}>.`, ephemeral: true });
+    return interaction.reply({ content: `Added role <@&${roleId}>.`, ephemeral: true });
   }
 }
 
+// ── Ticket modal submit ───────────────────────────────────────────────────────
 async function handleTicketModal(interaction, client) {
   const reason = interaction.fields.getTextInputValue('ticket_reason');
   const guild = interaction.guild;
@@ -294,7 +308,7 @@ async function handleTicketModal(interaction, client) {
     id: ticketId,
     channelId: channel.id,
     userId: user.id,
-    username: user.tag,
+    username: user.username,
     reason,
     status: 'open',
     createdAt: new Date().toISOString(),
@@ -304,14 +318,15 @@ async function handleTicketModal(interaction, client) {
   const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
   const ticketEmbed = new EmbedBuilder()
     .setColor(config.colors.primary)
-    .setTitle('🎫 Support Ticket')
-    .setDescription(`Hello <@${user.id}>! A staff member will be with you shortly.\n\n**Your reason:** ${reason}`)
-    .setFooter({ text: 'HowToERLC Support • Use the button below to close this ticket' })
+    .setTitle('Support Ticket')
+    .setDescription(`Hello <@${user.id}>. A staff member will be with you shortly.\n\n**Your issue:** ${reason}`)
+    .addFields({ name: 'Opened', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true })
+    .setFooter({ text: 'HowToERLC Support — use the button below to close this ticket' })
     .setTimestamp();
 
   const closeBtn = new ButtonBuilder()
     .setCustomId('ticket:close')
-    .setLabel('🔒 Close Ticket')
+    .setLabel('Close Ticket')
     .setStyle(ButtonStyle.Danger);
 
   await channel.send({
@@ -320,9 +335,87 @@ async function handleTicketModal(interaction, client) {
     components: [new ActionRowBuilder().addComponents(closeBtn)],
   });
 
-  await interaction.reply({ content: `✅ Your ticket has been created: ${channel}`, ephemeral: true });
+  await interaction.reply({ content: `Your ticket has been created: ${channel}`, ephemeral: true });
 }
 
+// ── Dashboard info select menu ────────────────────────────────────────────────
+const INFO_EMBEDS = {
+  info_guidelines: {
+    title: 'Community Guidelines',
+    description: 'We expect all members to treat each other and staff with respect. Harassment, hate speech, and discrimination of any kind are not tolerated. Keep all content relevant to ERLC community building — off-topic discussions belong in designated channels. Spam and unsolicited self-promotion are not permitted. All members must comply with Discord\'s Terms of Service at all times. Staff decisions are final, and repeated violations will result in removal from the server.',
+  },
+  info_advertising: {
+    title: 'Advertising Rules',
+    description: 'Server advertisements are permitted in the designated channels only, and must be directly related to ERLC or Roblox emergency services communities. Each server may post one advertisement per 24-hour period. Direct recruiting of members from this server is strictly prohibited. All advertisements must include a valid Discord invite link. Paid or sponsored promotions must be clearly disclosed. Staff reserve the right to remove any advertisement at their discretion without notice.',
+  },
+  info_partnerships: {
+    title: 'Partnership Guidelines',
+    description: 'Partnerships are open to active ERLC-related Discord servers that align with our community values. Your server must be active and have an established member base. Partnership includes cross-promotion and access to shared resources. Applications must be submitted through the website at howtoerlc.xyz — direct requests via DM will not be considered. Partners are expected to maintain community standards consistent with our own, and partnerships may be revoked if those standards are not upheld.',
+  },
+  info_tos: {
+    title: 'Terms of Service',
+    description: 'By participating in the HowToERLC Discord server and using the website at howtoerlc.xyz, you agree to these terms. Content submitted through website forms — including applications, suggestions, and partnership requests — may be used to improve our services. We reserve the right to remove access for any user who violates our guidelines or Discord\'s Terms of Service. Full terms are available at howtoerlc.xyz. Discord\'s own Terms of Service apply at all times and take precedence.',
+  },
+  info_mission: {
+    title: 'Our Mission',
+    description: 'HowToERLC exists to give every ERLC community owner the tools, knowledge, and support they need to build something great. From department structures to livery design, web presence to staff management — we cover it all, for free.\n\nWe believe that well-run ERLC communities make the game better for everyone. Our goal is to lower the barrier to building one, so that anyone with the drive can create a community they\'re proud of.',
+    footer: 'HowToERLC — Est. 2024',
+  },
+};
+
+async function handleDashboardSelect(interaction) {
+  const value = interaction.values[0];
+  const data = INFO_EMBEDS[value];
+  if (!data) return interaction.reply({ content: 'Unknown option.', ephemeral: true });
+
+  const embed = new EmbedBuilder()
+    .setColor(config.colors.primary)
+    .setTitle(data.title)
+    .setDescription(data.description)
+    .setFooter({ text: data.footer || 'HowToERLC' });
+
+  await interaction.reply({ embeds: [embed], ephemeral: true });
+}
+
+// ── Notification role select menu ─────────────────────────────────────────────
+async function handleRoleSelect(interaction) {
+  const selectedValues = interaction.values;
+  const allNotifRoles = [
+    config.roles.notifications.updates,
+    config.roles.notifications.resources,
+    config.roles.notifications.partnerships,
+  ].filter(Boolean);
+
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  if (!member) return interaction.reply({ content: 'Could not fetch your member data.', ephemeral: true });
+
+  const added = [];
+  const removed = [];
+
+  for (const roleId of allNotifRoles) {
+    const hasRole = member.roles.cache.has(roleId);
+    const wantsRole = selectedValues.includes(roleId);
+    const role = interaction.guild.roles.cache.get(roleId);
+    const roleName = role ? role.name : roleId;
+
+    if (wantsRole && !hasRole) {
+      await member.roles.add(roleId).catch(() => {});
+      added.push(roleName);
+    } else if (!wantsRole && hasRole) {
+      await member.roles.remove(roleId).catch(() => {});
+      removed.push(roleName);
+    }
+  }
+
+  const lines = [];
+  if (added.length) lines.push(`Added: ${added.join(', ')}`);
+  if (removed.length) lines.push(`Removed: ${removed.join(', ')}`);
+  if (!lines.length) lines.push('No changes made.');
+
+  await interaction.reply({ content: `Your notification roles have been updated.\n${lines.join('\n')}`, ephemeral: true });
+}
+
+// ── Main export ───────────────────────────────────────────────────────────────
 module.exports = async (interaction, client) => {
   try {
     if (interaction.isButton()) {
@@ -332,6 +425,11 @@ module.exports = async (interaction, client) => {
       if (prefix === 'partnership') return handlePartnershipButton(interaction, client);
       if (prefix === 'ticket') return handleTicketButton(interaction, client);
       if (prefix === 'role') return handleRolePanelButton(interaction);
+    }
+
+    if (interaction.isStringSelectMenu()) {
+      if (interaction.customId === 'dashboard:info') return handleDashboardSelect(interaction);
+      if (interaction.customId === 'rolepanel:notifications') return handleRoleSelect(interaction);
     }
 
     if (interaction.isModalSubmit()) {

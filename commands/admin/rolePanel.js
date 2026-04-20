@@ -16,14 +16,14 @@ module.exports = {
     const roleIds = interaction.options.getString('roles').split(',').map(r => r.trim()).filter(Boolean);
 
     if (roleIds.length > 5) {
-      return interaction.reply({ content: '❌ Maximum 5 roles per panel.', ephemeral: true });
+      return interaction.reply({ content: 'Maximum 5 roles per panel.', ephemeral: true });
     }
 
     const buttons = [];
     for (const roleId of roleIds) {
       const role = interaction.guild.roles.cache.get(roleId);
       if (!role) {
-        return interaction.reply({ content: `❌ Role ID \`${roleId}\` not found.`, ephemeral: true });
+        return interaction.reply({ content: `Role ID \`${roleId}\` not found.`, ephemeral: true });
       }
       buttons.push(
         new ButtonBuilder()
@@ -37,10 +37,10 @@ module.exports = {
       .setColor(config.colors.primary)
       .setTitle(title)
       .setDescription(`${description}\n\nClick a button below to add or remove a role.`)
-      .setFooter({ text: 'HowToERLC • Click to toggle a role' });
+      .setFooter({ text: 'HowToERLC' });
 
     const row = new ActionRowBuilder().addComponents(buttons);
     await interaction.channel.send({ embeds: [embed], components: [row] });
-    await interaction.reply({ content: '✅ Role panel created.', ephemeral: true });
+    await interaction.reply({ content: 'Role panel created.', ephemeral: true });
   },
 };

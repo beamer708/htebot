@@ -6,7 +6,7 @@ const config = require('../../config.json');
 const logsPath = path.join(__dirname, '..', '..', 'data', 'warnings.json');
 function readLogs() { try { return JSON.parse(fs.readFileSync(logsPath, 'utf8')); } catch { return {}; } }
 
-const TYPE_ICONS = { warn: '⚠️', mute: '🔇', kick: '👢', ban: '🔨' };
+const TYPE_LABELS = { warn: 'WARN', mute: 'MUTE', kick: 'KICK', ban: 'BAN' };
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -34,9 +34,9 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle(`📋 Mod Logs — ${target.tag}`)
+      .setTitle(`Mod Logs — ${target.username}`)
       .setThumbnail(target.displayAvatarURL())
-      .setFooter({ text: `HowToERLC Moderation • ${entries.length} record(s)` })
+      .setFooter({ text: `HowToERLC Moderation — ${entries.length} record(s)` })
       .setTimestamp();
 
     if (entries.length === 0) {
@@ -44,9 +44,9 @@ module.exports = {
     } else {
       const recent = entries.slice(-10).reverse();
       const lines = recent.map(e => {
-        const icon = TYPE_ICONS[e.type] || '📌';
+        const label = TYPE_LABELS[e.type] || e.type.toUpperCase();
         const date = new Date(e.timestamp).toLocaleDateString();
-        return `${icon} **${e.type.toUpperCase()}** — ${e.reason}\n> by ${e.moderator} on ${date}`;
+        return `**${label}** — ${e.reason}\n> by ${e.moderator} on ${date}`;
       });
       embed.setDescription(lines.join('\n\n'));
     }

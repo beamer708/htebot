@@ -23,34 +23,35 @@ module.exports = {
     if (!logs[target.id]) logs[target.id] = [];
 
     const warnId = `WARN-${Date.now()}`;
-    logs[target.id].push({ id: warnId, type: 'warn', reason, moderator: interaction.user.tag, timestamp: new Date().toISOString() });
+    logs[target.id].push({ id: warnId, type: 'warn', reason, moderator: interaction.user.username, timestamp: new Date().toISOString() });
     writeLogs(logs);
 
     const warnCount = logs[target.id].filter(e => e.type === 'warn').length;
 
     const dmEmbed = new EmbedBuilder()
       .setColor(config.colors.warning)
-      .setTitle('⚠️ You have received a warning')
-      .setDescription('You were warned in **HowToERLC**.')
+      .setTitle('Warning Received')
+      .setDescription('You have received a warning in the **HowToERLC** Discord server.')
       .addFields(
         { name: 'Reason', value: reason },
         { name: 'Warning ID', value: warnId },
         { name: 'Total Warnings', value: `${warnCount}` },
       )
-      .setFooter({ text: 'HowToERLC • howtoerlc.xyz' })
+      .setFooter({ text: 'HowToERLC — howtoerlc.xyz' })
       .setTimestamp();
 
     await target.send({ embeds: [dmEmbed] }).catch(() => {});
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.warning)
-      .setTitle('⚠️ Member Warned')
+      .setTitle('Member Warned')
       .addFields(
-        { name: 'User', value: `${target.tag} (${target.id})`, inline: true },
-        { name: 'Moderator', value: interaction.user.tag, inline: true },
+        { name: 'User', value: `${target.username} (${target.id})`, inline: true },
+        { name: 'Moderator', value: interaction.user.username, inline: true },
         { name: 'Warning #', value: `${warnCount}`, inline: true },
         { name: 'Reason', value: reason, inline: false },
       )
+      .setFooter({ text: 'HowToERLC' })
       .setTimestamp();
 
     const logChannel = interaction.guild.channels.cache.get(config.channels.logs);

@@ -4,10 +4,7 @@ const path = require('path');
 const config = require('../../config.json');
 
 const logsPath = path.join(__dirname, '..', '..', 'data', 'warnings.json');
-
-function readLogs() {
-  try { return JSON.parse(fs.readFileSync(logsPath, 'utf8')); } catch { return {}; }
-}
+function readLogs() { try { return JSON.parse(fs.readFileSync(logsPath, 'utf8')); } catch { return {}; } }
 function writeLogs(data) { fs.writeFileSync(logsPath, JSON.stringify(data, null, 2)); }
 
 module.exports = {
@@ -25,34 +22,35 @@ module.exports = {
     const days = interaction.options.getInteger('days') ?? 0;
 
     if (target.id === interaction.user.id) {
-      return interaction.reply({ content: '❌ You cannot ban yourself.', ephemeral: true });
+      return interaction.reply({ content: 'You cannot ban yourself.', ephemeral: true });
     }
 
     try {
       const dmEmbed = new EmbedBuilder()
         .setColor(config.colors.error)
-        .setTitle('🔨 You have been banned')
-        .setDescription(`You were banned from **HowToERLC**.`)
+        .setTitle('You have been banned')
+        .setDescription('You were banned from the **HowToERLC** Discord server.')
         .addFields({ name: 'Reason', value: reason })
-        .setFooter({ text: 'HowToERLC • howtoerlc.xyz' })
+        .setFooter({ text: 'HowToERLC — howtoerlc.xyz' })
         .setTimestamp();
 
       await target.send({ embeds: [dmEmbed] }).catch(() => {});
-      await interaction.guild.bans.create(target.id, { reason: `${reason} | Banned by ${interaction.user.tag}`, deleteMessageDays: days });
+      await interaction.guild.bans.create(target.id, { reason: `${reason} | Banned by ${interaction.user.username}`, deleteMessageDays: days });
 
       const logs = readLogs();
       if (!logs[target.id]) logs[target.id] = [];
-      logs[target.id].push({ type: 'ban', reason, moderator: interaction.user.tag, timestamp: new Date().toISOString() });
+      logs[target.id].push({ type: 'ban', reason, moderator: interaction.user.username, timestamp: new Date().toISOString() });
       writeLogs(logs);
 
       const embed = new EmbedBuilder()
         .setColor(config.colors.error)
-        .setTitle('🔨 Member Banned')
+        .setTitle('Member Banned')
         .addFields(
-          { name: 'User', value: `${target.tag} (${target.id})`, inline: true },
-          { name: 'Moderator', value: interaction.user.tag, inline: true },
+          { name: 'User', value: `${target.username} (${target.id})`, inline: true },
+          { name: 'Moderator', value: interaction.user.username, inline: true },
           { name: 'Reason', value: reason, inline: false },
         )
+        .setFooter({ text: 'HowToERLC' })
         .setTimestamp();
 
       const logChannel = interaction.guild.channels.cache.get(config.channels.logs);
@@ -60,7 +58,8 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
-      await interaction.reply({ content: `❌ Failed to ban: ${err.message}`, ephemeral: true });
+      console.error('[ban] Error:', err);
+      await interaction.reply({ content: 'Failed to ban this user. Make sure my role is above theirs.', ephemeral: true });
     }
   },
 };

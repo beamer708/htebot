@@ -45,25 +45,26 @@ module.exports = {
     const reason = interaction.options.getString('reason') || 'No reason provided';
     const ms = DURATION_MAP[durationKey];
 
-    if (!target) return interaction.reply({ content: '❌ Member not found.', ephemeral: true });
+    if (!target) return interaction.reply({ content: 'Member not found.', ephemeral: true });
 
     try {
-      await target.timeout(ms, `${reason} | Muted by ${interaction.user.tag}`);
+      await target.timeout(ms, `${reason} | Muted by ${interaction.user.username}`);
 
       const logs = readLogs();
       if (!logs[target.id]) logs[target.id] = [];
-      logs[target.id].push({ type: 'mute', reason, duration: durationKey, moderator: interaction.user.tag, timestamp: new Date().toISOString() });
+      logs[target.id].push({ type: 'mute', reason, duration: durationKey, moderator: interaction.user.username, timestamp: new Date().toISOString() });
       writeLogs(logs);
 
       const embed = new EmbedBuilder()
         .setColor(config.colors.warning)
-        .setTitle('🔇 Member Muted')
+        .setTitle('Member Muted')
         .addFields(
-          { name: 'User', value: `${target.user.tag} (${target.id})`, inline: true },
+          { name: 'User', value: `${target.user.username} (${target.id})`, inline: true },
           { name: 'Duration', value: durationKey, inline: true },
-          { name: 'Moderator', value: interaction.user.tag, inline: true },
+          { name: 'Moderator', value: interaction.user.username, inline: true },
           { name: 'Reason', value: reason, inline: false },
         )
+        .setFooter({ text: 'HowToERLC' })
         .setTimestamp();
 
       const logChannel = interaction.guild.channels.cache.get(config.channels.logs);
@@ -71,7 +72,8 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
-      await interaction.reply({ content: `❌ Failed to mute: ${err.message}`, ephemeral: true });
+      console.error('[mute] Error:', err);
+      await interaction.reply({ content: 'Failed to mute this user.', ephemeral: true });
     }
   },
 };

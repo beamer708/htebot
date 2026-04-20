@@ -19,34 +19,35 @@ module.exports = {
     const target = interaction.options.getMember('user');
     const reason = interaction.options.getString('reason') || 'No reason provided';
 
-    if (!target) return interaction.reply({ content: '❌ Member not found.', ephemeral: true });
-    if (target.id === interaction.user.id) return interaction.reply({ content: '❌ You cannot kick yourself.', ephemeral: true });
+    if (!target) return interaction.reply({ content: 'Member not found.', ephemeral: true });
+    if (target.id === interaction.user.id) return interaction.reply({ content: 'You cannot kick yourself.', ephemeral: true });
 
     try {
       const dmEmbed = new EmbedBuilder()
         .setColor(config.colors.warning)
-        .setTitle('👢 You have been kicked')
-        .setDescription('You were kicked from **HowToERLC**.')
+        .setTitle('You have been kicked')
+        .setDescription('You were kicked from the **HowToERLC** Discord server.')
         .addFields({ name: 'Reason', value: reason })
-        .setFooter({ text: 'HowToERLC • howtoerlc.xyz' })
+        .setFooter({ text: 'HowToERLC — howtoerlc.xyz' })
         .setTimestamp();
 
       await target.send({ embeds: [dmEmbed] }).catch(() => {});
-      await target.kick(`${reason} | Kicked by ${interaction.user.tag}`);
+      await target.kick(`${reason} | Kicked by ${interaction.user.username}`);
 
       const logs = readLogs();
       if (!logs[target.id]) logs[target.id] = [];
-      logs[target.id].push({ type: 'kick', reason, moderator: interaction.user.tag, timestamp: new Date().toISOString() });
+      logs[target.id].push({ type: 'kick', reason, moderator: interaction.user.username, timestamp: new Date().toISOString() });
       writeLogs(logs);
 
       const embed = new EmbedBuilder()
         .setColor(config.colors.warning)
-        .setTitle('👢 Member Kicked')
+        .setTitle('Member Kicked')
         .addFields(
-          { name: 'User', value: `${target.user.tag} (${target.id})`, inline: true },
-          { name: 'Moderator', value: interaction.user.tag, inline: true },
+          { name: 'User', value: `${target.user.username} (${target.id})`, inline: true },
+          { name: 'Moderator', value: interaction.user.username, inline: true },
           { name: 'Reason', value: reason, inline: false },
         )
+        .setFooter({ text: 'HowToERLC' })
         .setTimestamp();
 
       const logChannel = interaction.guild.channels.cache.get(config.channels.logs);
@@ -54,7 +55,8 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
-      await interaction.reply({ content: `❌ Failed to kick: ${err.message}`, ephemeral: true });
+      console.error('[kick] Error:', err);
+      await interaction.reply({ content: 'Failed to kick this user. Make sure my role is above theirs.', ephemeral: true });
     }
   },
 };

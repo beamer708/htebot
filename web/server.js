@@ -9,9 +9,20 @@ module.exports = (client) => {
   const app = express();
 
   // ── CORS ──────────────────────────────────────────────────────────────────
+  const allowedOrigins = [
+    process.env.WEBSITE_URL || 'https://howtoerlc.xyz',
+    'https://www.howtoerlc.xyz',
+  ];
+
   const corsOptions = {
     origin: process.env.NODE_ENV === 'production'
-      ? (process.env.WEBSITE_URL || 'https://howtoerlc.xyz')
+      ? (origin, callback) => {
+          if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        }
       : '*',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'X-API-SECRET', 'X-BETA-TOKEN'],
@@ -19,8 +30,8 @@ module.exports = (client) => {
   app.use(cors(corsOptions));
 
   // ── Body Parsing ──────────────────────────────────────────────────────────
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ limit: '50kb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
   // ── Session ───────────────────────────────────────────────────────────────
   app.use(session({
@@ -29,7 +40,9 @@ module.exports = (client) => {
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      httpOnly: true,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }));
 
@@ -46,7 +59,6 @@ module.exports = (client) => {
         const guild = client.guilds.cache.get(config.guildId);
         if (!guild) return done(null, false);
 
-        // Verify the user is a staff member in the HowToERLC guild
         const member = await guild.members.fetch(profile.id).catch(() => null);
         if (!member) return done(null, false);
 
@@ -73,20 +85,12 @@ module.exports = (client) => {
   app.set('discordClient', client);
 
   // ── Routes ────────────────────────────────────────────────────────────────
+  app.use('/api', require('./routes/status'));
   app.use('/api', require('./routes/api'));
   app.use('/auth', require('./routes/auth'));
   app.use('/admin', require('./routes/admin'));
 
-  // ── Health Check ──────────────────────────────────────────────────────────
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'ok',
-      bot: client.isReady() ? 'online' : 'offline',
-      maintenance: process.env.MAINTENANCE_MODE === 'true',
-      timestamp: new Date().toISOString(),
-    });
-  });
-
+  // ── Root ──────────────────────────────────────────────────────────────────
   app.get('/', (req, res) => {
     res.json({ name: 'HowToERLC Bot API', website: 'https://howtoerlc.xyz', status: 'running' });
   });

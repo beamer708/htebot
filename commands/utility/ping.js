@@ -7,18 +7,17 @@ module.exports = {
     .setDescription('Check the bot\'s latency and API response time.'),
 
   async execute(interaction) {
-    const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
+    const sent = await interaction.reply({ content: 'Checking...', fetchReply: true });
     const latency = sent.createdTimestamp - interaction.createdTimestamp;
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.primary)
-      .setTitle('🏓 Pong!')
+      .setTitle('Latency')
       .addFields(
-        { name: 'Bot Latency', value: `${latency}ms`, inline: true },
-        { name: 'API Latency', value: `${Math.round(interaction.client.ws.ping)}ms`, inline: true },
+        { name: 'Bot', value: `${latency}ms`, inline: true },
+        { name: 'API', value: `${Math.round(interaction.client.ws.ping)}ms`, inline: true },
       )
-      .setFooter({ text: 'HowToERLC Bot' })
-      .setTimestamp();
+      .setFooter({ text: 'HowToERLC' });
 
     await interaction.editReply({ content: null, embeds: [embed] });
   },

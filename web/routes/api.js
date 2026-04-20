@@ -18,7 +18,6 @@ function writeJSON(file, data) {
   fs.writeFileSync(dataPath(file), JSON.stringify(data, null, 2));
 }
 
-// In-memory session store for AI chat (last 5 messages per session)
 const chatSessions = new Map();
 
 // ─── POST /api/application ────────────────────────────────────────────────────
@@ -56,28 +55,28 @@ router.post('/application', maintenance, apiAuth, async (req, res) => {
 
   const embed = new EmbedBuilder()
     .setColor(config.colors.primary)
-    .setTitle('📋 New Staff Application')
-    .setDescription(`A new application has been submitted via the HowToERLC website.`)
+    .setTitle('New Staff Application')
+    .setDescription('A staff application has been submitted via the HowToERLC website.')
     .addFields(
-      { name: '👤 Applicant', value: `${username} (<@${discordId}>)`, inline: true },
-      { name: '🎯 Role', value: roleApplying, inline: true },
-      { name: '🎂 Age', value: age.toString(), inline: true },
-      { name: '🕐 Timezone', value: timezone, inline: true },
-      { name: '📝 Reason for Applying', value: reason, inline: false },
-      { name: '⭐ Experience', value: experience, inline: false },
-      { name: '🆔 Submission ID', value: submissionId, inline: false },
+      { name: 'Applicant', value: `${username} (<@${discordId}>)`, inline: true },
+      { name: 'Role', value: roleApplying, inline: true },
+      { name: 'Age', value: age.toString(), inline: true },
+      { name: 'Timezone', value: timezone, inline: true },
+      { name: 'Reason for Applying', value: reason, inline: false },
+      { name: 'Experience', value: experience, inline: false },
+      { name: 'Submission ID', value: submissionId, inline: false },
     )
-    .setFooter({ text: 'HowToERLC Staff Applications • howtoerlc.xyz' })
+    .setFooter({ text: 'HowToERLC Staff Applications — howtoerlc.xyz' })
     .setTimestamp();
 
   const acceptBtn = new ButtonBuilder()
     .setCustomId(`app:accept:${submissionId}`)
-    .setLabel('✅ Accept')
+    .setLabel('Accept')
     .setStyle(ButtonStyle.Success);
 
   const denyBtn = new ButtonBuilder()
     .setCustomId(`app:deny:${submissionId}`)
-    .setLabel('❌ Deny')
+    .setLabel('Deny')
     .setStyle(ButtonStyle.Danger);
 
   await appChannel.send({
@@ -122,34 +121,34 @@ router.post('/suggestion', maintenance, apiAuth, async (req, res) => {
 
   const embed = new EmbedBuilder()
     .setColor(config.colors.info)
-    .setTitle(`💡 Suggestion: ${title}`)
+    .setTitle(title)
     .setDescription(details)
     .addFields(
-      { name: '👤 Submitted By', value: `${username} (<@${discordId}>)`, inline: true },
-      { name: '🏷️ Category', value: category, inline: true },
-      { name: '📊 Votes', value: '👍 0  •  👎 0', inline: false },
+      { name: 'Submitted By', value: `${username} (<@${discordId}>)`, inline: true },
+      { name: 'Category', value: category, inline: true },
+      { name: 'Votes', value: '0 up  •  0 down', inline: false },
     )
-    .setFooter({ text: `ID: ${submissionId} • HowToERLC Suggestions` })
+    .setFooter({ text: `ID: ${submissionId} — HowToERLC Suggestions` })
     .setTimestamp();
 
   const upvoteBtn = new ButtonBuilder()
     .setCustomId(`suggestion:upvote:${submissionId}`)
-    .setLabel('👍 Upvote')
+    .setLabel('Upvote')
     .setStyle(ButtonStyle.Success);
 
   const downvoteBtn = new ButtonBuilder()
     .setCustomId(`suggestion:downvote:${submissionId}`)
-    .setLabel('👎 Downvote')
+    .setLabel('Downvote')
     .setStyle(ButtonStyle.Danger);
 
   const approveBtn = new ButtonBuilder()
     .setCustomId(`suggestion:approve:${submissionId}`)
-    .setLabel('✅ Approve')
+    .setLabel('Approve')
     .setStyle(ButtonStyle.Primary);
 
   const declineBtn = new ButtonBuilder()
     .setCustomId(`suggestion:decline:${submissionId}`)
-    .setLabel('❌ Decline')
+    .setLabel('Decline')
     .setStyle(ButtonStyle.Secondary);
 
   const msg = await suggestChannel.send({
@@ -160,7 +159,6 @@ router.post('/suggestion', maintenance, apiAuth, async (req, res) => {
     ],
   });
 
-  // Auto-create discussion thread
   try {
     await msg.startThread({
       name: `Discussion: ${title}`.slice(0, 100),
@@ -168,7 +166,7 @@ router.post('/suggestion', maintenance, apiAuth, async (req, res) => {
       reason: 'Auto discussion thread for suggestion',
     });
   } catch {
-    // Thread creation is best-effort; channel may not support it
+    // Thread creation is best-effort
   }
 
   res.json({ success: true, message: 'Suggestion submitted successfully.', id: submissionId });
@@ -209,27 +207,27 @@ router.post('/partnership', maintenance, apiAuth, async (req, res) => {
   const pingRole = config.roles.notifications?.partnerships;
   const embed = new EmbedBuilder()
     .setColor(config.colors.primary)
-    .setTitle('🤝 New Partnership Request')
-    .setDescription(`A new partnership request has been submitted via the HowToERLC website.`)
+    .setTitle('New Partnership Request')
+    .setDescription('A partnership request has been submitted via the HowToERLC website.')
     .addFields(
-      { name: '🏠 Server Name', value: serverName, inline: true },
-      { name: '📌 Server Type', value: serverType, inline: true },
-      { name: '🔗 Invite Link', value: inviteLink, inline: false },
-      { name: '💬 Reason for Partnership', value: reason, inline: false },
-      { name: '🎁 What They\'re Offering', value: offering, inline: false },
-      { name: '🆔 Submission ID', value: submissionId, inline: false },
+      { name: 'Server Name', value: serverName, inline: true },
+      { name: 'Server Type', value: serverType, inline: true },
+      { name: 'Invite Link', value: inviteLink, inline: false },
+      { name: 'Reason for Partnership', value: reason, inline: false },
+      { name: 'What They\'re Offering', value: offering, inline: false },
+      { name: 'Submission ID', value: submissionId, inline: false },
     )
-    .setFooter({ text: 'HowToERLC Partnerships • howtoerlc.xyz' })
+    .setFooter({ text: 'HowToERLC Partnerships — howtoerlc.xyz' })
     .setTimestamp();
 
   const approveBtn = new ButtonBuilder()
     .setCustomId(`partnership:approve:${submissionId}`)
-    .setLabel('✅ Approve')
+    .setLabel('Approve')
     .setStyle(ButtonStyle.Success);
 
   const denyBtn = new ButtonBuilder()
     .setCustomId(`partnership:deny:${submissionId}`)
-    .setLabel('❌ Deny')
+    .setLabel('Deny')
     .setStyle(ButtonStyle.Danger);
 
   await partnerChannel.send({
@@ -243,7 +241,6 @@ router.post('/partnership', maintenance, apiAuth, async (req, res) => {
 
 // ─── POST /api/ai-chat ────────────────────────────────────────────────────────
 router.post('/ai-chat', maintenance, async (req, res) => {
-  // Beta mode gating
   if (process.env.AI_BETA_MODE === 'true') {
     const betaToken = req.headers['x-beta-token'];
     const validTokens = (process.env.AI_BETA_TOKENS || '').split(',').map(t => t.trim()).filter(Boolean);
@@ -258,18 +255,22 @@ router.post('/ai-chat', maintenance, async (req, res) => {
     return res.status(400).json({ success: false, error: 'Missing or empty message.' });
   }
 
+  if (message.length > 2000) {
+    return res.status(400).json({ success: false, error: 'Message too long. Maximum 2,000 characters.' });
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return res.status(500).json({ success: false, error: 'AI assistant is not configured on this server.' });
   }
 
   const sid = sessionId || crypto.randomUUID();
-  if (!chatSessions.has(sid)) chatSessions.set(sid, []);
+  if (!chatSessions.has(sid)) chatSessions.set(sid, { messages: [], lastActivity: Date.now() });
 
-  const history = chatSessions.get(sid);
-  history.push({ role: 'user', content: message.trim() });
+  const session = chatSessions.get(sid);
+  session.lastActivity = Date.now();
+  session.messages.push({ role: 'user', content: message.trim() });
 
-  // Keep last 5 exchanges (10 messages)
-  const trimmed = history.slice(-10);
+  const trimmed = session.messages.slice(-10);
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -289,11 +290,9 @@ You ONLY answer questions related to:
 - Growing and moderating ERLC Discord communities
 - Roblox game mechanics relevant to ERLC
 
-If someone asks about ANYTHING outside of these topics — including but not limited to: general coding, other games, real-world events, personal advice, politics, or any topic unrelated to ERLC community building — you must politely decline and redirect them.
+If someone asks about anything outside of these topics, politely decline and redirect them. Say something like: "I'm specifically designed to help with ERLC community building topics. For that, you'd be better served by a general-purpose assistant. Is there anything ERLC-related I can help you with?"
 
-When declining, say something like: "I'm specifically designed to help with ERLC community building topics. For [their topic], you'd be better served by a general-purpose assistant. Is there anything ERLC-related I can help you with?"
-
-Be helpful, clear, and friendly. Format responses with bullet points or headers when useful. Keep answers focused and actionable.`;
+Be helpful, clear, and professional. Format responses with bullet points or headers when useful.`;
 
   try {
     const response = await anthropic.messages.create({
@@ -304,10 +303,8 @@ Be helpful, clear, and friendly. Format responses with bullet points or headers 
     });
 
     const reply = response.content[0].text;
-    history.push({ role: 'assistant', content: reply });
-
-    // Trim session to 10 messages
-    if (history.length > 10) history.splice(0, history.length - 10);
+    session.messages.push({ role: 'assistant', content: reply });
+    if (session.messages.length > 10) session.messages.splice(0, session.messages.length - 10);
 
     res.json({ success: true, reply, sessionId: sid });
   } catch (err) {
@@ -315,5 +312,13 @@ Be helpful, clear, and friendly. Format responses with bullet points or headers 
     res.status(500).json({ success: false, error: 'Failed to get a response from the AI assistant.' });
   }
 });
+
+// Session TTL cleanup — remove sessions inactive for 30+ minutes
+setInterval(() => {
+  const cutoff = Date.now() - 30 * 60 * 1000;
+  for (const [sid, session] of chatSessions.entries()) {
+    if (session.lastActivity < cutoff) chatSessions.delete(sid);
+  }
+}, 10 * 60 * 1000);
 
 module.exports = router;

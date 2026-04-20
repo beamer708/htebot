@@ -32,19 +32,19 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle(`📦 New ${type} Released!`)
+      .setTitle(`New ${type} — ${title}`)
       .setDescription(description)
       .addFields(
-        { name: '📎 Access Link', value: link, inline: false },
-        { name: '🏷️ Type', value: type, inline: true },
-        { name: '👤 Posted By', value: interaction.user.tag, inline: true },
+        { name: 'Link', value: link, inline: false },
+        { name: 'Type', value: type, inline: true },
+        { name: 'Posted By', value: interaction.user.username, inline: true },
       )
       .setAuthor({ name: 'HowToERLC Resources', iconURL: interaction.guild.iconURL() })
-      .setFooter({ text: 'HowToERLC • howtoerlc.xyz' })
+      .setFooter({ text: 'HowToERLC — howtoerlc.xyz' })
       .setTimestamp();
 
     const content = pingRole ? `<@&${pingRole}>` : '';
     await resourceChannel.send({ content, embeds: [embed] });
-    await interaction.reply({ content: `✅ Resource posted in ${resourceChannel}.`, ephemeral: true });
+    await interaction.reply({ content: `Resource posted in ${resourceChannel}.`, ephemeral: true });
   },
 };
