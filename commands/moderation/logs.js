@@ -36,7 +36,6 @@ module.exports = {
       .setColor(config.colors.info)
       .setTitle(`Mod Logs — ${target.username}`)
       .setThumbnail(target.displayAvatarURL())
-      .setFooter({ text: `HowToERLC Moderation — ${entries.length} record(s)` })
       .setTimestamp();
 
     if (entries.length === 0) {

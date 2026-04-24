@@ -38,7 +38,6 @@ module.exports = {
           inline: false,
         },
       )
-      .setFooter({ text: 'HowToERLC — howtoerlc.xyz' });
 
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   },

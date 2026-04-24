@@ -27,7 +27,6 @@ module.exports = {
         { name: 'Deleted At', value: `<t:${deletedAt}:R>`, inline: true },
         { name: 'Content', value: content, inline: false },
       )
-      .setFooter({ text: 'HowToERLC Logs' })
       .setTimestamp();
 
     if (message.attachments.size > 0) {

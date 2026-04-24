@@ -24,7 +24,6 @@ module.exports = {
       .setTitle(title)
       .setDescription(message)
       .setAuthor({ name: 'HowToERLC', iconURL: interaction.guild.iconURL() })
-      .setFooter({ text: `Posted by ${interaction.user.username} — HowToERLC` })
       .setTimestamp();
 
     const content = pingRole ? `<@&${pingRole}>` : '';

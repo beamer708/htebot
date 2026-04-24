@@ -37,7 +37,6 @@ module.exports = {
         { name: 'Warning ID', value: warnId },
         { name: 'Total Warnings', value: `${warnCount}` },
       )
-      .setFooter({ text: 'HowToERLC — howtoerlc.xyz' })
       .setTimestamp();
 
     await target.send({ embeds: [dmEmbed] }).catch(() => {});
@@ -51,7 +50,6 @@ module.exports = {
         { name: 'Warning #', value: `${warnCount}`, inline: true },
         { name: 'Reason', value: reason, inline: false },
       )
-      .setFooter({ text: 'HowToERLC' })
       .setTimestamp();
 
     const logChannel = interaction.guild.channels.cache.get(config.channels.logs);

@@ -64,7 +64,6 @@ module.exports = {
           { name: 'Moderator', value: interaction.user.username, inline: true },
           { name: 'Reason', value: reason, inline: false },
         )
-        .setFooter({ text: 'HowToERLC' })
         .setTimestamp();
 
       const logChannel = interaction.guild.channels.cache.get(config.channels.logs);

@@ -60,14 +60,12 @@ async function handleApplicationButton(interaction, client) {
       ? 'Your staff application for **HowToERLC** has been accepted. A staff member will be in touch with further steps.'
       : 'Your staff application for **HowToERLC** has been denied. You are welcome to re-apply in the future.')
     .addFields({ name: 'Role Applied For', value: app.roleApplying || 'Unknown' })
-    .setFooter({ text: `Reviewed by ${staffName} — HowToERLC` })
     .setTimestamp();
 
   await dmUser(client, app.discordId, resultEmbed);
 
   const reviewedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setFooter({ text: `${accepted ? 'Accepted' : 'Denied'} by ${staffName} — ${new Date().toLocaleString()}` });
 
   await interaction.update({ embeds: [reviewedEmbed], components: [] });
 }
@@ -142,14 +140,12 @@ async function handleSuggestionButton(interaction, client) {
     .setDescription(accepted
       ? `Your suggestion **"${suggestion.title}"** has been approved by the HowToERLC staff team.`
       : `Your suggestion **"${suggestion.title}"** has been declined by the HowToERLC staff team.`)
-    .setFooter({ text: `Reviewed by ${staffName} — HowToERLC` })
     .setTimestamp();
 
   await dmUser(client, suggestion.discordId, resultEmbed);
 
   const reviewedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setFooter({ text: `${accepted ? 'Approved' : 'Declined'} by ${staffName} — ${new Date().toLocaleString()}` });
 
   await interaction.update({ embeds: [reviewedEmbed], components: [] });
 }
@@ -183,14 +179,12 @@ async function handlePartnershipButton(interaction, client) {
     .setDescription(accepted
       ? `Your partnership request for **${partnership.serverName}** has been approved by HowToERLC. A staff member will reach out with next steps.`
       : `Your partnership request for **${partnership.serverName}** has been denied by HowToERLC.`)
-    .setFooter({ text: `Reviewed by ${staffName} — HowToERLC` })
     .setTimestamp();
 
   if (partnership.contactId) await dmUser(client, partnership.contactId, resultEmbed);
 
   const reviewedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(accepted ? config.colors.success : config.colors.error)
-    .setFooter({ text: `${accepted ? 'Approved' : 'Denied'} by ${staffName} — ${new Date().toLocaleString()}` });
 
   await interaction.update({ embeds: [reviewedEmbed], components: [] });
 }
@@ -333,7 +327,6 @@ async function handleTicketModal(interaction, client) {
       { name: 'Opened At', value: `<t:${Math.floor(new Date(now).getTime() / 1000)}:F>`,     inline: true },
       { name: 'Ticket ID', value: ticketId,                                                   inline: true },
     )
-    .setFooter({ text: 'HowToERLC Support — use the buttons below to manage this ticket' })
     .setTimestamp();
 
   const row1 = new ActionRowBuilder().addComponents(
@@ -393,7 +386,6 @@ async function handleDashboardSelect(interaction) {
     .setTitle(data.title)
     .setDescription(data.description)
     .setThumbnail(config.branding.thumbnail)
-    .setFooter({ text: 'HowToERLC', iconURL: config.branding.footerIcon });
 
   await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 }

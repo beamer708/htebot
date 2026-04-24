@@ -41,7 +41,6 @@ module.exports = {
         { name: 'Before', value: beforeText, inline: false },
         { name: 'After', value: afterText, inline: false },
       )
-      .setFooter({ text: 'HowToERLC Logs' })
       .setTimestamp();
 
     const jumpButton = new ButtonBuilder()

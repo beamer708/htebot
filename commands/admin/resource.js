@@ -40,7 +40,6 @@ module.exports = {
         { name: 'Posted By', value: interaction.user.username, inline: true },
       )
       .setAuthor({ name: 'HowToERLC Resources', iconURL: interaction.guild.iconURL() })
-      .setFooter({ text: 'HowToERLC — howtoerlc.xyz' })
       .setTimestamp();
 
     const content = pingRole ? `<@&${pingRole}>` : '';

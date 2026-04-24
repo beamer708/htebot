@@ -36,7 +36,6 @@ module.exports = {
       .setDescription(enabled
         ? 'The public web API is now returning 503 Service Unavailable. The admin panel remains accessible.'
         : 'The web API is back online and accepting requests.')
-      .setFooter({ text: `Updated by ${interaction.user.username} — HowToERLC` })
       .setTimestamp();
 
     await interaction.reply({ embeds: [embed] });

@@ -66,7 +66,6 @@ router.post('/application', maintenance, apiAuth, async (req, res) => {
       { name: 'Experience', value: experience, inline: false },
       { name: 'Submission ID', value: submissionId, inline: false },
     )
-    .setFooter({ text: 'HowToERLC Staff Applications — howtoerlc.xyz' })
     .setTimestamp();
 
   const acceptBtn = new ButtonBuilder()
@@ -128,7 +127,6 @@ router.post('/suggestion', maintenance, apiAuth, async (req, res) => {
       { name: 'Category', value: category, inline: true },
       { name: 'Votes', value: '0 up  •  0 down', inline: false },
     )
-    .setFooter({ text: `ID: ${submissionId} — HowToERLC Suggestions` })
     .setTimestamp();
 
   const upvoteBtn = new ButtonBuilder()
@@ -217,7 +215,6 @@ router.post('/partnership', maintenance, apiAuth, async (req, res) => {
       { name: 'What They\'re Offering', value: offering, inline: false },
       { name: 'Submission ID', value: submissionId, inline: false },
     )
-    .setFooter({ text: 'HowToERLC Partnerships — howtoerlc.xyz' })
     .setTimestamp();
 
   const approveBtn = new ButtonBuilder()

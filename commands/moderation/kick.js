@@ -28,7 +28,6 @@ module.exports = {
         .setTitle('You have been kicked')
         .setDescription('You were kicked from the **HowToERLC** Discord server.')
         .addFields({ name: 'Reason', value: reason })
-        .setFooter({ text: 'HowToERLC — howtoerlc.xyz' })
         .setTimestamp();
 
       await target.send({ embeds: [dmEmbed] }).catch(() => {});
@@ -47,7 +46,6 @@ module.exports = {
           { name: 'Moderator', value: interaction.user.username, inline: true },
           { name: 'Reason', value: reason, inline: false },
         )
-        .setFooter({ text: 'HowToERLC' })
         .setTimestamp();
 
       const logChannel = interaction.guild.channels.cache.get(config.channels.logs);

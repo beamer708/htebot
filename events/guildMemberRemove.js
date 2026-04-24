@@ -53,7 +53,6 @@ module.exports = {
         { name: 'Joined', value: member.joinedAt ? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>` : 'Unknown', inline: true },
         { name: 'Member Count', value: `${member.guild.memberCount}`, inline: true },
       )
-      .setFooter({ text: 'HowToERLC' })
       .setTimestamp();
 
     await logChannel.send({ embeds: [embed] });

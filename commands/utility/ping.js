@@ -17,7 +17,6 @@ module.exports = {
         { name: 'Bot', value: `${latency}ms`, inline: true },
         { name: 'API', value: `${Math.round(interaction.client.ws.ping)}ms`, inline: true },
       )
-      .setFooter({ text: 'HowToERLC' });
 
     await interaction.editReply({ content: null, embeds: [embed] });
   },
