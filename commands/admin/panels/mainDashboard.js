@@ -43,7 +43,7 @@ async function sendMainDashboard(interaction) {
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
         '### Welcome to HowToERLC\n' +
-        'You have just joined the **number one resource hub** for ERLC community owners on Roblox. ' +
+        'You have just joined the **#1 resource hub** for ERLC community owners on Roblox. ' +
         'Browse our server information below, **grab your notification roles**, and visit **howtoerlc.xyz** for guides, templates, and tools built specifically for your community. ' +
         'Need help? Our staff team is always available — **open a ticket** and we will get back to you.'
       )
