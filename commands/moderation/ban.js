@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits , MessageFlags } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config.json');
@@ -22,7 +22,7 @@ module.exports = {
     const days = interaction.options.getInteger('days') ?? 0;
 
     if (target.id === interaction.user.id) {
-      return interaction.reply({ content: 'You cannot ban yourself.', ephemeral: true });
+      return interaction.reply({ content: 'You cannot ban yourself.', flags: MessageFlags.Ephemeral });
     }
 
     try {
@@ -59,7 +59,7 @@ module.exports = {
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
       console.error('[ban] Error:', err);
-      await interaction.reply({ content: 'Failed to ban this user. Make sure my role is above theirs.', ephemeral: true });
+      await interaction.reply({ content: 'Failed to ban this user. Make sure my role is above theirs.', flags: MessageFlags.Ephemeral });
     }
   },
 };

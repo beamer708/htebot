@@ -7,8 +7,8 @@ module.exports = {
     .setDescription('Check the bot\'s latency and API response time.'),
 
   async execute(interaction) {
-    const sent = await interaction.reply({ content: 'Checking...', fetchReply: true });
-    const latency = sent.createdTimestamp - interaction.createdTimestamp;
+    const { resource } = await interaction.reply({ content: 'Checking...', withResponse: true });
+    const latency = resource.message.createdTimestamp - interaction.createdTimestamp;
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.primary)

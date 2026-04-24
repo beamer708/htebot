@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits , MessageFlags } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,10 +16,10 @@ module.exports = {
 
   async execute(interaction, client) {
     const type = interaction.options.getString('type');
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     if (type === 'main') {
-      const { sendMainDashboard } = require('./panels/mainDashboard');
+      const { sendMainDashboard } = require('../../panels/mainDashboard');
       await sendMainDashboard(interaction);
       return interaction.editReply({ content: 'Main dashboard posted.' });
     }

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits , MessageFlags } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config.json');
@@ -19,8 +19,8 @@ module.exports = {
     const target = interaction.options.getMember('user');
     const reason = interaction.options.getString('reason') || 'No reason provided';
 
-    if (!target) return interaction.reply({ content: 'Member not found.', ephemeral: true });
-    if (target.id === interaction.user.id) return interaction.reply({ content: 'You cannot kick yourself.', ephemeral: true });
+    if (!target) return interaction.reply({ content: 'Member not found.', flags: MessageFlags.Ephemeral });
+    if (target.id === interaction.user.id) return interaction.reply({ content: 'You cannot kick yourself.', flags: MessageFlags.Ephemeral });
 
     try {
       const dmEmbed = new EmbedBuilder()
@@ -56,7 +56,7 @@ module.exports = {
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
       console.error('[kick] Error:', err);
-      await interaction.reply({ content: 'Failed to kick this user. Make sure my role is above theirs.', ephemeral: true });
+      await interaction.reply({ content: 'Failed to kick this user. Make sure my role is above theirs.', flags: MessageFlags.Ephemeral });
     }
   },
 };

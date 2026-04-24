@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits , MessageFlags } = require('discord.js');
 const config = require('../../config.json');
 
 module.exports = {
@@ -45,6 +45,6 @@ module.exports = {
 
     const content = pingRole ? `<@&${pingRole}>` : '';
     await resourceChannel.send({ content, embeds: [embed] });
-    await interaction.reply({ content: `Resource posted in ${resourceChannel}.`, ephemeral: true });
+    await interaction.reply({ content: `Resource posted in ${resourceChannel}.`, flags: MessageFlags.Ephemeral });
   },
 };

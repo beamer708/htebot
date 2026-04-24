@@ -1,6 +1,6 @@
 const {
   SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder,
-  ButtonStyle, PermissionFlagsBits, AttachmentBuilder,
+  ButtonStyle, PermissionFlagsBits, AttachmentBuilder, MessageFlags,
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
@@ -65,7 +65,7 @@ module.exports = {
       const access = readAccess();
       access[target.id] = { grantedBy: interaction.user.id, grantedAt: new Date().toISOString() };
       writeAccess(access);
-      return interaction.reply({ content: `✅ Tracker access granted to <@${target.id}>.`, ephemeral: true });
+      return interaction.reply({ content: `✅ Tracker access granted to <@${target.id}>.`, flags: MessageFlags.Ephemeral });
     }
 
     // ── access remove ────────────────────────────────────────────
@@ -74,7 +74,7 @@ module.exports = {
       const access = readAccess();
       delete access[target.id];
       writeAccess(access);
-      return interaction.reply({ content: `✅ Tracker access revoked from <@${target.id}>.`, ephemeral: true });
+      return interaction.reply({ content: `✅ Tracker access revoked from <@${target.id}>.`, flags: MessageFlags.Ephemeral });
     }
 
     // ── access list ──────────────────────────────────────────────
@@ -91,7 +91,7 @@ module.exports = {
         .setTitle('📋 Invite Tracker Access List')
         .setDescription(desc)
         .setTimestamp();
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
 
     // ── stats ────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ module.exports = {
             { name: '❌ Lost',           value: `${s.lost}`,     inline: true },
           )
           .setTimestamp();
-        return interaction.reply({ embeds: [embed], ephemeral: true });
+        return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
 
       // Server-wide
@@ -140,7 +140,7 @@ module.exports = {
             value: top5.length > 0 ? top5.join('\n') : 'No data yet.', inline: false },
         )
         .setTimestamp();
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
 
     // ── reset ────────────────────────────────────────────────────
@@ -159,14 +159,14 @@ module.exports = {
           .setLabel('Confirm Reset')
           .setStyle(ButtonStyle.Danger)
       );
-      return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+      return interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
     }
 
     // ── export ───────────────────────────────────────────────────
     if (sub === 'export') {
       const buf = Buffer.from(JSON.stringify(invites, null, 2));
       const attachment = new AttachmentBuilder(buf, { name: 'invites.json' });
-      return interaction.reply({ content: '📎 Current `invites.json`:', files: [attachment], ephemeral: true });
+      return interaction.reply({ content: '📎 Current `invites.json`:', files: [attachment], flags: MessageFlags.Ephemeral });
     }
   },
 };

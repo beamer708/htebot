@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder , MessageFlags } = require('discord.js');
 const config = require('../../config.json');
 
 module.exports = {
@@ -40,6 +40,6 @@ module.exports = {
       )
       .setFooter({ text: 'HowToERLC — howtoerlc.xyz' });
 
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   },
 };

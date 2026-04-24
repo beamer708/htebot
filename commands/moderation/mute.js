@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits , MessageFlags } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config.json');
@@ -45,7 +45,7 @@ module.exports = {
     const reason = interaction.options.getString('reason') || 'No reason provided';
     const ms = DURATION_MAP[durationKey];
 
-    if (!target) return interaction.reply({ content: 'Member not found.', ephemeral: true });
+    if (!target) return interaction.reply({ content: 'Member not found.', flags: MessageFlags.Ephemeral });
 
     try {
       await target.timeout(ms, `${reason} | Muted by ${interaction.user.username}`);
@@ -73,7 +73,7 @@ module.exports = {
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
       console.error('[mute] Error:', err);
-      await interaction.reply({ content: 'Failed to mute this user.', ephemeral: true });
+      await interaction.reply({ content: 'Failed to mute this user.', flags: MessageFlags.Ephemeral });
     }
   },
 };

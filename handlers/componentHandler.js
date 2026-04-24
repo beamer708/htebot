@@ -1,7 +1,7 @@
 const {
   EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder,
-  PermissionFlagsBits,
+  PermissionFlagsBits, MessageFlags,
 } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
@@ -34,7 +34,7 @@ async function handleApplicationButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const applications = readJSON('applications.json');
   const idx = applications.findIndex(a => a.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: 'Application not found.', ephemeral: true });
+  if (idx === -1) return interaction.reply({ content: 'Application not found.', flags: MessageFlags.Ephemeral });
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
@@ -42,7 +42,7 @@ async function handleApplicationButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: 'Only staff can review applications.', ephemeral: true });
+  if (!isStaff) return interaction.reply({ content: 'Only staff can review applications.', flags: MessageFlags.Ephemeral });
 
   const app = applications[idx];
   const accepted = action === 'accept';
@@ -77,7 +77,7 @@ async function handleSuggestionButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const suggestions = readJSON('suggestions.json');
   const idx = suggestions.findIndex(s => s.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: 'Suggestion not found.', ephemeral: true });
+  if (idx === -1) return interaction.reply({ content: 'Suggestion not found.', flags: MessageFlags.Ephemeral });
 
   const suggestion = suggestions[idx];
 
@@ -127,7 +127,7 @@ async function handleSuggestionButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: 'Only staff can approve or decline suggestions.', ephemeral: true });
+  if (!isStaff) return interaction.reply({ content: 'Only staff can approve or decline suggestions.', flags: MessageFlags.Ephemeral });
 
   const accepted = action === 'approve';
   const staffName = interaction.user.username;
@@ -159,7 +159,7 @@ async function handlePartnershipButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const partnerships = readJSON('partnerships.json');
   const idx = partnerships.findIndex(p => p.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: 'Partnership not found.', ephemeral: true });
+  if (idx === -1) return interaction.reply({ content: 'Partnership not found.', flags: MessageFlags.Ephemeral });
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
@@ -167,7 +167,7 @@ async function handlePartnershipButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: 'Only staff can review partnership requests.', ephemeral: true });
+  if (!isStaff) return interaction.reply({ content: 'Only staff can review partnership requests.', flags: MessageFlags.Ephemeral });
 
   const partnership = partnerships[idx];
   const accepted = action === 'approve';
@@ -249,16 +249,16 @@ async function handleTicketTranscript(interaction, client) {
     member.permissions.has('ManageChannels')
   );
   if (!isStaff) {
-    return interaction.reply({ content: 'Only staff can generate transcripts.', ephemeral: true });
+    return interaction.reply({ content: 'Only staff can generate transcripts.', flags: MessageFlags.Ephemeral });
   }
 
   const ticketsData = readTickets();
   const ticket = Object.values(ticketsData).find(t => t.channelId === interaction.channel.id);
   if (!ticket) {
-    return interaction.reply({ content: 'No ticket found for this channel.', ephemeral: true });
+    return interaction.reply({ content: 'No ticket found for this channel.', flags: MessageFlags.Ephemeral });
   }
 
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
   const messages = await fetchAllMessages(interaction.channel).catch(() => []);
   const transcriptText = buildTranscript(ticket, messages);
@@ -293,7 +293,7 @@ async function handleTicketModal(interaction, client) {
   if (existing) {
     return interaction.reply({
       content: `You already have an open ticket: <#${existing.channelId}>`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -350,7 +350,7 @@ async function handleTicketModal(interaction, client) {
     components: [row1, row2],
   });
 
-  await interaction.reply({ content: `Your ticket has been created: ${channel}`, ephemeral: true });
+  await interaction.reply({ content: `Your ticket has been created: ${channel}`, flags: MessageFlags.Ephemeral });
 }
 
 // ── Role panel buttons ────────────────────────────────────────────────────────
@@ -360,10 +360,10 @@ async function handleRolePanelButton(interaction) {
 
   if (member.roles.cache.has(roleId)) {
     await member.roles.remove(roleId);
-    return interaction.reply({ content: `Removed role <@&${roleId}>.`, ephemeral: true });
+    return interaction.reply({ content: `Removed role <@&${roleId}>.`, flags: MessageFlags.Ephemeral });
   } else {
     await member.roles.add(roleId);
-    return interaction.reply({ content: `Added role <@&${roleId}>.`, ephemeral: true });
+    return interaction.reply({ content: `Added role <@&${roleId}>.`, flags: MessageFlags.Ephemeral });
   }
 }
 
@@ -386,7 +386,7 @@ const INFO_EMBEDS = {
 async function handleDashboardSelect(interaction) {
   const value = interaction.values[0];
   const data = INFO_EMBEDS[value];
-  if (!data) return interaction.reply({ content: 'Unknown option.', ephemeral: true });
+  if (!data) return interaction.reply({ content: 'Unknown option.', flags: MessageFlags.Ephemeral });
 
   const embed = new EmbedBuilder()
     .setColor(config.colors.primary)
@@ -395,7 +395,7 @@ async function handleDashboardSelect(interaction) {
     .setThumbnail(config.branding.thumbnail)
     .setFooter({ text: 'HowToERLC', iconURL: config.branding.footerIcon });
 
-  await interaction.reply({ embeds: [embed], ephemeral: true });
+  await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 }
 
 // ── Notification role select menu ─────────────────────────────────────────────
@@ -408,7 +408,7 @@ async function handleRoleSelect(interaction) {
   ].filter(Boolean);
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
-  if (!member) return interaction.reply({ content: 'Could not fetch your member data.', ephemeral: true });
+  if (!member) return interaction.reply({ content: 'Could not fetch your member data.', flags: MessageFlags.Ephemeral });
 
   const added = [];
   const removed = [];
@@ -433,7 +433,7 @@ async function handleRoleSelect(interaction) {
   if (removed.length) lines.push(`Removed: ${removed.join(', ')}`);
   if (!lines.length) lines.push('No changes made.');
 
-  await interaction.reply({ content: `Your notification roles have been updated.\n${lines.join('\n')}`, ephemeral: true });
+  await interaction.reply({ content: `Your notification roles have been updated.\n${lines.join('\n')}`, flags: MessageFlags.Ephemeral });
 }
 
 // ── Invite reset confirm button ──────────────────────────────────────────────
@@ -476,7 +476,7 @@ module.exports = async (interaction, client) => {
     }
   } catch (err) {
     console.error('[ComponentHandler] Error:', err);
-    const errMsg = { content: 'An error occurred processing that action.', ephemeral: true };
+    const errMsg = { content: 'An error occurred processing that action.', flags: MessageFlags.Ephemeral };
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp(errMsg).catch(() => {});
     } else {
