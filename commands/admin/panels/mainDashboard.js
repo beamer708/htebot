@@ -33,12 +33,19 @@ async function sendMainDashboard(interaction) {
     .setStyle(ButtonStyle.Link)
     .setURL('https://howtoerlc.xyz');
 
+  const assistBtn = new ButtonBuilder()
+    .setCustomId('ticket:create')
+    .setLabel('Get Assistance')
+    .setStyle(ButtonStyle.Primary);
+
   const container = new ContainerBuilder()
     .setAccentColor(resolveColor(config.colors.primary))
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
         '### Welcome to HowToERLC\n' +
-        "Here you'll find essential information such as **guidelines, resources, applications, and links**."
+        'You have just joined the **number one resource hub** for ERLC community owners on Roblox. ' +
+        'Browse our server information below, **grab your notification roles**, and visit **howtoerlc.xyz** for guides, templates, and tools built specifically for your community. ' +
+        'Need help? Our staff team is always available — **open a ticket** and we will get back to you.'
       )
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
@@ -50,7 +57,7 @@ async function sendMainDashboard(interaction) {
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addActionRowComponents(
-      new ActionRowBuilder().addComponents(websiteBtn)
+      new ActionRowBuilder().addComponents(websiteBtn, assistBtn)
     );
 
   await interaction.channel.send({
