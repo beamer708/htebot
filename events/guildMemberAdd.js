@@ -25,7 +25,7 @@ module.exports = {
         .setURL('https://howtoerlc.xyz');
 
       await welcomeChannel.send({
-        content: `<:howtoglogo:1494830728113033327> Welcome <@${member.id}> to **HowToERLC**`,
+        content: `Welcome <@${member.id}> to <:howtoglogo:1494830728113033327> **HowToERLC**`,
         components: [new ActionRowBuilder().addComponents(countBtn, websiteBtn)],
       });
     }
