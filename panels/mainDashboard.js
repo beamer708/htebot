@@ -3,7 +3,7 @@ const {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder,
   MessageFlags, resolveColor,
 } = require('discord.js');
-const config = require('../../../config.json');
+const config = require('../config.json');
 
 async function sendMainDashboard(interaction) {
   const infoMenu = new StringSelectMenuBuilder()
