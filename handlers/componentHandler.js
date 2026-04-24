@@ -369,26 +369,18 @@ async function handleRolePanelButton(interaction) {
 
 // ── Dashboard info select menu ────────────────────────────────────────────────
 const INFO_EMBEDS = {
+  info_about: {
+    title: 'About HowToERLC',
+    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\nOur website at **howtoerlc.xyz** extends everything in this server — submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
+    footer: 'HowToERLC — Est. 2024',
+  },
   info_guidelines: {
-    title: 'Community Guidelines',
-    description: 'We expect all members to treat each other and staff with respect. Harassment, hate speech, and discrimination of any kind are not tolerated. Keep all content relevant to ERLC community building — off-topic discussions belong in designated channels. Spam and unsolicited self-promotion are not permitted. All members must comply with Discord\'s Terms of Service at all times. Staff decisions are final, and repeated violations will result in removal from the server.',
+    title: 'Server Guidelines',
+    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n**1. Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n**2. Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n**3. No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n**4. Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n**5. Staff decisions are final.** Repeated violations will result in removal from the server.',
   },
   info_advertising: {
-    title: 'Advertising Rules',
-    description: 'Server advertisements are permitted in the designated channels only, and must be directly related to ERLC or Roblox emergency services communities. Each server may post one advertisement per 24-hour period. Direct recruiting of members from this server is strictly prohibited. All advertisements must include a valid Discord invite link. Paid or sponsored promotions must be clearly disclosed. Staff reserve the right to remove any advertisement at their discretion without notice.',
-  },
-  info_partnerships: {
-    title: 'Partnership Guidelines',
-    description: 'Partnerships are open to active ERLC-related Discord servers that align with our community values. Your server must be active and have an established member base. Partnership includes cross-promotion and access to shared resources. Applications must be submitted through the website at howtoerlc.xyz — direct requests via DM will not be considered. Partners are expected to maintain community standards consistent with our own, and partnerships may be revoked if those standards are not upheld.',
-  },
-  info_tos: {
-    title: 'Terms of Service',
-    description: 'By participating in the HowToERLC Discord server and using the website at howtoerlc.xyz, you agree to these terms. Content submitted through website forms — including applications, suggestions, and partnership requests — may be used to improve our services. We reserve the right to remove access for any user who violates our guidelines or Discord\'s Terms of Service. Full terms are available at howtoerlc.xyz. Discord\'s own Terms of Service apply at all times and take precedence.',
-  },
-  info_mission: {
-    title: 'Our Mission',
-    description: 'HowToERLC exists to give every ERLC community owner the tools, knowledge, and support they need to build something great. From department structures to livery design, web presence to staff management — we cover it all, for free.\n\nWe believe that well-run ERLC communities make the game better for everyone. Our goal is to lower the barrier to building one, so that anyone with the drive can create a community they\'re proud of.',
-    footer: 'HowToERLC — Est. 2024',
+    title: 'Advertising Guidelines',
+    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n**1. ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n**2. One post per 24 hours.** Each server may advertise once per 24-hour period.\n\n**3. No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n**4. Valid invite required.** All advertisements must include a valid Discord invite link.\n\n**5. Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\nStaff reserve the right to remove any advertisement at their discretion.',
   },
 };
 
