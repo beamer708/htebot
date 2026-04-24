@@ -1,90 +1,11 @@
 const express = require('express');
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EmbedBuilder, ChannelType } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
 const apiAuth = require('../middleware/apiAuth');
 const maintenance = require('../middleware/maintenance');
 const config = require('../../config.json');
 
 const router = express.Router();
-const dataPath = (file) => path.join(__dirname, '..', '..', 'data', file);
-
-function readJSON(file) {
-  try { return JSON.parse(fs.readFileSync(dataPath(file), 'utf8')); } catch { return []; }
-}
-function writeJSON(file, data) {
-  fs.writeFileSync(dataPath(file), JSON.stringify(data, null, 2));
-}
-
-const chatSessions = new Map();
-
-// ─── POST /api/application ────────────────────────────────────────────────────
-router.post('/application', maintenance, apiAuth, async (req, res) => {
-  const { discordId, username, age, timezone, reason, experience, roleApplying } = req.body;
-
-  if (!discordId || !username || !age || !timezone || !reason || !experience || !roleApplying) {
-    return res.status(400).json({ success: false, error: 'Missing required fields.' });
-  }
-
-  const client = req.app.get('discordClient');
-  const guild = client.guilds.cache.get(config.guildId);
-  if (!guild) return res.status(500).json({ success: false, error: 'Discord guild not found.' });
-
-  const appChannel = guild.channels.cache.get(config.channels.applications);
-  if (!appChannel) return res.status(500).json({ success: false, error: 'Applications channel not configured.' });
-
-  const submissionId = crypto.randomUUID();
-  const application = {
-    id: submissionId,
-    discordId,
-    username,
-    age,
-    timezone,
-    reason,
-    experience,
-    roleApplying,
-    status: 'pending',
-    submittedAt: new Date().toISOString(),
-  };
-
-  const applications = readJSON('applications.json');
-  applications.push(application);
-  writeJSON('applications.json', applications);
-
-  const embed = new EmbedBuilder()
-    .setColor(config.colors.primary)
-    .setTitle('New Staff Application')
-    .setDescription('A staff application has been submitted via the HowToERLC website.')
-    .addFields(
-      { name: 'Applicant', value: `${username} (<@${discordId}>)`, inline: true },
-      { name: 'Role', value: roleApplying, inline: true },
-      { name: 'Age', value: age.toString(), inline: true },
-      { name: 'Timezone', value: timezone, inline: true },
-      { name: 'Reason for Applying', value: reason, inline: false },
-      { name: 'Experience', value: experience, inline: false },
-      { name: 'Submission ID', value: submissionId, inline: false },
-    )
-    .setTimestamp();
-
-  const acceptBtn = new ButtonBuilder()
-    .setCustomId(`app:accept:${submissionId}`)
-    .setLabel('Accept')
-    .setStyle(ButtonStyle.Success);
-
-  const denyBtn = new ButtonBuilder()
-    .setCustomId(`app:deny:${submissionId}`)
-    .setLabel('Deny')
-    .setStyle(ButtonStyle.Danger);
-
-  await appChannel.send({
-    embeds: [embed],
-    components: [new ActionRowBuilder().addComponents(acceptBtn, denyBtn)],
-  });
-
-  res.json({ success: true, message: 'Application submitted successfully.', id: submissionId });
-});
 
 // ─── POST /api/suggestion ─────────────────────────────────────────────────────
 router.post('/suggestion', maintenance, apiAuth, async (req, res) => {
@@ -94,146 +15,112 @@ router.post('/suggestion', maintenance, apiAuth, async (req, res) => {
     return res.status(400).json({ success: false, error: 'Missing required fields.' });
   }
 
-  const client = req.app.get('discordClient');
-  const guild = client.guilds.cache.get(config.guildId);
-  if (!guild) return res.status(500).json({ success: false, error: 'Discord guild not found.' });
-
-  const suggestChannel = guild.channels.cache.get(config.channels.suggestions);
-  if (!suggestChannel) return res.status(500).json({ success: false, error: 'Suggestions channel not configured.' });
-
-  const submissionId = crypto.randomUUID();
-  const suggestion = {
-    id: submissionId,
-    discordId,
-    username,
-    category,
-    title,
-    details,
-    status: 'pending',
-    votes: { up: [], down: [] },
-    submittedAt: new Date().toISOString(),
-  };
-
-  const suggestions = readJSON('suggestions.json');
-  suggestions.push(suggestion);
-  writeJSON('suggestions.json', suggestions);
-
-  const embed = new EmbedBuilder()
-    .setColor(config.colors.info)
-    .setTitle(title)
-    .setDescription(details)
-    .addFields(
-      { name: 'Submitted By', value: `${username} (<@${discordId}>)`, inline: true },
-      { name: 'Category', value: category, inline: true },
-      { name: 'Votes', value: '0 up  •  0 down', inline: false },
-    )
-    .setTimestamp();
-
-  const upvoteBtn = new ButtonBuilder()
-    .setCustomId(`suggestion:upvote:${submissionId}`)
-    .setLabel('Upvote')
-    .setStyle(ButtonStyle.Success);
-
-  const downvoteBtn = new ButtonBuilder()
-    .setCustomId(`suggestion:downvote:${submissionId}`)
-    .setLabel('Downvote')
-    .setStyle(ButtonStyle.Danger);
-
-  const approveBtn = new ButtonBuilder()
-    .setCustomId(`suggestion:approve:${submissionId}`)
-    .setLabel('Approve')
-    .setStyle(ButtonStyle.Primary);
-
-  const declineBtn = new ButtonBuilder()
-    .setCustomId(`suggestion:decline:${submissionId}`)
-    .setLabel('Decline')
-    .setStyle(ButtonStyle.Secondary);
-
-  const msg = await suggestChannel.send({
-    embeds: [embed],
-    components: [
-      new ActionRowBuilder().addComponents(upvoteBtn, downvoteBtn),
-      new ActionRowBuilder().addComponents(approveBtn, declineBtn),
-    ],
-  });
-
   try {
-    await msg.startThread({
-      name: `Discussion: ${title}`.slice(0, 100),
-      autoArchiveDuration: 1440,
-      reason: 'Auto discussion thread for suggestion',
+    const client = req.app.get('discordClient');
+    const channel = await client.channels.fetch(config.channels.suggestions);
+    if (!channel || channel.type !== ChannelType.GuildForum) {
+      return res.status(500).json({ success: false, error: 'Suggestions forum channel not configured.' });
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setTitle(title)
+      .addFields(
+        { name: 'Category', value: category, inline: true },
+        { name: 'Submitted By', value: `${username} (<@${discordId}>)`, inline: true },
+        { name: 'Details', value: details, inline: false },
+      )
+      .setTimestamp();
+
+    const thread = await channel.threads.create({
+      name: title.slice(0, 100),
+      message: { embeds: [embed] },
     });
-  } catch {
-    // Thread creation is best-effort
+
+    res.json({ success: true, id: thread.id });
+  } catch (err) {
+    console.error('[API] /api/suggestion error:', err);
+    res.status(500).json({ success: false, error: 'Failed to submit suggestion.' });
+  }
+});
+
+// ─── POST /api/application ────────────────────────────────────────────────────
+router.post('/application', maintenance, apiAuth, async (req, res) => {
+  const { discordId, username, age, timezone, reason, experience, roleApplying } = req.body;
+
+  if (!discordId || !username || !age || !timezone || !reason || !experience || !roleApplying) {
+    return res.status(400).json({ success: false, error: 'Missing required fields.' });
   }
 
-  res.json({ success: true, message: 'Suggestion submitted successfully.', id: submissionId });
+  try {
+    const client = req.app.get('discordClient');
+    const channel = await client.channels.fetch(config.channels.applications);
+    if (!channel || channel.type !== ChannelType.GuildForum) {
+      return res.status(500).json({ success: false, error: 'Applications forum channel not configured.' });
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor(0x57F287)
+      .setTitle('New Staff Application')
+      .addFields(
+        { name: 'Applicant', value: `${username} (<@${discordId}>)`, inline: true },
+        { name: 'Role Applying For', value: roleApplying, inline: true },
+        { name: 'Age', value: String(age), inline: true },
+        { name: 'Timezone', value: timezone, inline: true },
+        { name: 'Reason for Applying', value: reason, inline: false },
+        { name: 'Experience', value: experience, inline: false },
+      )
+      .setTimestamp();
+
+    const thread = await channel.threads.create({
+      name: `${roleApplying} — ${username}`.slice(0, 100),
+      message: { embeds: [embed] },
+    });
+
+    res.json({ success: true, id: thread.id });
+  } catch (err) {
+    console.error('[API] /api/application error:', err);
+    res.status(500).json({ success: false, error: 'Failed to submit application.' });
+  }
 });
 
 // ─── POST /api/partnership ────────────────────────────────────────────────────
 router.post('/partnership', maintenance, apiAuth, async (req, res) => {
-  const { serverName, inviteLink, serverType, reason, offering, contactId } = req.body;
+  const { serverName, inviteLink, serverType, reason, offering } = req.body;
 
   if (!serverName || !inviteLink || !serverType || !reason || !offering) {
     return res.status(400).json({ success: false, error: 'Missing required fields.' });
   }
 
-  const client = req.app.get('discordClient');
-  const guild = client.guilds.cache.get(config.guildId);
-  if (!guild) return res.status(500).json({ success: false, error: 'Discord guild not found.' });
+  try {
+    const client = req.app.get('discordClient');
+    const channel = await client.channels.fetch(config.channels.partnerships);
+    if (!channel || channel.type !== ChannelType.GuildForum) {
+      return res.status(500).json({ success: false, error: 'Partnerships forum channel not configured.' });
+    }
 
-  const partnerChannel = guild.channels.cache.get(config.channels.partnerships);
-  if (!partnerChannel) return res.status(500).json({ success: false, error: 'Partnerships channel not configured.' });
+    const embed = new EmbedBuilder()
+      .setColor(0x9B59B6)
+      .setTitle('New Partnership Request')
+      .addFields(
+        { name: 'Server Name', value: serverName, inline: true },
+        { name: 'Server Type', value: serverType, inline: true },
+        { name: 'Invite Link', value: inviteLink, inline: false },
+        { name: 'Reason', value: reason, inline: false },
+        { name: 'Offering', value: offering, inline: false },
+      )
+      .setTimestamp();
 
-  const submissionId = crypto.randomUUID();
-  const partnership = {
-    id: submissionId,
-    serverName,
-    inviteLink,
-    serverType,
-    reason,
-    offering,
-    contactId: contactId || null,
-    status: 'pending',
-    submittedAt: new Date().toISOString(),
-  };
+    const thread = await channel.threads.create({
+      name: serverName.slice(0, 100),
+      message: { embeds: [embed] },
+    });
 
-  const partnerships = readJSON('partnerships.json');
-  partnerships.push(partnership);
-  writeJSON('partnerships.json', partnerships);
-
-  const pingRole = config.roles.notifications?.partnerships;
-  const embed = new EmbedBuilder()
-    .setColor(config.colors.primary)
-    .setTitle('New Partnership Request')
-    .setDescription('A partnership request has been submitted via the HowToERLC website.')
-    .addFields(
-      { name: 'Server Name', value: serverName, inline: true },
-      { name: 'Server Type', value: serverType, inline: true },
-      { name: 'Invite Link', value: inviteLink, inline: false },
-      { name: 'Reason for Partnership', value: reason, inline: false },
-      { name: 'What They\'re Offering', value: offering, inline: false },
-      { name: 'Submission ID', value: submissionId, inline: false },
-    )
-    .setTimestamp();
-
-  const approveBtn = new ButtonBuilder()
-    .setCustomId(`partnership:approve:${submissionId}`)
-    .setLabel('Approve')
-    .setStyle(ButtonStyle.Success);
-
-  const denyBtn = new ButtonBuilder()
-    .setCustomId(`partnership:deny:${submissionId}`)
-    .setLabel('Deny')
-    .setStyle(ButtonStyle.Danger);
-
-  await partnerChannel.send({
-    content: pingRole ? `<@&${pingRole}>` : undefined,
-    embeds: [embed],
-    components: [new ActionRowBuilder().addComponents(approveBtn, denyBtn)],
-  });
-
-  res.json({ success: true, message: 'Partnership request submitted successfully.', id: submissionId });
+    res.json({ success: true, id: thread.id });
+  } catch (err) {
+    console.error('[API] /api/partnership error:', err);
+    res.status(500).json({ success: false, error: 'Failed to submit partnership request.' });
+  }
 });
 
 // ─── POST /api/ai-chat ────────────────────────────────────────────────────────
@@ -246,30 +133,15 @@ router.post('/ai-chat', maintenance, async (req, res) => {
     }
   }
 
-  const { message, sessionId } = req.body;
+  const { messages, options } = req.body;
 
-  if (!message || typeof message !== 'string' || message.trim().length === 0) {
-    return res.status(400).json({ success: false, error: 'Missing or empty message.' });
-  }
-
-  if (message.length > 2000) {
-    return res.status(400).json({ success: false, error: 'Message too long. Maximum 2,000 characters.' });
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ success: false, error: 'Missing or invalid messages array.' });
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return res.status(500).json({ success: false, error: 'AI assistant is not configured on this server.' });
   }
-
-  const sid = sessionId || crypto.randomUUID();
-  if (!chatSessions.has(sid)) chatSessions.set(sid, { messages: [], lastActivity: Date.now() });
-
-  const session = chatSessions.get(sid);
-  session.lastActivity = Date.now();
-  session.messages.push({ role: 'user', content: message.trim() });
-
-  const trimmed = session.messages.slice(-10);
-
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const systemPrompt = `You are the HowToERLC AI Assistant — a specialized helper for ERLC (Emergency Response: Liberty County) community builders and server owners.
 
@@ -292,30 +164,21 @@ If someone asks about anything outside of these topics, politely decline and red
 Be helpful, clear, and professional. Format responses with bullet points or headers when useful.`;
 
   try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       system: systemPrompt,
-      messages: trimmed,
+      messages,
+      ...(options || {}),
     });
 
-    const reply = response.content[0].text;
-    session.messages.push({ role: 'assistant', content: reply });
-    if (session.messages.length > 10) session.messages.splice(0, session.messages.length - 10);
-
-    res.json({ success: true, reply, sessionId: sid });
+    const content = response.content[0].text;
+    res.json({ success: true, content });
   } catch (err) {
-    console.error('[AI Chat] Anthropic error:', err);
+    console.error('[API] /api/ai-chat error:', err);
     res.status(500).json({ success: false, error: 'Failed to get a response from the AI assistant.' });
   }
 });
-
-// Session TTL cleanup — remove sessions inactive for 30+ minutes
-setInterval(() => {
-  const cutoff = Date.now() - 30 * 60 * 1000;
-  for (const [sid, session] of chatSessions.entries()) {
-    if (session.lastActivity < cutoff) chatSessions.delete(sid);
-  }
-}, 10 * 60 * 1000);
 
 module.exports = router;
