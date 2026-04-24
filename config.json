@@ -34,5 +34,9 @@
     "info": "#00B0F4",
     "flagAlert": "#FFA500"
   },
-  "website": "https://howtoerlc.xyz"
+  "website": "https://howtoerlc.xyz",
+  "branding": {
+    "footerIcon": "https://cdn.discordapp.com/attachments/1461879573707882610/1497367092037419149/kit.png?ex=69ed4346&is=69ebf1c6&hm=09f9fafa7b6cd1d9bbc0fccda9c6c664011b9e14b56f52cb88871cedfa0b805c&",
+    "thumbnail": "https://cdn.discordapp.com/attachments/1461879573707882610/1497372156324090067/GreenLogo.png?ex=69ed47fd&is=69ebf67d&hm=83ab78197f9f14d60fc8a522caf06223af696ac07a8465580fd6d16df860f132&"
+  }
 }

@@ -371,8 +371,7 @@ async function handleRolePanelButton(interaction) {
 const INFO_EMBEDS = {
   info_about: {
     title: 'About HowToERLC',
-    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\nOur website at **howtoerlc.xyz** extends everything in this server — submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
-    footer: 'HowToERLC — Est. 2024',
+    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\nVisit **howtoerlc.xyz** to submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
   },
   info_guidelines: {
     title: 'Server Guidelines',
@@ -380,7 +379,7 @@ const INFO_EMBEDS = {
   },
   info_advertising: {
     title: 'Advertising Guidelines',
-    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n**1. ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n**2. One post per 24 hours.** Each server may advertise once per 24-hour period.\n\n**3. No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n**4. Valid invite required.** All advertisements must include a valid Discord invite link.\n\n**5. Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\nStaff reserve the right to remove any advertisement at their discretion.',
+    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n**1. ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n**2. No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n**3. Valid invite required.** All advertisements must include a valid Discord invite link.\n\n**4. Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
   },
 };
 
@@ -393,7 +392,8 @@ async function handleDashboardSelect(interaction) {
     .setColor(config.colors.primary)
     .setTitle(data.title)
     .setDescription(data.description)
-    .setFooter({ text: data.footer || 'HowToERLC' });
+    .setThumbnail(config.branding.thumbnail)
+    .setFooter({ text: 'HowToERLC', iconURL: config.branding.footerIcon });
 
   await interaction.reply({ embeds: [embed], ephemeral: true });
 }
