@@ -7,7 +7,7 @@ module.exports = {
   async execute(client) {
     console.log(`[Ready] Logged in as ${client.user.tag}`);
     client.user.setPresence({
-      activities: [{ name: '<:Mention:1494830498290340000> howtoerlc.xyz', type: ActivityType.Watching }],
+      activities: [{ name: '🌐 howtoerlc.xyz', type: ActivityType.Watching }],
       status: 'online',
     });
 
