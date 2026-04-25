@@ -7,8 +7,10 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../config.json');
 const {
-  readTickets, writeTickets, getNextTicketNumber, formatTicketId,
-  fetchAllMessages, buildTranscript, postTranscript, closeTicket, claimTicket,
+  getNextTicketNumber, formatTicketId,
+  getOpenTicketByChannel, getOpenTicketByUser, createTicket,
+  fetchAllMessages, buildTranscript, postTranscript,
+  closeTicket, requestCloseTicket, approveCloseRequest, denyCloseRequest, claimTicket,
 } = require('../utils/ticketUtils');
 
 const dataPath = (file) => path.join(__dirname, '..', 'data', file);
@@ -230,9 +232,11 @@ async function handleTicketButton(interaction, client) {
     return interaction.showModal(modal);
   }
 
-  if (action === 'close')      return closeTicket(interaction, client);
-  if (action === 'claim')      return claimTicket(interaction, client);
-  if (action === 'transcript') return handleTicketTranscript(interaction, client);
+  if (action === 'close')         return closeTicket(interaction, client);
+  if (action === 'claim')         return claimTicket(interaction, client);
+  if (action === 'transcript')    return handleTicketTranscript(interaction, client);
+  if (action === 'approve_close') return approveCloseRequest(interaction, client);
+  if (action === 'deny_close')    return denyCloseRequest(interaction);
 }
 
 async function handleTicketTranscript(interaction, client) {
@@ -246,8 +250,7 @@ async function handleTicketTranscript(interaction, client) {
     return interaction.reply({ content: 'Only staff can generate transcripts.', flags: MessageFlags.Ephemeral });
   }
 
-  const ticketsData = readTickets();
-  const ticket = Object.values(ticketsData).find(t => t.channelId === interaction.channel.id);
+  const ticket = getOpenTicketByChannel(interaction.channel.id);
   if (!ticket) {
     return interaction.reply({ content: 'No ticket found for this channel.', flags: MessageFlags.Ephemeral });
   }
@@ -279,11 +282,7 @@ async function handleTicketModal(interaction, client) {
   const guild = interaction.guild;
   const user  = interaction.user;
 
-  const ticketsData = readTickets();
-
-  const existing = Object.values(ticketsData).find(
-    t => t.userId === user.id && t.status !== 'closed'
-  );
+  const existing = getOpenTicketByUser(user.id);
   if (existing) {
     return interaction.reply({
       content: `You already have an open ticket: <#${existing.channelId}>`,
@@ -291,7 +290,7 @@ async function handleTicketModal(interaction, client) {
     });
   }
 
-  const ticketNum = getNextTicketNumber(ticketsData);
+  const ticketNum = getNextTicketNumber();
   const ticketId  = formatTicketId(ticketNum);
 
   const channel = await guild.channels.create({
@@ -308,14 +307,11 @@ async function handleTicketModal(interaction, client) {
   });
 
   const now = new Date().toISOString();
-  ticketsData[ticketId] = {
+  createTicket({
     id: ticketId, number: ticketNum, channelId: channel.id,
     userId: user.id, username: user.tag,
-    subject, description, priority,
-    status: 'open', claimedBy: null, claimedAt: null,
-    openedAt: now, closedAt: null, closedBy: null, messages: [],
-  };
-  writeTickets(ticketsData);
+    subject, description, priority, openedAt: now,
+  });
 
   const ticketEmbed = new EmbedBuilder()
     .setColor(config.colors.primary)
