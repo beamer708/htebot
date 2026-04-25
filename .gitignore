@@ -1,3 +1,6 @@
 node_modules/
 .env
 *.log
+data/tickets.db
+data/tickets.db-shm
+data/tickets.db-wal
