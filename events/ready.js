@@ -1,5 +1,7 @@
 const { ActivityType, Collection } = require('discord.js');
 const { startRetentionChecker } = require('../utils/retentionChecker');
+const { resendSticky } = require('./messageCreate');
+const config = require('../config.json');
 
 module.exports = {
   name: 'clientReady',
@@ -27,5 +29,12 @@ module.exports = {
     console.log('[Ready] Invite cache populated.');
 
     startRetentionChecker(client);
+
+    // Send initial sticky messages to advertising channels
+    for (const channelId of config.advertisingChannels) {
+      const channel = client.channels.cache.get(channelId);
+      if (channel) await resendSticky(channel).catch(() => {});
+    }
+    console.log('[Ready] Advertising stickies posted.');
   },
 };
