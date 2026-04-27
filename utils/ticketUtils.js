@@ -135,7 +135,7 @@ async function postTranscript(guild, ticket, messages, closedBy, closeReason) {
 
   const embed = new EmbedBuilder()
     .setColor(config.colors.info)
-    .setTitle(`Ticket Transcript — #${String(ticket.number).padStart(4, '0')}`)
+    .setTitle(`<:Dot:1496643767585865818> Ticket Transcript — #${String(ticket.number).padStart(4, '0')}`)
     .addFields(fields)
     .setTimestamp();
 
@@ -192,7 +192,7 @@ async function closeTicket(interaction, client, reason) {
 
     const dmEmbed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('Your Ticket Has Been Closed')
+      .setTitle('<:Off:1498148430634160248> Your Ticket Has Been Closed')
       .addFields(dmFields)
       .setTimestamp();
     await creator.send({ embeds: [dmEmbed] });
@@ -357,7 +357,7 @@ async function claimTicket(interaction, client) {
       const updatedEmbed = EmbedBuilder.from(originalMsg.embeds[0])
         .setColor(config.colors.info)
         .addFields({
-          name: 'Claimed By',
+          name: '<:On:1498148402180001942> Claimed By',
           value: `<@${interaction.user.id}> at <t:${Math.floor(Date.now() / 1000)}:R>`,
           inline: false,
         });

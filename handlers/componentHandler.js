@@ -315,7 +315,7 @@ async function handleTicketModal(interaction, client) {
 
   const ticketEmbed = new EmbedBuilder()
     .setColor(config.colors.primary)
-    .setTitle(`Ticket #${String(ticketNum).padStart(4, '0')} — ${subject}`)
+    .setTitle(`<:On:1498148402180001942> Ticket #${String(ticketNum).padStart(4, '0')} — ${subject}`)
     .setDescription(description)
     .addFields(
       { name: 'Opened By', value: `<@${user.id}> (${user.id})`,                             inline: true },
@@ -359,16 +359,16 @@ async function handleRolePanelButton(interaction) {
 // ── Dashboard info select menu ────────────────────────────────────────────────
 const INFO_EMBEDS = {
   info_about: {
-    title: 'About HowToERLC',
-    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\nVisit **howtoerlc.xyz** to submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
+    title: '<:howtoglogo:1494830728113033327> About HowToERLC',
+    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\n<:RightArrow:1498148469284667562> Visit **howtoerlc.xyz** to submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
   },
   info_guidelines: {
-    title: 'Server Guidelines',
-    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n**1. Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n**2. Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n**3. No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n**4. Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n**5. Staff decisions are final.** Repeated violations will result in removal from the server.',
+    title: '<:Dot:1496643767585865818> Server Guidelines',
+    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n<:Check:1494830681484824616> **Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n<:Check:1494830681484824616> **Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n<:Cancel:1494830662581092482> **No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n<:Check:1494830681484824616> **Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n<:Dot:1496643767585865818> **Staff decisions are final.** Repeated violations will result in removal from the server.',
   },
   info_advertising: {
-    title: 'Advertising Guidelines',
-    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n**1. ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n**2. No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n**3. Valid invite required.** All advertisements must include a valid Discord invite link.\n\n**4. Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
+    title: '<:Dot:1496643767585865818> Advertising Guidelines',
+    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n<:Check:1494830681484824616> **ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n<:Cancel:1494830662581092482> **No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n<:Check:1494830681484824616> **Valid invite required.** All advertisements must include a valid Discord invite link.\n\n<:Dot:1496643767585865818> **Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
   },
 };
 
@@ -417,9 +417,9 @@ async function handleRoleSelect(interaction) {
   }
 
   const lines = [];
-  if (added.length) lines.push(`Added: ${added.join(', ')}`);
-  if (removed.length) lines.push(`Removed: ${removed.join(', ')}`);
-  if (!lines.length) lines.push('No changes made.');
+  if (added.length) lines.push(`<:On:1498148402180001942> ${added.join(', ')}`);
+  if (removed.length) lines.push(`<:Off:1498148430634160248> ${removed.join(', ')}`);
+  if (!lines.length) lines.push('<:Dot:1496643767585865818> No changes made.');
 
   await interaction.reply({ content: `Your notification roles have been updated.\n${lines.join('\n')}`, flags: MessageFlags.Ephemeral });
 }
