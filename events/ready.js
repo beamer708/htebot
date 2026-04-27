@@ -1,6 +1,5 @@
 const { ActivityType, Collection } = require('discord.js');
 const { startRetentionChecker } = require('../utils/retentionChecker');
-const { resendSticky } = require('./messageCreate');
 const { db } = require('../utils/appDb');
 const config = require('../config.json');
 
@@ -103,11 +102,5 @@ module.exports = {
       ].join('\n')
     );
 
-    // Send initial sticky messages to advertising channels
-    for (const channelId of config.advertisingChannels) {
-      const channel = client.channels.cache.get(channelId);
-      if (channel) await resendSticky(channel).catch(() => {});
-    }
-    console.log('[Ready] Advertising stickies posted.');
   },
 };
