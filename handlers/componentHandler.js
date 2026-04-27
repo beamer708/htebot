@@ -36,7 +36,7 @@ async function handleApplicationButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const applications = readJSON('applications.json');
   const idx = applications.findIndex(a => a.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: 'Application not found.', flags: MessageFlags.Ephemeral });
+  if (idx === -1) return interaction.reply({ content: '<:Cancel:1494830662581092482> Application not found.', flags: MessageFlags.Ephemeral });
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
@@ -44,7 +44,7 @@ async function handleApplicationButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: 'Only staff can review applications.', flags: MessageFlags.Ephemeral });
+  if (!isStaff) return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can review applications.', flags: MessageFlags.Ephemeral });
 
   const app = applications[idx];
   const accepted = action === 'accept';
@@ -77,7 +77,7 @@ async function handleSuggestionButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const suggestions = readJSON('suggestions.json');
   const idx = suggestions.findIndex(s => s.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: 'Suggestion not found.', flags: MessageFlags.Ephemeral });
+  if (idx === -1) return interaction.reply({ content: '<:Cancel:1494830662581092482> Suggestion not found.', flags: MessageFlags.Ephemeral });
 
   const suggestion = suggestions[idx];
 
@@ -127,7 +127,7 @@ async function handleSuggestionButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: 'Only staff can approve or decline suggestions.', flags: MessageFlags.Ephemeral });
+  if (!isStaff) return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can approve or decline suggestions.', flags: MessageFlags.Ephemeral });
 
   const accepted = action === 'approve';
   const staffName = interaction.user.username;
@@ -157,7 +157,7 @@ async function handlePartnershipButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const partnerships = readJSON('partnerships.json');
   const idx = partnerships.findIndex(p => p.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: 'Partnership not found.', flags: MessageFlags.Ephemeral });
+  if (idx === -1) return interaction.reply({ content: '<:Cancel:1494830662581092482> Partnership not found.', flags: MessageFlags.Ephemeral });
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
@@ -165,7 +165,7 @@ async function handlePartnershipButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: 'Only staff can review partnership requests.', flags: MessageFlags.Ephemeral });
+  if (!isStaff) return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can review partnership requests.', flags: MessageFlags.Ephemeral });
 
   const partnership = partnerships[idx];
   const accepted = action === 'approve';
@@ -247,7 +247,7 @@ async function handleTicketTranscript(interaction, client) {
     member.permissions.has('ManageChannels')
   );
   if (!isStaff) {
-    return interaction.reply({ content: 'Only staff can generate transcripts.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can generate transcripts.', flags: MessageFlags.Ephemeral });
   }
 
   const ticket = getOpenTicketByChannel(interaction.channel.id);
@@ -339,7 +339,7 @@ async function handleTicketModal(interaction, client) {
     components: [row1, row2],
   });
 
-  await interaction.reply({ content: `Your ticket has been created: ${channel}`, flags: MessageFlags.Ephemeral });
+  await interaction.reply({ content: `<:Check:1494830681484824616> Your ticket has been created: ${channel}`, flags: MessageFlags.Ephemeral });
 }
 
 // ── Role panel buttons ────────────────────────────────────────────────────────
@@ -396,7 +396,7 @@ async function handleRoleSelect(interaction) {
   ].filter(Boolean);
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
-  if (!member) return interaction.reply({ content: 'Could not fetch your member data.', flags: MessageFlags.Ephemeral });
+  if (!member) return interaction.reply({ content: '<:Cancel:1494830662581092482> Could not fetch your member data.', flags: MessageFlags.Ephemeral });
 
   const added = [];
   const removed = [];

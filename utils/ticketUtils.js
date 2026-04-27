@@ -148,7 +148,7 @@ async function closeTicket(interaction, client, reason) {
   const ticket = getOpenTicketByChannel(interaction.channel.id);
 
   if (!ticket) {
-    const msg = { content: 'No open ticket found in this channel.', flags: MessageFlags.Ephemeral };
+    const msg = { content: '<:Cancel:1494830662581092482> No open ticket found in this channel.', flags: MessageFlags.Ephemeral };
     return interaction.replied || interaction.deferred
       ? interaction.followUp(msg)
       : interaction.reply(msg);
@@ -161,7 +161,7 @@ async function closeTicket(interaction, client, reason) {
     member.permissions.has('ManageChannels')
   );
   if (!isStaff && ticket.userId !== interaction.user.id) {
-    const msg = { content: 'Only the ticket creator or staff can close this ticket.', flags: MessageFlags.Ephemeral };
+    const msg = { content: '<:Cancel:1494830662581092482> Only the ticket creator or staff can close this ticket.', flags: MessageFlags.Ephemeral };
     return interaction.replied || interaction.deferred
       ? interaction.followUp(msg)
       : interaction.reply(msg);
@@ -201,7 +201,7 @@ async function closeTicket(interaction, client, reason) {
   }
 
   await interaction.channel.send(
-    `Ticket closed by **${interaction.user.tag}**${reason ? ` — ${reason}` : ''}. This channel will be deleted in 10 seconds.`
+    `<:Cancel:1494830662581092482> Ticket closed by **${interaction.user.tag}**${reason ? ` — ${reason}` : ''}. This channel will be deleted in 10 seconds.`
   ).catch(() => {});
 
   setTimeout(() => interaction.channel.delete().catch(() => {}), 10_000);
@@ -234,7 +234,7 @@ async function requestCloseTicket(interaction, reason) {
 
   const embed = new EmbedBuilder()
     .setColor(config.colors.warning)
-    .setTitle('Close Requested')
+    .setTitle('<:Dot:1496643767585865818> Close Requested')
     .setDescription(`**<@${interaction.user.id}>** has requested this ticket be closed.`)
     .addFields({ name: 'Reason', value: reason, inline: false })
     .setTimestamp();
@@ -254,7 +254,7 @@ async function requestCloseTicket(interaction, reason) {
     components: [new ActionRowBuilder().addComponents(approveBtn, denyBtn)],
   });
 
-  await interaction.reply({ content: 'Your close request has been submitted. Staff will review it shortly.', flags: MessageFlags.Ephemeral });
+  await interaction.reply({ content: '<:Check:1494830681484824616> Your close request has been submitted. Staff will review it shortly.', flags: MessageFlags.Ephemeral });
 }
 
 async function approveCloseRequest(interaction, client) {
@@ -301,7 +301,7 @@ async function denyCloseRequest(interaction) {
     embeds: [
       new EmbedBuilder()
         .setColor(config.colors.error)
-        .setTitle('Close Request Denied')
+        .setTitle('<:Cancel:1494830662581092482> Close Request Denied')
         .setDescription(`**${interaction.user.tag}** denied the close request.`)
         .setTimestamp(),
     ],
@@ -366,7 +366,7 @@ async function claimTicket(interaction, client) {
   }
 
   await interaction.reply({
-    content: `**${interaction.user.tag}** has claimed this ticket and will assist you shortly.`,
+    content: `<:Check:1494830681484824616> **${interaction.user.tag}** has claimed this ticket and will assist you shortly.`,
   });
 }
 
