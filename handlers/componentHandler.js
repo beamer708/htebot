@@ -12,6 +12,9 @@ const {
   fetchAllMessages, buildTranscript, postTranscript,
   closeTicket, requestCloseTicket, approveCloseRequest, denyCloseRequest, claimTicket,
 } = require('../utils/ticketUtils');
+const { handleStaffApplyButton, handleStaffApplyModal } = require('./appHandler');
+const { handleSuggestModal, handleSugApprove, handleSugDeny } = require('./sugHandler');
+const { handleSearchNav } = require('./searchHandler');
 
 const dataPath = (file) => path.join(__dirname, '..', 'data', file);
 
@@ -446,12 +449,16 @@ module.exports = async (interaction, client) => {
   try {
     if (interaction.isButton()) {
       const prefix = interaction.customId.split(':')[0];
-      if (prefix === 'app')         return handleApplicationButton(interaction, client);
-      if (prefix === 'suggestion')  return handleSuggestionButton(interaction, client);
-      if (prefix === 'partnership') return handlePartnershipButton(interaction, client);
-      if (prefix === 'ticket')      return handleTicketButton(interaction, client);
-      if (prefix === 'role')        return handleRolePanelButton(interaction);
-      if (prefix === 'invitereset') return handleInviteResetButton(interaction);
+      if (interaction.customId === 'staff_apply') return handleStaffApplyButton(interaction);
+      if (prefix === 'sug_approve')  return handleSugApprove(interaction, client);
+      if (prefix === 'sug_deny')     return handleSugDeny(interaction, client);
+      if (prefix === 'search_nav')   return handleSearchNav(interaction);
+      if (prefix === 'app')          return handleApplicationButton(interaction, client);
+      if (prefix === 'suggestion')   return handleSuggestionButton(interaction, client);
+      if (prefix === 'partnership')  return handlePartnershipButton(interaction, client);
+      if (prefix === 'ticket')       return handleTicketButton(interaction, client);
+      if (prefix === 'role')         return handleRolePanelButton(interaction);
+      if (prefix === 'invitereset')  return handleInviteResetButton(interaction);
     }
 
     if (interaction.isStringSelectMenu()) {
@@ -460,7 +467,9 @@ module.exports = async (interaction, client) => {
     }
 
     if (interaction.isModalSubmit()) {
-      if (interaction.customId === 'ticket_modal') return handleTicketModal(interaction, client);
+      if (interaction.customId === 'ticket_modal')     return handleTicketModal(interaction, client);
+      if (interaction.customId === 'staff_apply_modal') return handleStaffApplyModal(interaction, client);
+      if (interaction.customId === 'suggest_modal')     return handleSuggestModal(interaction, client);
     }
   } catch (err) {
     console.error('[ComponentHandler] Error:', err);

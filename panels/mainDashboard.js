@@ -28,6 +28,11 @@ async function sendMainDashboard(interaction) {
       { label: 'Partnerships', description: 'Get notified about new partners', value: config.roles.notifications.partnerships || 'partnerships' },
     ]);
 
+  const applyBtn = new ButtonBuilder()
+    .setCustomId('staff_apply')
+    .setLabel('Apply')
+    .setStyle(ButtonStyle.Success);
+
   const websiteBtn = new ButtonBuilder()
     .setLabel('Website')
     .setStyle(ButtonStyle.Link)
@@ -63,7 +68,7 @@ async function sendMainDashboard(interaction) {
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addActionRowComponents(
-      new ActionRowBuilder().addComponents(websiteBtn, assistBtn)
+      new ActionRowBuilder().addComponents(websiteBtn, assistBtn, applyBtn)
     )
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`-# HowToERLC`)
