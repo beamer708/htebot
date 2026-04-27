@@ -30,13 +30,7 @@ function buildStickyMessage() {
         '<:Check:1494830681484824616> **ERLC-related only**\n' +
         'Advertisements must be for ERLC or Roblox emergency services communities.\n\n' +
         '<:Check:1494830681484824616> **Valid invite link required**\n' +
-        'Ensure your link is active before posting. Expired or broken links result in an automatic **warning**.\n\n' +
-        '<:Dot:1496643767585865818> **24 hour cooldown**\n' +
-        'Wait at least 24 hours between posts in the same channel.\n\n' +
-        '<:Cancel:1494830662581092482> **No staff recruiting**\n' +
-        'Soliciting members away from this server is not allowed.\n\n' +
-        '<:Cancel:1494830662581092482> **One post per channel**\n' +
-        'Do not post the same advertisement across multiple channels at once.'
+        'Ensure your link is active before posting. Expired or broken links result in an automatic **warning**.'
       )
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
