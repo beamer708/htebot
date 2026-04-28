@@ -146,6 +146,8 @@ async function handleStaffApplyModal(interaction, client) {
       // Pin the starter message
       const starter = await thread.fetchStarterMessage().catch(() => null);
       if (starter) await starter.pin().catch(() => {});
+
+      await thread.send(`<@&${config.roles.admin}> New application submitted.`);
     }
 
     // DM applicant
