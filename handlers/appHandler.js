@@ -1,6 +1,7 @@
 const {
   ModalBuilder, TextInputBuilder, TextInputStyle,
-  ActionRowBuilder, EmbedBuilder, MessageFlags,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
+  EmbedBuilder, MessageFlags,
 } = require('discord.js');
 const { db, nextAppId } = require('../utils/appDb');
 const config = require('../config.json');
@@ -124,9 +125,20 @@ async function handleStaffApplyModal(interaction, client) {
         )
         .setTimestamp(now * 1000);
 
+      const reviewRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`app_review:approve:${appId}`)
+          .setLabel('Accept')
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId(`app_review:deny:${appId}`)
+          .setLabel('Deny')
+          .setStyle(ButtonStyle.Danger),
+      );
+
       const thread = await forumChannel.threads.create({
         name: `[${appId}] ${interaction.user.tag} — ${role}`.slice(0, 100),
-        message: { embeds: [embed] },
+        message: { embeds: [embed], components: [reviewRow] },
       });
 
       db.prepare('UPDATE applications SET thread_id = ? WHERE id = ?').run(thread.id, appId);
@@ -306,9 +318,147 @@ async function denyApplication(interaction, client, rawId, reason) {
   });
 }
 
+// ── Forum thread Accept / Deny buttons ───────────────────────────────────────
+
+async function handleAppReviewButton(interaction, client) {
+  const [, action, appId] = interaction.customId.split(':');
+
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  const isStaff = member && (
+    member.roles.cache.has(config.roles.staff) ||
+    member.roles.cache.has(config.roles.admin) ||
+    member.permissions.has('ManageGuild')
+  );
+  if (!isStaff) {
+    return interaction.reply({
+      content: '<:Cancel:1494830662581092482> Only staff can review applications.',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
+  if (!app) {
+    return interaction.reply({
+      content: `<:Cancel:1494830662581092482> Application **${appId}** not found.`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+  if (app.status !== 'pending') {
+    return interaction.reply({
+      content: `<:Cancel:1494830662581092482> This application has already been **${app.status}**.`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  if (action === 'approve') {
+    const now = Math.floor(Date.now() / 1000);
+    db.prepare('UPDATE applications SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
+      .run('approved', interaction.user.id, now, app.id);
+
+    const fields = interaction.message.embeds[0].fields.map(f =>
+      f.name === 'Status'
+        ? { name: 'Status', value: '<:Check:1494830681484824616> Approved', inline: f.inline }
+        : f
+    );
+    fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
+
+    await interaction.update({
+      embeds: [EmbedBuilder.from(interaction.message.embeds[0]).setColor(0x57F287).setFields(fields)],
+      components: [],
+    });
+
+    try {
+      const user = await client.users.fetch(app.user_id);
+      const dmEmbed = new EmbedBuilder()
+        .setColor(0x57F287)
+        .setTitle('<:Check:1494830681484824616> Application Approved')
+        .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved! A staff member will reach out with next steps.`)
+        .setTimestamp();
+      await user.send({ embeds: [dmEmbed] });
+    } catch { /* DMs disabled */ }
+
+  } else {
+    // Show modal for optional deny reason
+    const modal = new ModalBuilder()
+      .setCustomId(`app_deny_modal:${appId}`)
+      .setTitle('Deny Application');
+
+    modal.addComponents(
+      new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+          .setCustomId('deny_reason')
+          .setLabel('Reason (optional)')
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(false)
+          .setPlaceholder('Provide a reason for denying this application.')
+          .setMaxLength(500)
+      )
+    );
+
+    return interaction.showModal(modal);
+  }
+}
+
+async function handleAppDenyModal(interaction, client) {
+  const appId = interaction.customId.split(':')[1];
+  const reason = interaction.fields.getTextInputValue('deny_reason').trim();
+
+  const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
+  if (!app || app.status !== 'pending') {
+    return interaction.reply({
+      content: `<:Cancel:1494830662581092482> Application **${appId}** is no longer pending.`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  await interaction.deferUpdate();
+
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare('UPDATE applications SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
+    .run('denied', interaction.user.id, now, app.id);
+
+  // Update the forum thread starter message
+  if (app.thread_id) {
+    try {
+      const thread = await client.channels.fetch(app.thread_id).catch(() => null);
+      if (thread) {
+        const starter = await thread.fetchStarterMessage().catch(() => null);
+        if (starter?.embeds[0]) {
+          const fields = starter.embeds[0].fields.map(f =>
+            f.name === 'Status'
+              ? { name: 'Status', value: '<:Cancel:1494830662581092482> Denied', inline: f.inline }
+              : f
+          );
+          fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
+          if (reason) fields.push({ name: 'Reason', value: reason, inline: false });
+          await starter.edit({
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0xED4245).setFields(fields)],
+            components: [],
+          }).catch(() => {});
+        }
+      }
+    } catch (err) {
+      console.error('[AppHandler] Forum edit error on deny modal:', err);
+    }
+  }
+
+  try {
+    const user = await client.users.fetch(app.user_id);
+    const dmEmbed = new EmbedBuilder()
+      .setColor(0xED4245)
+      .setTitle('<:Cancel:1494830662581092482> Application Denied')
+      .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
+      .setTimestamp();
+    if (reason) dmEmbed.addFields({ name: 'Reason', value: reason, inline: false });
+    await user.send({ embeds: [dmEmbed] });
+  } catch { /* DMs disabled */ }
+}
+
 module.exports = {
   handleStaffApplyButton,
   handleStaffApplyModal,
   approveApplication,
   denyApplication,
+  handleAppReviewButton,
+  handleAppDenyModal,
 };
