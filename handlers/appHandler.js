@@ -67,7 +67,7 @@ async function handleStaffApplyButton(interaction) {
         .setCustomId('app_role')
         .setLabel('Role applying for')
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder('Community Team or Beta Tester')
+        .setPlaceholder('Management / Public Relations / Administration / Beta Tester')
         .setRequired(true)
     ),
   );
