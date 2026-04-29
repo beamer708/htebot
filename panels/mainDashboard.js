@@ -40,7 +40,7 @@ async function sendMainDashboard(interaction) {
   const assistBtn = new ButtonBuilder()
     .setCustomId('ticket:create')
     .setLabel('Get Assistance')
-    .setStyle(ButtonStyle.Primary);
+    .setStyle(ButtonStyle.Success);
 
   const applyBtn = new ButtonBuilder()
     .setCustomId('staff_apply')
@@ -48,7 +48,7 @@ async function sendMainDashboard(interaction) {
     .setStyle(ButtonStyle.Success);
 
   const container = new ContainerBuilder()
-    .setAccentColor(resolveColor(config.colors.primary))
+    .setAccentColor(resolveColor('#4ade80'))
     .addMediaGalleryComponents(
       new MediaGalleryBuilder().addItems(
         new MediaGalleryItemBuilder().setURL(HEADER_IMAGE)
