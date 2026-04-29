@@ -1,9 +1,13 @@
 const {
-  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, SectionBuilder, ThumbnailBuilder,
+  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
+  MediaGalleryBuilder, MediaGalleryItemBuilder,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder,
   MessageFlags, resolveColor,
 } = require('discord.js');
 const config = require('../config.json');
+
+const HEADER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499183886578614442/Embed_Header_Banner.png';
+const FOOTER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499184076383588502/Embed_Footer_Banner.png';
 
 async function sendMainDashboard(interaction) {
   const infoMenu = new StringSelectMenuBuilder()
@@ -28,11 +32,6 @@ async function sendMainDashboard(interaction) {
       { label: 'Partnerships', description: 'Get notified about new partners', value: config.roles.notifications.partnerships || 'partnerships' },
     ]);
 
-  const applyBtn = new ButtonBuilder()
-    .setCustomId('staff_apply')
-    .setLabel('Apply')
-    .setStyle(ButtonStyle.Success);
-
   const websiteBtn = new ButtonBuilder()
     .setLabel('Website')
     .setStyle(ButtonStyle.Link)
@@ -43,21 +42,24 @@ async function sendMainDashboard(interaction) {
     .setLabel('Get Assistance')
     .setStyle(ButtonStyle.Primary);
 
+  const applyBtn = new ButtonBuilder()
+    .setCustomId('staff_apply')
+    .setLabel('Apply')
+    .setStyle(ButtonStyle.Success);
+
   const container = new ContainerBuilder()
     .setAccentColor(resolveColor(config.colors.primary))
-    .addSectionComponents(
-      new SectionBuilder()
-        .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(
-            '### Welcome to HowToERLC\n' +
-            '> You have just joined the **#1 resource hub** for ERLC community owners on Roblox. ' +
-            'Browse our server information below, **grab your notification roles**, and visit **howtoerlc.xyz** for guides, templates, and tools built specifically for your community. ' +
-            'Need help? Our staff team is always available. **Open a ticket** and we will get back to you.'
-          )
-        )
-        .setThumbnailAccessory(
-          new ThumbnailBuilder().setURL(config.branding.thumbnail)
-        )
+    .addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(HEADER_IMAGE)
+      )
+    )
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        'Welcome to **HowToERLC**, the #1 resource hub for ERLC community owners on Roblox. ' +
+        'Browse our server information below, grab your notification roles, and visit **howtoerlc.xyz** for guides, templates, and tools built for your community. ' +
+        'Need help? Our staff team is always here. Open a ticket and we will get back to you.'
+      )
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addActionRowComponents(
@@ -70,8 +72,10 @@ async function sendMainDashboard(interaction) {
     .addActionRowComponents(
       new ActionRowBuilder().addComponents(websiteBtn, assistBtn, applyBtn)
     )
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`-# HowToERLC`)
+    .addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(FOOTER_IMAGE)
+      )
     );
 
   await interaction.channel.send({
