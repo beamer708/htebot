@@ -23,7 +23,7 @@ router.post('/suggestion', maintenance, apiAuth, async (req, res) => {
     }
 
     const embed = new EmbedBuilder()
-      .setColor(0x5865F2)
+      .setColor(0x4ADE80)
       .setTitle(title)
       .addFields(
         { name: 'Category', value: category, inline: true },
@@ -60,7 +60,7 @@ router.post('/application', maintenance, apiAuth, async (req, res) => {
     }
 
     const embed = new EmbedBuilder()
-      .setColor(0x57F287)
+      .setColor(0x4ADE80)
       .setTitle('New Staff Application')
       .addFields(
         { name: 'Applicant', value: `${username} (<@${discordId}>)`, inline: true },
@@ -100,7 +100,7 @@ router.post('/partnership', maintenance, apiAuth, async (req, res) => {
     }
 
     const embed = new EmbedBuilder()
-      .setColor(0x9B59B6)
+      .setColor(0x4ADE80)
       .setTitle('New Partnership Request')
       .addFields(
         { name: 'Server Name', value: serverName, inline: true },

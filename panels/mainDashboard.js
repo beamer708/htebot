@@ -6,7 +6,6 @@ const {
 } = require('discord.js');
 const config = require('../config.json');
 
-const HEADER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499183886578614442/Embed_Header_Banner.png';
 const FOOTER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499184076383588502/Embed_Footer_Banner.png';
 
 async function sendMainDashboard(interaction) {
@@ -49,11 +48,6 @@ async function sendMainDashboard(interaction) {
 
   const container = new ContainerBuilder()
     .setAccentColor(resolveColor('#4ade80'))
-    .addMediaGalleryComponents(
-      new MediaGalleryBuilder().addItems(
-        new MediaGalleryItemBuilder().setURL(HEADER_IMAGE)
-      )
-    )
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
         'Welcome to **HowToERLC**, the #1 resource hub for ERLC community owners on Roblox. ' +

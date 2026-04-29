@@ -6,7 +6,7 @@ const {
 const { db, nextAppId } = require('../utils/appDb');
 const config = require('../config.json');
 
-const APP_COLOR = 0x52D973;
+const APP_COLOR = 0x4ADE80;
 const RATE_LIMIT_DAYS = 7;
 
 // ── Staff Apply button → open modal ──────────────────────────────────────────
@@ -217,7 +217,7 @@ async function approveApplication(interaction, client, rawId, reason) {
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
           if (reason) fields.push({ name: 'Review Note', value: reason, inline: false });
           await starter.edit({
-            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x57F287).setFields(fields)],
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x4ADE80).setFields(fields)],
           }).catch(() => {});
         }
       }
@@ -230,7 +230,7 @@ async function approveApplication(interaction, client, rawId, reason) {
   try {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
-      .setColor(0x57F287)
+      .setColor(0x4ADE80)
       .setTitle('<:Check:1494830681484824616> Application Approved')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved! A staff member will reach out with next steps.`)
       .setTimestamp();
@@ -294,7 +294,7 @@ async function denyApplication(interaction, client, rawId, reason) {
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
           if (reason) fields.push({ name: 'Reason', value: reason, inline: false });
           await starter.edit({
-            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0xED4245).setFields(fields)],
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x4ADE80).setFields(fields)],
           }).catch(() => {});
         }
       }
@@ -307,7 +307,7 @@ async function denyApplication(interaction, client, rawId, reason) {
   try {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
-      .setColor(0xED4245)
+      .setColor(0x4ADE80)
       .setTitle('<:Cancel:1494830662581092482> Application Denied')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
       .setTimestamp();
@@ -365,14 +365,14 @@ async function handleAppReviewButton(interaction, client) {
     fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
 
     await interaction.update({
-      embeds: [EmbedBuilder.from(interaction.message.embeds[0]).setColor(0x57F287).setFields(fields)],
+      embeds: [EmbedBuilder.from(interaction.message.embeds[0]).setColor(0x4ADE80).setFields(fields)],
       components: [],
     });
 
     try {
       const user = await client.users.fetch(app.user_id);
       const dmEmbed = new EmbedBuilder()
-        .setColor(0x57F287)
+        .setColor(0x4ADE80)
         .setTitle('<:Check:1494830681484824616> Application Approved')
         .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved! A staff member will reach out with next steps.`)
         .setTimestamp();
@@ -434,7 +434,7 @@ async function handleAppDenyModal(interaction, client) {
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
           if (reason) fields.push({ name: 'Reason', value: reason, inline: false });
           await starter.edit({
-            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0xED4245).setFields(fields)],
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x4ADE80).setFields(fields)],
             components: [],
           }).catch(() => {});
         }
@@ -447,7 +447,7 @@ async function handleAppDenyModal(interaction, client) {
   try {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
-      .setColor(0xED4245)
+      .setColor(0x4ADE80)
       .setTitle('<:Cancel:1494830662581092482> Application Denied')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
       .setTimestamp();

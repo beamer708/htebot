@@ -12,13 +12,8 @@ function statusBadge(status) {
   return '<:Dot:1496643767585865818> Pending';
 }
 
-function statusColor(type, status) {
-  if (type === 'application') {
-    if (status === 'approved') return 0x57F287;
-    if (status === 'denied')   return 0xED4245;
-    return 0xFEE75C;
-  }
-  return status === 'denied' ? 0xED4245 : 0x5865F2;
+function statusColor() {
+  return 0x4ADE80;
 }
 
 function buildQuery(type, filters) {
@@ -56,7 +51,7 @@ function buildListEmbed(type, rows, page, total) {
   });
 
   return new EmbedBuilder()
-    .setColor(0x5865F2)
+    .setColor(0x4ADE80)
     .setTitle(`<:Dot:1496643767585865818> ${typeLabel} Search Results`)
     .setDescription(lines.join('\n') || 'No results.')
     .setFooter({ text: `Page ${page + 1} of ${totalPages} • ${total} total` })
