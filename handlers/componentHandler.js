@@ -395,7 +395,7 @@ async function handleRoleSelect(interaction) {
   const allNotifRoles = [
     config.roles.notifications.updates,
     config.roles.notifications.resources,
-    config.roles.notifications.partnerships,
+    config.roles.notifications.announcements,
   ].filter(Boolean);
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);

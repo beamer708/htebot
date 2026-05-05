@@ -26,9 +26,9 @@ async function sendMainDashboard(interaction) {
     .setMinValues(0)
     .setMaxValues(3)
     .addOptions([
-      { label: 'Server Updates', description: 'Get notified about announcements', value: config.roles.notifications.updates || 'updates' },
+      { label: 'Change Log', description: 'Get notified about change logs', value: config.roles.notifications.updates || 'updates' },
       { label: 'New Resources', description: 'Get notified when resources drop', value: config.roles.notifications.resources || 'resources' },
-      { label: 'Partnerships', description: 'Get notified about new partners', value: config.roles.notifications.partnerships || 'partnerships' },
+      { label: 'Announcements', description: 'Get notified about announcements', value: config.roles.notifications.announcements || 'announcements' },
     ]);
 
   const websiteBtn = new ButtonBuilder()
