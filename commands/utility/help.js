@@ -14,7 +14,7 @@ module.exports = {
       .addFields(
         {
           name: 'Tickets',
-          value: '`/ticket-setup` — Post the ticket creation panel\n`/close` — Close the current ticket channel',
+          value: '`/claim` — Claim the current ticket\n`/close` — Close or request closure of the current ticket',
           inline: false,
         },
         {
@@ -24,17 +24,12 @@ module.exports = {
         },
         {
           name: 'Admin',
-          value: '`/announce` — Post an announcement\n`/resource` — Post a resource release\n`/role-panel` — Create a role selection panel\n`/panel` — Post a server dashboard\n`/maintenance` — Toggle maintenance mode',
+          value: '`/announce` — Post an announcement\n`/resource` — Post a resource release\n`/panel` — Post a server dashboard\n`/maintenance` — Toggle maintenance mode\n`/invite-admin` — Manage invite tracking\n`/approve` — Approve a staff application\n`/deny` — Deny a staff application\n`/search` — Search applications or suggestions',
           inline: false,
         },
         {
           name: 'Utility',
-          value: '`/ping` — Check bot latency\n`/help` — Show this list',
-          inline: false,
-        },
-        {
-          name: 'Web Forms',
-          value: 'Staff applications, suggestions, and partnership requests are submitted through the website at [howtoerlc.xyz](https://howtoerlc.xyz) and post automatically to this server.',
+          value: '`/suggest` — Submit a suggestion\n`/ping` — Check bot latency\n`/help` — Show this list',
           inline: false,
         },
       )
