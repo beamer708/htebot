@@ -12,7 +12,7 @@ const {
   fetchAllMessages, buildTranscript, postTranscript,
   closeTicket, requestCloseTicket, approveCloseRequest, denyCloseRequest, claimTicket,
 } = require('../utils/ticketUtils');
-const { handleStaffApplyButton, handleStaffApplyModal, handleAppReviewButton, handleAppDenyModal, handleAppUnlock } = require('./appHandler');
+const { handleStaffApplyButton, handleStaffApplyModal, handleAppReviewButton, handleAppApproveModal, handleAppDenyModal, handleAppUnlock } = require('./appHandler');
 const { handleSuggestModal, handleSugApprove, handleSugDeny } = require('./sugHandler');
 const { handleSearchNav } = require('./searchHandler');
 
@@ -469,10 +469,11 @@ module.exports = async (interaction, client) => {
     }
 
     if (interaction.isModalSubmit()) {
-      if (interaction.customId === 'ticket_modal')               return handleTicketModal(interaction, client);
-      if (interaction.customId === 'staff_apply_modal')          return handleStaffApplyModal(interaction, client);
-      if (interaction.customId === 'suggest_modal')              return handleSuggestModal(interaction, client);
-      if (interaction.customId.startsWith('app_deny_modal:'))    return handleAppDenyModal(interaction, client);
+      if (interaction.customId === 'ticket_modal')                    return handleTicketModal(interaction, client);
+      if (interaction.customId === 'staff_apply_modal')              return handleStaffApplyModal(interaction, client);
+      if (interaction.customId === 'suggest_modal')                   return handleSuggestModal(interaction, client);
+      if (interaction.customId.startsWith('app_approve_modal:'))     return handleAppApproveModal(interaction, client);
+      if (interaction.customId.startsWith('app_deny_modal:'))        return handleAppDenyModal(interaction, client);
     }
   } catch (err) {
     console.error('[ComponentHandler] Error:', err);
