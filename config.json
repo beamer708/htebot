@@ -24,16 +24,16 @@
     "notifications": {
       "updates": "1485745951451775211",
       "resources": "1485745906539302972",
-      "partnerships": "1495136624122527875"
+      "announcements": "1485746083635400954"
     }
   },
   "colors": {
-    "primary": "#5865F2",
-    "success": "#57F287",
-    "error": "#ED4245",
-    "warning": "#FEE75C",
-    "info": "#00B0F4",
-    "flagAlert": "#FFA500"
+    "primary": "#4ade80",
+    "success": "#4ade80",
+    "error": "#4ade80",
+    "warning": "#4ade80",
+    "info": "#4ade80",
+    "flagAlert": "#4ade80"
   },
   "website": "https://howtoerlc.xyz",
   "advertisingChannels": [

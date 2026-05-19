@@ -1,6 +1,7 @@
 const {
   ModalBuilder, TextInputBuilder, TextInputStyle,
-  ActionRowBuilder, EmbedBuilder, MessageFlags,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
+  EmbedBuilder, MessageFlags, PermissionFlagsBits,
 } = require('discord.js');
 const { db, nextAppId } = require('../utils/appDb');
 const config = require('../config.json');
@@ -134,6 +135,56 @@ async function handleStaffApplyModal(interaction, client) {
       // Pin the starter message
       const starter = await thread.fetchStarterMessage().catch(() => null);
       if (starter) await starter.pin().catch(() => {});
+
+      await thread.send(`<@&${config.roles.admin}> New application submitted.`);
+
+      // Create locked review channel for the applicant
+      const reviewChannel = await interaction.guild.channels.create({
+        name: `app-${appId.toLowerCase()}`,
+        parent: config.categories.tickets || null,
+        permissionOverwrites: [
+          { id: interaction.guild.id,      deny:  [PermissionFlagsBits.ViewChannel] },
+          { id: interaction.user.id,       allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory],
+                                           deny:  [PermissionFlagsBits.SendMessages] },
+          { id: config.roles.staff,        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages,
+                                                   PermissionFlagsBits.ReadMessageHistory, PermissionFlagsBits.ManageMessages] },
+          { id: config.roles.admin,        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages,
+                                                   PermissionFlagsBits.ReadMessageHistory, PermissionFlagsBits.ManageMessages] },
+        ],
+      }).catch(() => null);
+
+      if (reviewChannel) {
+        db.prepare('UPDATE applications SET review_channel_id = ? WHERE id = ?').run(reviewChannel.id, appId);
+
+        const threadUrl = `https://discord.com/channels/${interaction.guild.id}/${thread.id}`;
+        const reviewEmbed = new EmbedBuilder()
+          .setColor(APP_COLOR)
+          .setTitle(`Application Review — ${appId}`)
+          .setDescription(
+            `<@${interaction.user.id}> has submitted a staff application.\n\n` +
+            `This channel is **locked**. Unlock it to begin a conversation with the applicant before coming to a decision.\n\n` +
+            `<:RightArrow:1498148469284667562> [View Full Application](${threadUrl})`
+          )
+          .addFields(
+            { name: 'Applicant', value: `<@${interaction.user.id}>`, inline: true },
+            { name: 'Role Applying For', value: role, inline: true },
+            { name: 'Application ID', value: appId, inline: true },
+          )
+          .setTimestamp(now * 1000);
+
+        const unlockRow = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId(`app_unlock:${appId}:${interaction.user.id}`)
+            .setLabel('Unlock Channel')
+            .setStyle(ButtonStyle.Primary),
+        );
+
+        await reviewChannel.send({
+          content: `<@&${config.roles.admin}>`,
+          embeds: [reviewEmbed],
+          components: [unlockRow],
+        });
+      }
     }
 
     // DM applicant
@@ -306,9 +357,302 @@ async function denyApplication(interaction, client, rawId, reason) {
   });
 }
 
+// ── Forum thread Accept / Deny buttons ───────────────────────────────────────
+
+async function handleAppReviewButton(interaction, client) {
+  const [, action, appId] = interaction.customId.split(':');
+
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  const isAdmin = member && (
+    member.roles.cache.has(config.roles.admin) ||
+    member.permissions.has('ManageGuild')
+  );
+  if (!isAdmin) {
+    return interaction.reply({
+      content: '<:Cancel:1494830662581092482> Only management can review applications.',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
+  if (!app) {
+    return interaction.reply({
+      content: `<:Cancel:1494830662581092482> Application **${appId}** not found.`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+  if (app.status !== 'pending') {
+    return interaction.reply({
+      content: `<:Cancel:1494830662581092482> This application has already been **${app.status}**.`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  if (action === 'approve') {
+    const modal = new ModalBuilder()
+      .setCustomId(`app_approve_modal:${appId}`)
+      .setTitle('Approve Application');
+    modal.addComponents(
+      new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+          .setCustomId('starting_rank')
+          .setLabel('Starting Rank')
+          .setStyle(TextInputStyle.Short)
+          .setPlaceholder('e.g. Trial Moderator')
+          .setRequired(true)
+          .setMaxLength(100)
+      ),
+      new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+          .setCustomId('acceptance_message')
+          .setLabel('Message to Applicant')
+          .setStyle(TextInputStyle.Paragraph)
+          .setPlaceholder('Welcome message or next steps for the applicant.')
+          .setRequired(true)
+          .setMaxLength(500)
+      ),
+    );
+    return interaction.showModal(modal);
+
+  } else {
+    const modal = new ModalBuilder()
+      .setCustomId(`app_deny_modal:${appId}`)
+      .setTitle('Deny Application');
+    modal.addComponents(
+      new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+          .setCustomId('deny_reason')
+          .setLabel('Reason (optional)')
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(false)
+          .setPlaceholder('Provide a reason for denying this application.')
+          .setMaxLength(500)
+      )
+    );
+    return interaction.showModal(modal);
+  }
+}
+
+// ── Shared log helper ─────────────────────────────────────────────────────────
+
+async function postAppLog(client, guild, app, action, reviewerId, extra = {}) {
+  const logsChannel = await client.channels.fetch(config.channels.logs).catch(() => null);
+  if (!logsChannel) return;
+
+  const threadUrl = app.thread_id
+    ? `https://discord.com/channels/${guild.id}/${app.thread_id}`
+    : null;
+
+  const isApproved = action === 'approved';
+  const embed = new EmbedBuilder()
+    .setColor(APP_COLOR)
+    .setTitle(isApproved
+      ? '<:Check:1494830681484824616> Application Approved'
+      : '<:Cancel:1494830662581092482> Application Denied')
+    .addFields(
+      { name: 'Applicant',        value: `<@${app.user_id}> (${app.username})`, inline: true },
+      { name: 'Application ID',   value: app.id,  inline: true },
+      { name: 'Role Applied For', value: app.role, inline: true },
+      { name: 'Reviewed By',      value: `<@${reviewerId}>`, inline: true },
+      { name: 'Decision',         value: isApproved ? 'Approved' : 'Denied', inline: true },
+    )
+    .setTimestamp();
+
+  if (isApproved && extra.startingRank)
+    embed.addFields({ name: 'Starting Rank', value: extra.startingRank, inline: true });
+  if (extra.message)
+    embed.addFields({ name: isApproved ? 'Message' : 'Reason', value: extra.message, inline: false });
+  if (threadUrl)
+    embed.addFields({ name: 'Forum Thread', value: `[View Application](${threadUrl})`, inline: false });
+
+  await logsChannel.send({ embeds: [embed] }).catch(() => {});
+}
+
+// ── Approve modal submit ──────────────────────────────────────────────────────
+
+async function handleAppApproveModal(interaction, client) {
+  const appId        = interaction.customId.split(':')[1];
+  const startingRank = interaction.fields.getTextInputValue('starting_rank').trim();
+  const message      = interaction.fields.getTextInputValue('acceptance_message').trim();
+
+  const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
+  if (!app || app.status !== 'pending') {
+    return interaction.reply({
+      content: `<:Cancel:1494830662581092482> Application **${appId}** is no longer pending.`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare('UPDATE applications SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
+    .run('approved', interaction.user.id, now, app.id);
+
+  // Update forum thread starter embed
+  if (app.thread_id) {
+    try {
+      const thread = await client.channels.fetch(app.thread_id).catch(() => null);
+      if (thread) {
+        const starter = await thread.fetchStarterMessage().catch(() => null);
+        if (starter?.embeds[0]) {
+          const fields = starter.embeds[0].fields.map(f =>
+            f.name === 'Status'
+              ? { name: 'Status', value: '<:Check:1494830681484824616> Approved', inline: f.inline }
+              : f
+          );
+          fields.push({ name: 'Reviewed By',  value: `<@${interaction.user.id}>`, inline: true });
+          fields.push({ name: 'Starting Rank', value: startingRank,               inline: true });
+          fields.push({ name: 'Message',        value: message,                    inline: false });
+          await starter.edit({
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(APP_COLOR).setFields(fields)],
+            components: [],
+          }).catch(() => {});
+
+          await thread.send(
+            `<:Check:1494830681484824616> **Decision logged** — Approved by <@${interaction.user.id}>. Starting rank: **${startingRank}**.`
+          ).catch(() => {});
+        }
+      }
+    } catch (err) {
+      console.error('[AppHandler] Forum edit error on approve modal:', err);
+    }
+  }
+
+  // DM applicant
+  try {
+    const user = await client.users.fetch(app.user_id);
+    const dmEmbed = new EmbedBuilder()
+      .setColor(APP_COLOR)
+      .setTitle('<:Check:1494830681484824616> Application Approved')
+      .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved.`)
+      .addFields(
+        { name: 'Starting Rank', value: startingRank, inline: true },
+        { name: 'Message from Staff', value: message, inline: false },
+      )
+      .setTimestamp();
+    await user.send({ embeds: [dmEmbed] });
+  } catch { /* DMs disabled */ }
+
+  // Log to logs channel
+  await postAppLog(client, interaction.guild, app, 'approved', interaction.user.id, { startingRank, message });
+
+  await interaction.editReply({
+    content: `<:Check:1494830681484824616> Application **${app.id}** approved. Starting rank: **${startingRank}**.`,
+  });
+}
+
+// ── Deny modal submit ─────────────────────────────────────────────────────────
+
+async function handleAppDenyModal(interaction, client) {
+  const appId  = interaction.customId.split(':')[1];
+  const reason = interaction.fields.getTextInputValue('deny_reason').trim();
+
+  const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
+  if (!app || app.status !== 'pending') {
+    return interaction.reply({
+      content: `<:Cancel:1494830662581092482> Application **${appId}** is no longer pending.`,
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  await interaction.deferUpdate();
+
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare('UPDATE applications SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
+    .run('denied', interaction.user.id, now, app.id);
+
+  // Update forum thread starter embed
+  if (app.thread_id) {
+    try {
+      const thread = await client.channels.fetch(app.thread_id).catch(() => null);
+      if (thread) {
+        const starter = await thread.fetchStarterMessage().catch(() => null);
+        if (starter?.embeds[0]) {
+          const fields = starter.embeds[0].fields.map(f =>
+            f.name === 'Status'
+              ? { name: 'Status', value: '<:Cancel:1494830662581092482> Denied', inline: f.inline }
+              : f
+          );
+          fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
+          if (reason) fields.push({ name: 'Reason', value: reason, inline: false });
+          await starter.edit({
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(APP_COLOR).setFields(fields)],
+            components: [],
+          }).catch(() => {});
+
+          await thread.send(
+            `<:Cancel:1494830662581092482> **Decision logged** — Denied by <@${interaction.user.id}>.${reason ? ` Reason: ${reason}` : ''}`
+          ).catch(() => {});
+        }
+      }
+    } catch (err) {
+      console.error('[AppHandler] Forum edit error on deny modal:', err);
+    }
+  }
+
+  // DM applicant
+  try {
+    const user = await client.users.fetch(app.user_id);
+    const dmEmbed = new EmbedBuilder()
+      .setColor(APP_COLOR)
+      .setTitle('<:Cancel:1494830662581092482> Application Denied')
+      .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
+      .setTimestamp();
+    if (reason) dmEmbed.addFields({ name: 'Reason', value: reason, inline: false });
+    await user.send({ embeds: [dmEmbed] });
+  } catch { /* DMs disabled */ }
+
+  // Log to logs channel
+  await postAppLog(client, interaction.guild, app, 'denied', interaction.user.id, { message: reason || 'No reason provided' });
+}
+
+// ── Review channel Unlock button ─────────────────────────────────────────────
+
+async function handleAppUnlock(interaction, client) {
+  const [, appId, userId] = interaction.customId.split(':');
+
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  const isAdmin = member && (
+    member.roles.cache.has(config.roles.admin) ||
+    member.permissions.has('ManageGuild')
+  );
+  if (!isAdmin) {
+    return interaction.reply({
+      content: '<:Cancel:1494830662581092482> Only management can unlock this channel.',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  await interaction.channel.permissionOverwrites.edit(userId, {
+    SendMessages: true,
+  }).catch(() => {});
+
+  await interaction.update({
+    embeds: [
+      EmbedBuilder.from(interaction.message.embeds[0])
+        .setDescription(
+          interaction.message.embeds[0].description.replace(
+            'This channel is **locked**. Unlock it to begin a conversation with the applicant before coming to a decision.',
+            `Channel unlocked by <@${interaction.user.id}>. The applicant can now send messages.`
+          )
+        ),
+    ],
+    components: [],
+  });
+
+  await interaction.channel.send(
+    `<@${userId}> This channel has been unlocked by <@${interaction.user.id}>. You may now send messages here.`
+  );
+}
+
 module.exports = {
   handleStaffApplyButton,
   handleStaffApplyModal,
   approveApplication,
   denyApplication,
+  handleAppReviewButton,
+  handleAppApproveModal,
+  handleAppDenyModal,
+  handleAppUnlock,
 };

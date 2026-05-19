@@ -4,7 +4,7 @@ const {
 const { db, nextSugId } = require('../utils/appDb');
 const config = require('../config.json');
 
-const SUG_COLOR = 0x5865F2;
+const SUG_COLOR = 0x4ADE80;
 
 // ── suggest_modal submit → create suggestion ──────────────────────────────────
 
@@ -140,7 +140,7 @@ async function reviewSuggestion(interaction, client, sugId, approved) {
   db.prepare('UPDATE suggestions SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
     .run(newStatus, interaction.user.id, now, sugId);
 
-  const statusColor   = approved ? 0x57F287 : 0xED4245;
+  const statusColor   = 0x4ADE80;
   const statusLabel   = approved
     ? `<:Check:1494830681484824616> Approved`
     : `<:Cancel:1494830662581092482> Denied`;
