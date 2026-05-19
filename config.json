@@ -3,17 +3,17 @@
   "channels": {
     "welcome": "1483615235154903232",
     "logs": "1485351323816956064",
-    "tickets": "YOUR_TICKETS_CHANNEL_ID_HERE",
+    "inviteLogs": "",
     "ticketTranscripts": "1485352031471272156",
     "applications": "1492992155311145103",
     "suggestions": "1492992359477153942",
+    "suggestionApproval": "1498136628466683965",
     "partnerships": "1485744805941084301",
     "updates": "1485008114339283174",
     "resources": "1494468216133521418",
-    "rolePanels": "1495134864687628318",
-    "suggestionApproval": "1498136628466683965"
+    "rolePanels": "1495134864687628318"
   },
-"categories": {
+  "categories": {
     "tickets": "1485344810515562557"
   },
   "roles": {
@@ -46,6 +46,6 @@
   ],
   "branding": {
     "footerIcon": "https://cdn.discordapp.com/attachments/1461879573707882610/1497367092037419149/kit.png?ex=69ed4346&is=69ebf1c6&hm=09f9fafa7b6cd1d9bbc0fccda9c6c664011b9e14b56f52cb88871cedfa0b805c&",
-    "thumbnail": "https://cdn.discordapp.com/attachments/1461879573707882610/1497372156324090067/GreenLogo.png?ex=69ed47fd&is=69ebf67d&hm=83ab78197f9f14d60fc8a522caf06223af696ac07a8465580fd6d16df860f132&"
+    "thumbnail": "https://cdn.discordapp.com/attachments/1461879573707882610/1497372156324090067/GreenLogo.png?ex=69ed47fd&is=69ebf67d&hm=83ab78197f9f14d60fe8a522caf06223af696ac07a8465580fd6d16df860f132&"
   }
 }
