@@ -1,12 +1,18 @@
 const {
   ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
-  MediaGalleryBuilder, MediaGalleryItemBuilder,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder,
   MessageFlags, resolveColor,
 } = require('discord.js');
 const config = require('../config.json');
 
 const FOOTER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499184076383588502/Embed_Footer_Banner.png';
+
+// MediaGallery was added in discord.js 14.18 — guard for older installs
+let MediaGalleryBuilder, MediaGalleryItemBuilder;
+try {
+  ({ MediaGalleryBuilder, MediaGalleryItemBuilder } = require('discord.js'));
+} catch { /* not available */ }
+const hasMediaGallery = typeof MediaGalleryBuilder === 'function';
 
 async function sendMainDashboard(interaction) {
   const infoMenu = new StringSelectMenuBuilder()
@@ -56,21 +62,20 @@ async function sendMainDashboard(interaction) {
       )
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addActionRowComponents(
-      new ActionRowBuilder().addComponents(infoMenu)
-    )
-    .addActionRowComponents(
-      new ActionRowBuilder().addComponents(rolesMenu)
-    )
+    .addActionRowComponents(new ActionRowBuilder().addComponents(infoMenu))
+    .addActionRowComponents(new ActionRowBuilder().addComponents(rolesMenu))
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addActionRowComponents(
       new ActionRowBuilder().addComponents(websiteBtn, assistBtn, applyBtn)
-    )
-    .addMediaGalleryComponents(
+    );
+
+  if (hasMediaGallery) {
+    container.addMediaGalleryComponents(
       new MediaGalleryBuilder().addItems(
         new MediaGalleryItemBuilder().setURL(FOOTER_IMAGE)
       )
     );
+  }
 
   await interaction.channel.send({
     components: [container],

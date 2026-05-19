@@ -20,8 +20,13 @@ module.exports = {
 
     if (type === 'main') {
       const { sendMainDashboard } = require('../../panels/mainDashboard');
-      await sendMainDashboard(interaction);
-      return interaction.editReply({ content: 'Main dashboard posted.' });
+      try {
+        await sendMainDashboard(interaction);
+        return interaction.editReply({ content: 'Main dashboard posted.' });
+      } catch (err) {
+        console.error('[Panel] sendMainDashboard error:', err);
+        return interaction.editReply({ content: `Failed to post dashboard: \`${err.message}\`` });
+      }
     }
 
     if (type === 'staff') {
