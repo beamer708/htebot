@@ -1,12 +1,12 @@
 const {
   ModalBuilder, TextInputBuilder, TextInputStyle,
   ActionRowBuilder, ButtonBuilder, ButtonStyle,
-  EmbedBuilder, MessageFlags,
+  EmbedBuilder, MessageFlags, PermissionFlagsBits,
 } = require('discord.js');
 const { db, nextAppId } = require('../utils/appDb');
 const config = require('../config.json');
 
-const APP_COLOR = 0x4ADE80;
+const APP_COLOR = 0x52D973;
 const RATE_LIMIT_DAYS = 7;
 
 // ── Staff Apply button → open modal ──────────────────────────────────────────
@@ -67,7 +67,7 @@ async function handleStaffApplyButton(interaction) {
         .setCustomId('app_role')
         .setLabel('Role applying for')
         .setStyle(TextInputStyle.Short)
-        .setPlaceholder('Management / Public Relations / Administration / Beta Tester')
+        .setPlaceholder('Community Team or Beta Tester')
         .setRequired(true)
     ),
   );
@@ -125,20 +125,9 @@ async function handleStaffApplyModal(interaction, client) {
         )
         .setTimestamp(now * 1000);
 
-      const reviewRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId(`app_review:approve:${appId}`)
-          .setLabel('Accept')
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId(`app_review:deny:${appId}`)
-          .setLabel('Deny')
-          .setStyle(ButtonStyle.Danger),
-      );
-
       const thread = await forumChannel.threads.create({
         name: `[${appId}] ${interaction.user.tag} — ${role}`.slice(0, 100),
-        message: { embeds: [embed], components: [reviewRow] },
+        message: { embeds: [embed] },
       });
 
       db.prepare('UPDATE applications SET thread_id = ? WHERE id = ?').run(thread.id, appId);
@@ -148,6 +137,54 @@ async function handleStaffApplyModal(interaction, client) {
       if (starter) await starter.pin().catch(() => {});
 
       await thread.send(`<@&${config.roles.admin}> New application submitted.`);
+
+      // Create locked review channel for the applicant
+      const reviewChannel = await interaction.guild.channels.create({
+        name: `app-${appId.toLowerCase()}`,
+        parent: config.categories.tickets || null,
+        permissionOverwrites: [
+          { id: interaction.guild.id,      deny:  [PermissionFlagsBits.ViewChannel] },
+          { id: interaction.user.id,       allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory],
+                                           deny:  [PermissionFlagsBits.SendMessages] },
+          { id: config.roles.staff,        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages,
+                                                   PermissionFlagsBits.ReadMessageHistory, PermissionFlagsBits.ManageMessages] },
+          { id: config.roles.admin,        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages,
+                                                   PermissionFlagsBits.ReadMessageHistory, PermissionFlagsBits.ManageMessages] },
+        ],
+      }).catch(() => null);
+
+      if (reviewChannel) {
+        db.prepare('UPDATE applications SET review_channel_id = ? WHERE id = ?').run(reviewChannel.id, appId);
+
+        const threadUrl = `https://discord.com/channels/${interaction.guild.id}/${thread.id}`;
+        const reviewEmbed = new EmbedBuilder()
+          .setColor(APP_COLOR)
+          .setTitle(`Application Review — ${appId}`)
+          .setDescription(
+            `<@${interaction.user.id}> has submitted a staff application.\n\n` +
+            `This channel is **locked**. Unlock it to begin a conversation with the applicant before coming to a decision.\n\n` +
+            `<:RightArrow:1498148469284667562> [View Full Application](${threadUrl})`
+          )
+          .addFields(
+            { name: 'Applicant', value: `<@${interaction.user.id}>`, inline: true },
+            { name: 'Role Applying For', value: role, inline: true },
+            { name: 'Application ID', value: appId, inline: true },
+          )
+          .setTimestamp(now * 1000);
+
+        const unlockRow = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId(`app_unlock:${appId}:${interaction.user.id}`)
+            .setLabel('Unlock Channel')
+            .setStyle(ButtonStyle.Primary),
+        );
+
+        await reviewChannel.send({
+          content: `<@&${config.roles.admin}>`,
+          embeds: [reviewEmbed],
+          components: [unlockRow],
+        });
+      }
     }
 
     // DM applicant
@@ -217,7 +254,7 @@ async function approveApplication(interaction, client, rawId, reason) {
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
           if (reason) fields.push({ name: 'Review Note', value: reason, inline: false });
           await starter.edit({
-            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x4ADE80).setFields(fields)],
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x57F287).setFields(fields)],
           }).catch(() => {});
         }
       }
@@ -230,7 +267,7 @@ async function approveApplication(interaction, client, rawId, reason) {
   try {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
-      .setColor(0x4ADE80)
+      .setColor(0x57F287)
       .setTitle('<:Check:1494830681484824616> Application Approved')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved! A staff member will reach out with next steps.`)
       .setTimestamp();
@@ -294,7 +331,7 @@ async function denyApplication(interaction, client, rawId, reason) {
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
           if (reason) fields.push({ name: 'Reason', value: reason, inline: false });
           await starter.edit({
-            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x4ADE80).setFields(fields)],
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0xED4245).setFields(fields)],
           }).catch(() => {});
         }
       }
@@ -307,7 +344,7 @@ async function denyApplication(interaction, client, rawId, reason) {
   try {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
-      .setColor(0x4ADE80)
+      .setColor(0xED4245)
       .setTitle('<:Cancel:1494830662581092482> Application Denied')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
       .setTimestamp();
@@ -326,14 +363,13 @@ async function handleAppReviewButton(interaction, client) {
   const [, action, appId] = interaction.customId.split(':');
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
-  const isStaff = member && (
-    member.roles.cache.has(config.roles.staff) ||
+  const isAdmin = member && (
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) {
+  if (!isAdmin) {
     return interaction.reply({
-      content: '<:Cancel:1494830662581092482> Only staff can review applications.',
+      content: '<:Cancel:1494830662581092482> Only management can review applications.',
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -365,14 +401,14 @@ async function handleAppReviewButton(interaction, client) {
     fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
 
     await interaction.update({
-      embeds: [EmbedBuilder.from(interaction.message.embeds[0]).setColor(0x4ADE80).setFields(fields)],
+      embeds: [EmbedBuilder.from(interaction.message.embeds[0]).setColor(APP_COLOR).setFields(fields)],
       components: [],
     });
 
     try {
       const user = await client.users.fetch(app.user_id);
       const dmEmbed = new EmbedBuilder()
-        .setColor(0x4ADE80)
+        .setColor(APP_COLOR)
         .setTitle('<:Check:1494830681484824616> Application Approved')
         .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved! A staff member will reach out with next steps.`)
         .setTimestamp();
@@ -380,11 +416,9 @@ async function handleAppReviewButton(interaction, client) {
     } catch { /* DMs disabled */ }
 
   } else {
-    // Show modal for optional deny reason
     const modal = new ModalBuilder()
       .setCustomId(`app_deny_modal:${appId}`)
       .setTitle('Deny Application');
-
     modal.addComponents(
       new ActionRowBuilder().addComponents(
         new TextInputBuilder()
@@ -396,7 +430,6 @@ async function handleAppReviewButton(interaction, client) {
           .setMaxLength(500)
       )
     );
-
     return interaction.showModal(modal);
   }
 }
@@ -419,7 +452,6 @@ async function handleAppDenyModal(interaction, client) {
   db.prepare('UPDATE applications SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
     .run('denied', interaction.user.id, now, app.id);
 
-  // Update the forum thread starter message
   if (app.thread_id) {
     try {
       const thread = await client.channels.fetch(app.thread_id).catch(() => null);
@@ -434,7 +466,7 @@ async function handleAppDenyModal(interaction, client) {
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
           if (reason) fields.push({ name: 'Reason', value: reason, inline: false });
           await starter.edit({
-            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(0x4ADE80).setFields(fields)],
+            embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(APP_COLOR).setFields(fields)],
             components: [],
           }).catch(() => {});
         }
@@ -447,13 +479,52 @@ async function handleAppDenyModal(interaction, client) {
   try {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
-      .setColor(0x4ADE80)
+      .setColor(APP_COLOR)
       .setTitle('<:Cancel:1494830662581092482> Application Denied')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
       .setTimestamp();
     if (reason) dmEmbed.addFields({ name: 'Reason', value: reason, inline: false });
     await user.send({ embeds: [dmEmbed] });
   } catch { /* DMs disabled */ }
+}
+
+// ── Review channel Unlock button ─────────────────────────────────────────────
+
+async function handleAppUnlock(interaction, client) {
+  const [, appId, userId] = interaction.customId.split(':');
+
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  const isAdmin = member && (
+    member.roles.cache.has(config.roles.admin) ||
+    member.permissions.has('ManageGuild')
+  );
+  if (!isAdmin) {
+    return interaction.reply({
+      content: '<:Cancel:1494830662581092482> Only management can unlock this channel.',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  await interaction.channel.permissionOverwrites.edit(userId, {
+    SendMessages: true,
+  }).catch(() => {});
+
+  await interaction.update({
+    embeds: [
+      EmbedBuilder.from(interaction.message.embeds[0])
+        .setDescription(
+          interaction.message.embeds[0].description.replace(
+            'This channel is **locked**. Unlock it to begin a conversation with the applicant before coming to a decision.',
+            `Channel unlocked by <@${interaction.user.id}>. The applicant can now send messages.`
+          )
+        ),
+    ],
+    components: [],
+  });
+
+  await interaction.channel.send(
+    `<@${userId}> This channel has been unlocked by <@${interaction.user.id}>. You may now send messages here.`
+  );
 }
 
 module.exports = {
@@ -463,4 +534,5 @@ module.exports = {
   denyApplication,
   handleAppReviewButton,
   handleAppDenyModal,
+  handleAppUnlock,
 };
