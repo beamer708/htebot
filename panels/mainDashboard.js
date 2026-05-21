@@ -1,9 +1,18 @@
 const {
-  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, SectionBuilder, ThumbnailBuilder,
+  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder,
   MessageFlags, resolveColor,
 } = require('discord.js');
 const config = require('../config.json');
+
+const FOOTER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499184076383588502/Embed_Footer_Banner.png';
+
+// MediaGallery was added in discord.js 14.18 — guard for older installs
+let MediaGalleryBuilder, MediaGalleryItemBuilder;
+try {
+  ({ MediaGalleryBuilder, MediaGalleryItemBuilder } = require('discord.js'));
+} catch { /* not available */ }
+const hasMediaGallery = typeof MediaGalleryBuilder === 'function';
 
 async function sendMainDashboard(interaction) {
   const infoMenu = new StringSelectMenuBuilder()
@@ -23,15 +32,10 @@ async function sendMainDashboard(interaction) {
     .setMinValues(0)
     .setMaxValues(3)
     .addOptions([
-      { label: 'Server Updates', description: 'Get notified about announcements', value: config.roles.notifications.updates || 'updates' },
+      { label: 'Change Log', description: 'Get notified about change logs', value: config.roles.notifications.updates || 'updates' },
       { label: 'New Resources', description: 'Get notified when resources drop', value: config.roles.notifications.resources || 'resources' },
-      { label: 'Partnerships', description: 'Get notified about new partners', value: config.roles.notifications.partnerships || 'partnerships' },
+      { label: 'Announcements', description: 'Get notified about announcements', value: config.roles.notifications.announcements || 'announcements' },
     ]);
-
-  const applyBtn = new ButtonBuilder()
-    .setCustomId('staff_apply')
-    .setLabel('Apply')
-    .setStyle(ButtonStyle.Success);
 
   const websiteBtn = new ButtonBuilder()
     .setLabel('Website')
@@ -41,38 +45,37 @@ async function sendMainDashboard(interaction) {
   const assistBtn = new ButtonBuilder()
     .setCustomId('ticket:create')
     .setLabel('Get Assistance')
-    .setStyle(ButtonStyle.Primary);
+    .setStyle(ButtonStyle.Success);
+
+  const applyBtn = new ButtonBuilder()
+    .setCustomId('staff_apply')
+    .setLabel('Apply')
+    .setStyle(ButtonStyle.Success);
 
   const container = new ContainerBuilder()
-    .setAccentColor(resolveColor(config.colors.primary))
-    .addSectionComponents(
-      new SectionBuilder()
-        .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(
-            '### Welcome to HowToERLC\n' +
-            '> You have just joined the **#1 resource hub** for ERLC community owners on Roblox. ' +
-            'Browse our server information below, **grab your notification roles**, and visit **howtoerlc.xyz** for guides, templates, and tools built specifically for your community. ' +
-            'Need help? Our staff team is always available. **Open a ticket** and we will get back to you.'
-          )
-        )
-        .setThumbnailAccessory(
-          new ThumbnailBuilder().setURL(config.branding.thumbnail)
-        )
+    .setAccentColor(resolveColor('#4ade80'))
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        'Welcome to **HowToERLC**, the #1 resource hub for ERLC community owners on Roblox. ' +
+        'Browse our server information below, grab your notification roles, and visit **howtoerlc.xyz** for guides, templates, and tools built for your community. ' +
+        'Need help? Our staff team is always here. Open a ticket and we will get back to you.'
+      )
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addActionRowComponents(
-      new ActionRowBuilder().addComponents(infoMenu)
-    )
-    .addActionRowComponents(
-      new ActionRowBuilder().addComponents(rolesMenu)
-    )
+    .addActionRowComponents(new ActionRowBuilder().addComponents(infoMenu))
+    .addActionRowComponents(new ActionRowBuilder().addComponents(rolesMenu))
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addActionRowComponents(
       new ActionRowBuilder().addComponents(websiteBtn, assistBtn, applyBtn)
-    )
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`-# HowToERLC`)
     );
+
+  if (hasMediaGallery) {
+    container.addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(FOOTER_IMAGE)
+      )
+    );
+  }
 
   await interaction.channel.send({
     components: [container],

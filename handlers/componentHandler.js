@@ -12,7 +12,7 @@ const {
   fetchAllMessages, buildTranscript, postTranscript,
   closeTicket, requestCloseTicket, approveCloseRequest, denyCloseRequest, claimTicket,
 } = require('../utils/ticketUtils');
-const { handleStaffApplyButton, handleStaffApplyModal } = require('./appHandler');
+const { handleStaffApplyButton, handleStaffApplyModal, handleAppReviewButton, handleAppApproveModal, handleAppDenyModal, handleAppUnlock } = require('./appHandler');
 const { handleSuggestModal, handleSugApprove, handleSugDeny } = require('./sugHandler');
 const { handleSearchNav } = require('./searchHandler');
 
@@ -879,6 +879,8 @@ module.exports = async (interaction, client) => {
       const prefix = interaction.customId.split(':')[0];
       if (prefix === 'pr')           return handlePrInteraction(interaction, client);
       if (interaction.customId === 'staff_apply') return handleStaffApplyButton(interaction);
+      if (prefix === 'app_review')   return handleAppReviewButton(interaction, client);
+      if (prefix === 'app_unlock')   return handleAppUnlock(interaction, client);
       if (prefix === 'sug_approve')  return handleSugApprove(interaction, client);
       if (prefix === 'sug_deny')     return handleSugDeny(interaction, client);
       if (prefix === 'search_nav')   return handleSearchNav(interaction);
@@ -898,10 +900,12 @@ module.exports = async (interaction, client) => {
     }
 
     if (interaction.isModalSubmit()) {
-      if (interaction.customId === 'pr_register_modal')  return handlePrInteraction(interaction, client);
-      if (interaction.customId === 'ticket_modal')       return handleTicketModal(interaction, client);
-      if (interaction.customId === 'staff_apply_modal')  return handleStaffApplyModal(interaction, client);
-      if (interaction.customId === 'suggest_modal')      return handleSuggestModal(interaction, client);
+      if (interaction.customId === 'pr_register_modal')              return handlePrInteraction(interaction, client);
+      if (interaction.customId === 'ticket_modal')                   return handleTicketModal(interaction, client);
+      if (interaction.customId === 'staff_apply_modal')              return handleStaffApplyModal(interaction, client);
+      if (interaction.customId === 'suggest_modal')                  return handleSuggestModal(interaction, client);
+      if (interaction.customId.startsWith('app_approve_modal:'))    return handleAppApproveModal(interaction, client);
+      if (interaction.customId.startsWith('app_deny_modal:'))       return handleAppDenyModal(interaction, client);
     }
   } catch (err) {
     console.error('[ComponentHandler] Error:', err);

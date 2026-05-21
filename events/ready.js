@@ -1,6 +1,5 @@
 const { ActivityType, Collection } = require('discord.js');
 const { startRetentionChecker } = require('../utils/retentionChecker');
-const { resendSticky } = require('./messageCreate');
 const { db } = require('../utils/appDb');
 const config = require('../config.json');
 
@@ -71,7 +70,9 @@ module.exports = {
         '- Any prior moderation, staff, or community experience',
         '- The role you are applying for',
         '',
-        '**Available roles:** Community Team · Beta Tester',
+        '**Available roles:** Management · Public Relations · Administration · Beta Tester',
+        '',
+        '**Note:** Higher ranks require more activity and better experience.',
         '',
         '**Response time:** We review applications as quickly as we can. You will receive a DM when a decision is made.',
         '',
@@ -103,11 +104,5 @@ module.exports = {
       ].join('\n')
     );
 
-    // Send initial sticky messages to advertising channels
-    for (const channelId of config.advertisingChannels) {
-      const channel = client.channels.cache.get(channelId);
-      if (channel) await resendSticky(channel).catch(() => {});
-    }
-    console.log('[Ready] Advertising stickies posted.');
   },
 };

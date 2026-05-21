@@ -49,6 +49,9 @@ function nextAppId() {
   return `APP-${String(row.count + 1).padStart(4, '0')}`;
 }
 
+// Add review_channel_id column if it doesn't exist (migration)
+try { db.exec('ALTER TABLE applications ADD COLUMN review_channel_id TEXT'); } catch {}
+
 function nextSugId() {
   const row = db.prepare('SELECT COUNT(*) as count FROM suggestions').get();
   return `SUG-${String(row.count + 1).padStart(4, '0')}`;
