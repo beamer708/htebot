@@ -137,5 +137,25 @@ module.exports = {
       .setTimestamp();
 
     await logChannel.send({ embeds: [logEmbed] });
+
+    // ── PR logs — log invite events ──────────────────────────────
+    if (inviter) {
+      const prLogChannel = member.guild.channels.cache.get(config.channels.prLogs);
+      if (prLogChannel) {
+        const prInviteEmbed = new EmbedBuilder()
+          .setColor(config.colors.info)
+          .setTitle('📨 PR Invite — Member Joined')
+          .addFields(
+            { name: 'New Member',    value: `<@${member.id}> (${member.user.tag})`,                         inline: true },
+            { name: 'Invited By',    value: `<@${inviter.id}> (${inviter.tag})`,                            inline: true },
+            { name: 'Invite Code',   value: `\`${inviteCode}\``,                                            inline: true },
+            { name: 'Joined At',     value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:F>`,           inline: true },
+            { name: 'Retention Due', value: `<t:${Math.floor((Date.now() + 30 * 24 * 60 * 60 * 1000) / 1000)}:R>`, inline: true },
+          )
+          .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+          .setTimestamp();
+        await prLogChannel.send({ embeds: [prInviteEmbed] }).catch(() => {});
+      }
+    }
   },
 };

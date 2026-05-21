@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits , MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -10,8 +10,8 @@ module.exports = {
       .setDescription('Which panel to post')
       .setRequired(true)
       .addChoices(
-        { name: 'Main Dashboard', value: 'main'  },
-        { name: 'Staff Dashboard', value: 'staff' },
+        { name: 'Main Dashboard', value: 'main' },
+        { name: 'PR Team Panel',  value: 'pr'   },
       )),
 
   async execute(interaction, client) {
@@ -24,8 +24,10 @@ module.exports = {
       return interaction.editReply({ content: 'Main dashboard posted.' });
     }
 
-    if (type === 'staff') {
-      return interaction.editReply({ content: 'Staff dashboard is not yet configured.' });
+    if (type === 'pr') {
+      const { sendPrPanel } = require('../../panels/prPanel');
+      await sendPrPanel(interaction);
+      return interaction.editReply({ content: 'PR Team panel posted.' });
     }
   },
 };

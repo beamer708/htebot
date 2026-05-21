@@ -21,9 +21,18 @@ const dataPath = (file) => path.join(__dirname, '..', 'data', file);
 function readJSON(file)        { try { return JSON.parse(fs.readFileSync(dataPath(file), 'utf8')); } catch { return []; } }
 function writeJSON(file, data) { fs.writeFileSync(dataPath(file), JSON.stringify(data, null, 2)); }
 
-const invitesPath = dataPath('invites.json');
-function readInvites() { try { return JSON.parse(fs.readFileSync(invitesPath, 'utf8')); } catch { return {}; } }
-function writeInvites(d) { fs.writeFileSync(invitesPath, JSON.stringify(d, null, 2)); }
+const invitesPath      = dataPath('invites.json');
+const prRegisteredPath = dataPath('prRegistered.json');
+const prPayoutsPath    = dataPath('prPayouts.json');
+
+function readInvites()        { try { return JSON.parse(fs.readFileSync(invitesPath, 'utf8')); }      catch { return {}; } }
+function writeInvites(d)      { fs.writeFileSync(invitesPath, JSON.stringify(d, null, 2)); }
+function readPrRegistered()   { try { return JSON.parse(fs.readFileSync(prRegisteredPath, 'utf8')); } catch { return {}; } }
+function writePrRegistered(d) { fs.writeFileSync(prRegisteredPath, JSON.stringify(d, null, 2)); }
+function readPrPayouts()      { try { return JSON.parse(fs.readFileSync(prPayoutsPath, 'utf8')); }    catch { return {}; } }
+function writePrPayouts(d)    { fs.writeFileSync(prPayoutsPath, JSON.stringify(d, null, 2)); }
+
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
 async function dmUser(client, userId, embed) {
   try {
@@ -444,11 +453,431 @@ async function handleInviteResetButton(interaction) {
   });
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// PR TEAM HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function hasPrAccess(interaction) {
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  return member && (
+    member.roles.cache.has(config.roles.prTeam) ||
+    member.roles.cache.has(config.roles.prManager) ||
+    member.permissions.has('ManageGuild')
+  );
+}
+
+async function hasPrManagerAccess(interaction) {
+  const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+  return member && (
+    member.roles.cache.has(config.roles.prManager) ||
+    member.permissions.has('ManageGuild')
+  );
+}
+
+async function logToPr(guild, embed, content) {
+  const ch = guild.channels.cache.get(config.channels.prLogs);
+  if (ch) await ch.send({ content: content || undefined, embeds: [embed] }).catch(() => {});
+}
+
+// ── Assets select menu ────────────────────────────────────────────────────────
+async function handlePrAssets(interaction) {
+  if (!await hasPrAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+  }
+  const value = interaction.values[0];
+  if (value === 'advertisement') {
+    return interaction.reply({
+      content:
+        '**@howtoerlc** is the #1 resource hub for serious ERLC communities.\n' +
+        'Stop wasting time searching. Everything you need to build, structure, and grow your server organized in one place.\n\n' +
+        '**Website:**\nhttps://howtoerlc.xyz\n**Discord**\nhttps://discord.gg/HjcqH2djjC',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+  if (value === 'invitation') {
+    return interaction.reply({
+      content:
+        '**@howtoerlc Invitation Offer**\n' +
+        '> Hey, on behalf of the @howtoerlc team we would like to invite you to our server to advertise. We\'ve noticed you use other advertising servers across ER:LC and we believe we would be a great resource hub for your server!\n\n' +
+        '**Website:**\nhttps://howtoerlc.xyz\n**Discord**\nhttps://discord.gg/HjcqH2djjC',
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+}
+
+// ── Handbook select menu ──────────────────────────────────────────────────────
+async function handlePrHandbook(interaction) {
+  if (!await hasPrAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+  }
+  const value = interaction.values[0];
+  let embed;
+
+  if (value === 'role') {
+    embed = new EmbedBuilder()
+      .setColor(config.colors.info)
+      .setTitle('🎯 What is the PR Team?')
+      .setDescription(
+        'The **HowToERLC PR (Public Relations) Team** is responsible for growing the server by building partnerships across the ERLC community.\n\n' +
+        '**As a PR Team member, your job is to:**\n' +
+        '• Find and approach ERLC communities, servers, and players\n' +
+        '• Invite them to join HowToERLC using your personal invite link\n' +
+        '• Use the outreach templates in the **Assets** section for messaging\n' +
+        '• Represent HowToERLC professionally at all times\n\n' +
+        '**The PR Team Manager** monitors invite activity, reviews invite stats, and processes all payout requests.'
+      )
+      .setFooter({ text: 'HowToERLC PR Team Handbook' });
+  } else if (value === 'invite_setup') {
+    embed = new EmbedBuilder()
+      .setColor(config.colors.info)
+      .setTitle('🔗 Invite Link Setup')
+      .setDescription(
+        '**Step 1 — Create a permanent invite**\n' +
+        '• Right-click any channel → **Invite People**\n' +
+        '• Click **Edit invite link** → set expiry to **Never**\n' +
+        '• Copy your invite code (the part after `discord.gg/`)\n\n' +
+        '**Step 2 — Register it with the bot**\n' +
+        '• Click the **Register Invite** button on the PR Panel\n' +
+        '• Enter your invite code in the modal that appears\n' +
+        '• The bot will verify and link it to your account\n\n' +
+        '**Step 3 — Share it!**\n' +
+        '• Use the **Assets** menu for ready-to-use outreach templates\n' +
+        '• The bot automatically tracks everyone who joins via your link\n\n' +
+        '⚠️ Only **one invite code** per member. Contact a PR Manager to change yours.'
+      )
+      .setFooter({ text: 'HowToERLC PR Team Handbook' });
+  } else if (value === 'payouts') {
+    embed = new EmbedBuilder()
+      .setColor(config.colors.info)
+      .setTitle('💰 Payout System')
+      .setDescription(
+        '**Earning a Payout:**\n' +
+        '• Earn **50 Robux** for every **10 retained invites**\n' +
+        '• A "retained invite" = someone you invited who stayed **30+ days**\n\n' +
+        '**How to Claim:**\n' +
+        '1. Reach **10 retained invites** — check with **My Stats**\n' +
+        '2. Click **Request Payout** on the PR Panel\n' +
+        '3. A **PR Manager** reviews your request in `#pr-logs`\n' +
+        '4. Once approved, you will be contacted for your **50 Robux**\n\n' +
+        '**Rules:**\n' +
+        '• Members must stay **30 full days** to count as retained\n' +
+        '• After payout approval, your counter resets for the next 10\n' +
+        '• Do not submit duplicate payout requests'
+      )
+      .setFooter({ text: 'HowToERLC PR Team Handbook' });
+  } else if (value === 'tracking') {
+    embed = new EmbedBuilder()
+      .setColor(config.colors.info)
+      .setTitle('📊 Tracking & Stats')
+      .setDescription(
+        '**How tracking works:**\n' +
+        '• When someone joins via your registered invite, the bot records the event\n' +
+        '• Each invited member starts a **30-day retention timer**\n' +
+        '• After 30 days still in server → **Retained** ✅\n' +
+        '• If they leave before 30 days → **Lost** ❌\n\n' +
+        '**Your Stats:**\n' +
+        '📨 **Total** — All who ever joined via your link\n' +
+        '✅ **Retained** — Stayed 30+ days (count toward payout)\n' +
+        '⏳ **Pending** — Still within their 30-day window\n' +
+        '❌ **Lost** — Left before 30 days\n\n' +
+        '**All activity is logged** in `#pr-logs` for the PR Manager to monitor.'
+      )
+      .setFooter({ text: 'HowToERLC PR Team Handbook' });
+  }
+
+  return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+}
+
+// ── My Stats button ───────────────────────────────────────────────────────────
+async function handlePrMyStats(interaction) {
+  if (!await hasPrAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+  }
+
+  const userId         = interaction.user.id;
+  const invites        = readInvites();
+  const registered     = readPrRegistered();
+  const payouts        = readPrPayouts();
+  const myReg          = registered[userId];
+
+  const all            = Object.values(invites).filter(e => e.inviterId === userId);
+  const retained       = all.filter(e => e.retained);
+  const unpaidRetained = retained.filter(e => !e.payoutId);
+  const pending        = all.filter(e => !e.retained && !e.leftAt);
+  const lost           = all.filter(e => e.leftAt && !e.retained);
+  const paidOut        = Object.values(payouts).filter(p => p.memberId === userId && p.status === 'approved').length;
+  const eligible       = unpaidRetained.length >= 10;
+  const needed         = Math.max(0, 10 - unpaidRetained.length);
+  const pendingPayout  = Object.values(payouts).find(p => p.memberId === userId && p.status === 'pending');
+
+  const embed = new EmbedBuilder()
+    .setColor(eligible ? config.colors.success : config.colors.info)
+    .setTitle(`📊 PR Stats — ${interaction.user.username}`)
+    .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
+    .addFields(
+      {
+        name: '🔗 Registered Invite',
+        value: myReg
+          ? `\`discord.gg/${myReg.inviteCode}\``
+          : '❌ Not registered — click **Register Invite**',
+        inline: false,
+      },
+      { name: '📨 Total Invites',  value: `${all.length}`,       inline: true },
+      { name: '✅ Retained (30d)', value: `${retained.length}`,   inline: true },
+      { name: '⏳ Pending',        value: `${pending.length}`,    inline: true },
+      { name: '❌ Lost',           value: `${lost.length}`,       inline: true },
+      { name: '🏆 Payouts Earned', value: `${paidOut}`,           inline: true },
+      {
+        name: '💰 Payout Status',
+        value: pendingPayout
+          ? '⏳ Payout request **pending review** by a PR Manager'
+          : eligible
+            ? '✅ **Eligible!** Click **Request Payout** to claim your 50 Robux'
+            : `❌ Need **${needed}** more retained invite${needed !== 1 ? 's' : ''} (${unpaidRetained.length}/10)`,
+        inline: false,
+      },
+    )
+    .setFooter({ text: 'HowToERLC PR Team • Stats update in real-time' })
+    .setTimestamp();
+
+  return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+}
+
+// ── Register Invite button ────────────────────────────────────────────────────
+async function handlePrRegister(interaction) {
+  if (!await hasPrAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+  }
+  const modal = new ModalBuilder()
+    .setCustomId('pr_register_modal')
+    .setTitle('Register Your Invite Link');
+
+  modal.addComponents(
+    new ActionRowBuilder().addComponents(
+      new TextInputBuilder()
+        .setCustomId('pr_invite_code')
+        .setLabel('Invite Code')
+        .setStyle(TextInputStyle.Short)
+        .setPlaceholder('e.g. HjcqH2djjC  (part after discord.gg/)')
+        .setRequired(true)
+        .setMinLength(3)
+        .setMaxLength(30)
+    ),
+  );
+  return interaction.showModal(modal);
+}
+
+// ── Register modal submit ─────────────────────────────────────────────────────
+async function handlePrRegisterModal(interaction, client) {
+  if (!await hasPrAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+  }
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+  const userId     = interaction.user.id;
+  const rawCode    = interaction.fields.getTextInputValue('pr_invite_code').trim();
+  const inviteCode = rawCode.replace(/^(https?:\/\/)?(www\.)?discord\.(gg|com\/invite)\//, '').trim();
+
+  let invite;
+  try {
+    invite = await interaction.guild.invites.fetch(inviteCode);
+  } catch {
+    return interaction.editReply({
+      content: `<:Cancel:1494830662581092482> Could not find invite code \`${inviteCode}\` in this server. Make sure it's a valid server invite.`,
+    });
+  }
+
+  const registered = readPrRegistered();
+  const existing   = registered[userId];
+
+  registered[userId] = {
+    inviteCode,
+    registeredAt: new Date().toISOString(),
+    updatedAt: existing ? new Date().toISOString() : null,
+  };
+  writePrRegistered(registered);
+
+  const logEmbed = new EmbedBuilder()
+    .setColor(config.colors.success)
+    .setTitle('🔗 PR Invite Registered')
+    .addFields(
+      { name: 'Member',      value: `<@${userId}> (${interaction.user.tag})`, inline: true },
+      { name: 'Invite Code', value: `\`discord.gg/${inviteCode}\``,           inline: true },
+      { name: 'Action',      value: existing ? '📝 Updated' : '✅ New',       inline: true },
+    )
+    .setTimestamp();
+  await logToPr(interaction.guild, logEmbed);
+
+  let reply = `✅ Your invite \`discord.gg/${inviteCode}\` has been registered! The bot will now track everyone who joins via this link.`;
+  if (invite.maxAge && invite.maxAge !== 0) {
+    reply += '\n\n⚠️ This invite has an expiry set. Please recreate it as **permanent (Never expires)** and re-register as soon as possible.';
+  }
+  await interaction.editReply({ content: reply });
+}
+
+// ── Request Payout button ─────────────────────────────────────────────────────
+async function handlePrPayout(interaction) {
+  if (!await hasPrAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+  }
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+  const userId  = interaction.user.id;
+  const invites = readInvites();
+  const payouts = readPrPayouts();
+
+  const existingPending = Object.values(payouts).find(p => p.memberId === userId && p.status === 'pending');
+  if (existingPending) {
+    return interaction.editReply({ content: '⏳ You already have a **pending payout request**. Wait for a PR Manager to review it before submitting another.' });
+  }
+
+  const unpaidRetained = Object.entries(invites).filter(
+    ([, e]) => e.inviterId === userId && e.retained && !e.payoutId
+  );
+
+  if (unpaidRetained.length < 10) {
+    const needed = 10 - unpaidRetained.length;
+    return interaction.editReply({
+      content: `<:Cancel:1494830662581092482> You need **${needed} more retained invite${needed !== 1 ? 's' : ''}** before requesting a payout.\n\nCurrent: **${unpaidRetained.length}/10** retained invites.`,
+    });
+  }
+
+  const toClaim  = unpaidRetained.slice(0, 10).map(([k]) => k);
+  const payoutId = `payout_${generateId()}`;
+
+  for (const uid of toClaim) invites[uid].payoutId = payoutId;
+  writeInvites(invites);
+
+  payouts[payoutId] = {
+    memberId: userId, memberTag: interaction.user.tag,
+    requestedAt: new Date().toISOString(),
+    invitesClaimed: toClaim, retainedCount: 10,
+    status: 'pending', reviewedBy: null, reviewedAt: null,
+  };
+  writePrPayouts(payouts);
+
+  const prLogChannel = interaction.guild.channels.cache.get(config.channels.prLogs);
+  if (prLogChannel) {
+    const payoutEmbed = new EmbedBuilder()
+      .setColor(config.colors.warning)
+      .setTitle('💰 Payout Request — Pending Review')
+      .setDescription(`<@&${config.roles.prManager}> — A PR Team member has requested their payout.`)
+      .addFields(
+        { name: 'Member',         value: `<@${userId}> (${interaction.user.tag})`,        inline: true },
+        { name: 'Retained Count', value: `${toClaim.length} invites`,                     inline: true },
+        { name: 'Payout ID',      value: `\`${payoutId}\``,                               inline: true },
+        { name: 'Amount',         value: '**50 Robux**',                                  inline: true },
+        { name: 'Requested At',   value: `<t:${Math.floor(Date.now() / 1000)}:F>`,        inline: false },
+      )
+      .setFooter({ text: 'Use the buttons below to approve or deny' })
+      .setTimestamp();
+
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId(`pr:approve:${payoutId}`).setLabel('✅ Approve Payout').setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId(`pr:deny:${payoutId}`).setLabel('❌ Deny Payout').setStyle(ButtonStyle.Danger),
+    );
+    await prLogChannel.send({ embeds: [payoutEmbed], components: [row] }).catch(() => {});
+  }
+
+  return interaction.editReply({
+    content: `✅ Payout request submitted! A **PR Manager** will review it in <#${config.channels.prLogs}>. You'll be notified when it's processed.`,
+  });
+}
+
+// ── Approve payout ────────────────────────────────────────────────────────────
+async function handlePrPayoutApprove(interaction, client) {
+  if (!await hasPrManagerAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> Only PR Managers can approve payout requests.', flags: MessageFlags.Ephemeral });
+  }
+  const payoutId = interaction.customId.split(':')[2];
+  const payouts  = readPrPayouts();
+  const payout   = payouts[payoutId];
+  if (!payout) return interaction.reply({ content: '<:Cancel:1494830662581092482> Payout record not found.', flags: MessageFlags.Ephemeral });
+  if (payout.status !== 'pending') return interaction.reply({ content: `<:Cancel:1494830662581092482> This payout is already **${payout.status}**.`, flags: MessageFlags.Ephemeral });
+
+  payout.status = 'approved'; payout.reviewedBy = interaction.user.tag; payout.reviewedAt = new Date().toISOString();
+  writePrPayouts(payouts);
+
+  const approvedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
+    .setColor(config.colors.success)
+    .setTitle('💰 Payout Request — Approved ✅')
+    .setFooter({ text: `Approved by ${interaction.user.tag} • ${new Date().toLocaleString()}` });
+  await interaction.update({ embeds: [approvedEmbed], components: [] });
+
+  const dmEmbed = new EmbedBuilder()
+    .setColor(config.colors.success)
+    .setTitle('🎉 Payout Approved!')
+    .setDescription('Your payout request for **HowToERLC** has been approved! You will receive your **50 Robux** shortly. Thank you for your contributions to the PR Team!')
+    .addFields(
+      { name: 'Retained Invites', value: `${payout.retainedCount}`, inline: true },
+      { name: 'Amount',           value: '50 Robux',                inline: true },
+      { name: 'Approved By',      value: interaction.user.tag,      inline: true },
+    )
+    .setFooter({ text: 'HowToERLC PR Team' })
+    .setTimestamp();
+  await dmUser(client, payout.memberId, dmEmbed);
+}
+
+// ── Deny payout ───────────────────────────────────────────────────────────────
+async function handlePrPayoutDeny(interaction, client) {
+  if (!await hasPrManagerAccess(interaction)) {
+    return interaction.reply({ content: '<:Cancel:1494830662581092482> Only PR Managers can deny payout requests.', flags: MessageFlags.Ephemeral });
+  }
+  const payoutId = interaction.customId.split(':')[2];
+  const payouts  = readPrPayouts();
+  const payout   = payouts[payoutId];
+  if (!payout) return interaction.reply({ content: '<:Cancel:1494830662581092482> Payout record not found.', flags: MessageFlags.Ephemeral });
+  if (payout.status !== 'pending') return interaction.reply({ content: `<:Cancel:1494830662581092482> This payout is already **${payout.status}**.`, flags: MessageFlags.Ephemeral });
+
+  payout.status = 'denied'; payout.reviewedBy = interaction.user.tag; payout.reviewedAt = new Date().toISOString();
+  writePrPayouts(payouts);
+
+  // Restore payoutId on invite entries so the counter isn't lost
+  const invites = readInvites();
+  for (const uid of payout.invitesClaimed) { if (invites[uid]) invites[uid].payoutId = null; }
+  writeInvites(invites);
+
+  const deniedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
+    .setColor(config.colors.error)
+    .setTitle('💰 Payout Request — Denied ❌')
+    .setFooter({ text: `Denied by ${interaction.user.tag} • ${new Date().toLocaleString()}` });
+  await interaction.update({ embeds: [deniedEmbed], components: [] });
+
+  const dmEmbed = new EmbedBuilder()
+    .setColor(config.colors.error)
+    .setTitle('❌ Payout Request Denied')
+    .setDescription('Your payout request for **HowToERLC** has been denied by the PR Team Manager. Your retained invites have been restored — you may submit a new request. Contact a PR Manager with any questions.')
+    .addFields({ name: 'Denied By', value: interaction.user.tag, inline: true })
+    .setFooter({ text: 'HowToERLC PR Team' })
+    .setTimestamp();
+  await dmUser(client, payout.memberId, dmEmbed);
+}
+
+// ── PR interaction router ─────────────────────────────────────────────────────
+async function handlePrInteraction(interaction, client) {
+  if (interaction.isButton()) {
+    const action = interaction.customId.split(':')[1];
+    if (action === 'mystats')  return handlePrMyStats(interaction);
+    if (action === 'register') return handlePrRegister(interaction);
+    if (action === 'payout')   return handlePrPayout(interaction);
+    if (action === 'approve')  return handlePrPayoutApprove(interaction, client);
+    if (action === 'deny')     return handlePrPayoutDeny(interaction, client);
+  }
+  if (interaction.isStringSelectMenu()) {
+    if (interaction.customId === 'pr:assets')   return handlePrAssets(interaction);
+    if (interaction.customId === 'pr:handbook') return handlePrHandbook(interaction);
+  }
+  if (interaction.isModalSubmit()) {
+    if (interaction.customId === 'pr_register_modal') return handlePrRegisterModal(interaction, client);
+  }
+}
+
 // ── Main router ───────────────────────────────────────────────────────────────
 module.exports = async (interaction, client) => {
   try {
     if (interaction.isButton()) {
       const prefix = interaction.customId.split(':')[0];
+      if (prefix === 'pr')           return handlePrInteraction(interaction, client);
       if (interaction.customId === 'staff_apply') return handleStaffApplyButton(interaction);
       if (prefix === 'sug_approve')  return handleSugApprove(interaction, client);
       if (prefix === 'sug_deny')     return handleSugDeny(interaction, client);
@@ -462,14 +891,17 @@ module.exports = async (interaction, client) => {
     }
 
     if (interaction.isStringSelectMenu()) {
-      if (interaction.customId === 'dashboard:info') return handleDashboardSelect(interaction);
+      const prefix = interaction.customId.split(':')[0];
+      if (prefix === 'pr')                                    return handlePrInteraction(interaction, client);
+      if (interaction.customId === 'dashboard:info')          return handleDashboardSelect(interaction);
       if (interaction.customId === 'rolepanel:notifications') return handleRoleSelect(interaction);
     }
 
     if (interaction.isModalSubmit()) {
-      if (interaction.customId === 'ticket_modal')     return handleTicketModal(interaction, client);
-      if (interaction.customId === 'staff_apply_modal') return handleStaffApplyModal(interaction, client);
-      if (interaction.customId === 'suggest_modal')     return handleSuggestModal(interaction, client);
+      if (interaction.customId === 'pr_register_modal')  return handlePrInteraction(interaction, client);
+      if (interaction.customId === 'ticket_modal')       return handleTicketModal(interaction, client);
+      if (interaction.customId === 'staff_apply_modal')  return handleStaffApplyModal(interaction, client);
+      if (interaction.customId === 'suggest_modal')      return handleSuggestModal(interaction, client);
     }
   } catch (err) {
     console.error('[ComponentHandler] Error:', err);

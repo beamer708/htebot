@@ -19,24 +19,29 @@ module.exports = {
       invites[member.id].leftAt = new Date().toISOString();
       writeInvites(invites);
 
-      const inviteLogChannel = member.guild.channels.cache.get(config.channels.inviteLogs)
-        || logChannel;
+      const joinedMs = new Date(entry.joinedAt).getTime();
+      const elapsed  = Date.now() - joinedMs;
+      const days     = Math.floor(elapsed / 86_400_000);
+      const hours    = Math.floor((elapsed % 86_400_000) / 3_600_000);
 
-      if (inviteLogChannel) {
-        const joinedMs = new Date(entry.joinedAt).getTime();
-        const elapsed = Date.now() - joinedMs;
-        const days = Math.floor(elapsed / 86_400_000);
-        const hours = Math.floor((elapsed % 86_400_000) / 3_600_000);
+      const inviteLeaveEmbed = new EmbedBuilder()
+        .setColor(config.colors.error)
+        .setTitle('<:LeftArrow:1498148495683751947> PR Invite — Member Left (Not Retained)')
+        .addFields(
+          { name: 'User',                value: `${member.user.tag} (${member.id})`,             inline: true },
+          { name: 'Originally Invited By', value: `<@${entry.inviterId}>`,                       inline: true },
+          { name: 'Time in Server',      value: `${days}d ${hours}h`,                            inline: true },
+          { name: 'Invite Code',         value: `\`${entry.inviteCode || 'unknown'}\``,          inline: true },
+          { name: 'Status',              value: '❌ Will NOT count toward payout',               inline: false },
+        )
+        .setTimestamp();
 
-        const inviteLeaveEmbed = new EmbedBuilder()
-          .setColor(config.colors.error)
-          .setTitle('<:LeftArrow:1498148495683751947> Invited Member Left (Not Retained)')
-          .addFields(
-            { name: 'User', value: `${member.user.tag} (${member.id})`, inline: true },
-            { name: 'Originally Invited By', value: `<@${entry.inviterId}>`, inline: true },
-            { name: 'Time in Server', value: `${days} days ${hours} hours`, inline: true },
-          )
-          .setTimestamp();
+      // Log to pr-logs (primary), then inviteLogs fallback, then general logs
+      const prLogChannel = member.guild.channels.cache.get(config.channels.prLogs);
+      const inviteLogChannel = member.guild.channels.cache.get(config.channels.inviteLogs) || logChannel;
+      if (prLogChannel) {
+        await prLogChannel.send({ embeds: [inviteLeaveEmbed] }).catch(() => {});
+      } else if (inviteLogChannel) {
         await inviteLogChannel.send({ embeds: [inviteLeaveEmbed] }).catch(() => {});
       }
     }
