@@ -1,142 +1,123 @@
 const {
-  EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle,
-  StringSelectMenuBuilder, StringSelectMenuOptionBuilder,
+  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder,
+  MessageFlags, resolveColor,
 } = require('discord.js');
 const config = require('../config.json');
 
+const FOOTER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499184076383588502/Embed_Footer_Banner.png';
+
+// MediaGallery was added in discord.js 14.18 — guard for older installs
+let MediaGalleryBuilder, MediaGalleryItemBuilder;
+try {
+  ({ MediaGalleryBuilder, MediaGalleryItemBuilder } = require('discord.js'));
+} catch { /* not available */ }
+const hasMediaGallery = typeof MediaGalleryBuilder === 'function';
+
 async function sendPrPanel(interaction) {
-  const guild = interaction.guild;
-
-  // ── Message 1: Hero Embed + Action Buttons ───────────────────────
-  const heroEmbed = new EmbedBuilder()
-    .setColor(config.colors.primary)
-    .setAuthor({ name: 'HowToERLC PR Team', iconURL: guild.iconURL() })
-    .setTitle('📣 PR Team — Invite Program')
-    .setDescription(
-      'Earn **50 Robux** for every **10 members** you successfully invite and retain!\n\n' +
-      'Use this panel to manage your invite link, check your progress, and claim your reward.'
-    )
-    .addFields(
-      {
-        name: '🎯 How It Works',
-        value:
-          '• Create a **permanent** (non-expiring) Discord invite link\n' +
-          '• Register it using the **Register Invite** button below\n' +
-          '• Share your link across ERLC communities\n' +
-          '• When **10 of your invited members** stay for **30+ days**, you qualify for a **50 Robux** payout',
-        inline: false,
-      },
-      {
-        name: '💰 Payout Rules',
-        value:
-          '• 10 retained invites (30+ days each) required per payout\n' +
-          '• Click **Request Payout** once you hit 10 retained invites\n' +
-          '• A **PR Manager** will review and process your payout\n' +
-          '• One payout per 10 retained invites — the counter resets after each claim',
-        inline: false,
-      },
-      {
-        name: '📊 Track Your Progress',
-        value: 'Click **My Stats** at any time to see your invite count, retention rate, and payout eligibility.',
-        inline: false,
-      },
-    )
-    .setFooter({ text: 'HowToERLC PR Team • howtoerlc.xyz' })
-    .setTimestamp();
-
-  const buttonRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('pr:mystats')
-      .setLabel('📊 My Stats')
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId('pr:register')
-      .setLabel('🔗 Register Invite')
-      .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
-      .setCustomId('pr:payout')
-      .setLabel('💰 Request Payout')
-      .setStyle(ButtonStyle.Secondary),
-  );
-
-  await interaction.channel.send({ embeds: [heroEmbed], components: [buttonRow] });
-
-  // ── Message 2: Assets Select Menu ───────────────────────────────
-  const assetsEmbed = new EmbedBuilder()
-    .setColor(config.colors.info)
-    .setTitle('📋 Outreach Assets')
-    .setDescription(
-      'Select a template below to receive a ready-to-use outreach message.\n' +
-      'The template will be sent only to you so you can copy and paste it.'
-    )
-    .setFooter({ text: 'HowToERLC PR Team • Templates are sent privately' });
-
   const assetsMenu = new StringSelectMenuBuilder()
     .setCustomId('pr:assets')
-    .setPlaceholder('📋 Select an outreach template...')
-    .addOptions(
-      new StringSelectMenuOptionBuilder()
-        .setLabel('📢 Server Advertisement')
-        .setDescription('General server ad for posting in advertisement channels')
-        .setValue('advertisement')
-        .setEmoji('📢'),
-      new StringSelectMenuOptionBuilder()
-        .setLabel('📨 Invitation Offer')
-        .setDescription('Personal outreach message for inviting specific servers')
-        .setValue('invitation')
-        .setEmoji('📨'),
-    );
-
-  const assetsRow = new ActionRowBuilder().addComponents(assetsMenu);
-  await interaction.channel.send({ embeds: [assetsEmbed], components: [assetsRow] });
-
-  // ── Message 3: Handbook Select Menu ─────────────────────────────
-  const handbookEmbed = new EmbedBuilder()
-    .setColor(config.colors.primary)
-    .setTitle('📖 PR Team Handbook')
-    .setDescription(
-      'Select a section below to learn about your role, the invite system, and how payouts work.'
-    )
-    .setFooter({ text: 'HowToERLC PR Team • Represent us professionally' });
+    .setPlaceholder('Outreach Assets')
+    .setMinValues(1)
+    .setMaxValues(1)
+    .addOptions([
+      {
+        label: 'Server Advertisement',
+        description: 'General server ad for posting in advertisement channels',
+        value: 'advertisement',
+        emoji: { name: 'RightArrow', id: '1498148469284667562' },
+      },
+      {
+        label: 'Invitation Offer',
+        description: 'Personal outreach message for inviting specific servers',
+        value: 'invitation',
+        emoji: { name: 'RightArrow', id: '1498148469284667562' },
+      },
+    ]);
 
   const handbookMenu = new StringSelectMenuBuilder()
     .setCustomId('pr:handbook')
-    .setPlaceholder('📖 Browse the handbook...')
-    .addOptions(
-      new StringSelectMenuOptionBuilder()
-        .setLabel('🎯 What is the PR Team?')
-        .setDescription('Your role and responsibilities')
-        .setValue('role')
-        .setEmoji('🎯'),
-      new StringSelectMenuOptionBuilder()
-        .setLabel('🔗 Invite Link Setup')
-        .setDescription('How to create and register your permanent invite link')
-        .setValue('invite_setup')
-        .setEmoji('🔗'),
-      new StringSelectMenuOptionBuilder()
-        .setLabel('💰 Payout System')
-        .setDescription('How the 50 Robux payout works and how to claim it')
-        .setValue('payouts')
-        .setEmoji('💰'),
-      new StringSelectMenuOptionBuilder()
-        .setLabel('📊 Tracking & Stats')
-        .setDescription('How invites are tracked and what the numbers mean')
-        .setValue('tracking')
-        .setEmoji('📊'),
+    .setPlaceholder('PR Team Handbook')
+    .setMinValues(1)
+    .setMaxValues(1)
+    .addOptions([
+      {
+        label: 'What is the PR Team?',
+        description: 'Your role and responsibilities as a PR Team member',
+        value: 'role',
+        emoji: { name: 'Dot', id: '1496643767585865818' },
+      },
+      {
+        label: 'Invite Link Setup',
+        description: 'How to create and register your permanent invite link',
+        value: 'invite_setup',
+        emoji: { name: 'Dot', id: '1496643767585865818' },
+      },
+      {
+        label: 'Payout System',
+        description: 'How the 50 Robux payout works and how to claim it',
+        value: 'payouts',
+        emoji: { name: 'Dot', id: '1496643767585865818' },
+      },
+      {
+        label: 'Tracking and Stats',
+        description: 'How invites are tracked and what the numbers mean',
+        value: 'tracking',
+        emoji: { name: 'Dot', id: '1496643767585865818' },
+      },
+    ]);
+
+  const statsBtn = new ButtonBuilder()
+    .setCustomId('pr:mystats')
+    .setLabel('My Stats')
+    .setStyle(ButtonStyle.Primary)
+    .setEmoji({ name: 'On', id: '1498148402180001942' });
+
+  const registerBtn = new ButtonBuilder()
+    .setCustomId('pr:register')
+    .setLabel('Register Invite')
+    .setStyle(ButtonStyle.Success)
+    .setEmoji({ name: 'RightArrow', id: '1498148469284667562' });
+
+  const payoutBtn = new ButtonBuilder()
+    .setCustomId('pr:payout')
+    .setLabel('Request Payout')
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji({ name: 'Dot', id: '1496643767585865818' });
+
+  const container = new ContainerBuilder()
+    .setAccentColor(resolveColor('#4ade80'))
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        '<:howtoglogo:1494830728113033327> **HowToERLC PR Team — Invite Program**\n\n' +
+        'Earn **50 Robux** for every **10 members** you successfully invite and retain for 30+ days. ' +
+        'Use the menus below to access outreach templates, browse the handbook, and manage your invites.\n\n' +
+        '<:Dot:1496643767585865818> Register a **permanent** (non-expiring) invite link using **Register Invite**\n' +
+        '<:Dot:1496643767585865818> Share your link across ERLC communities and servers\n' +
+        '<:Dot:1496643767585865818> When **10 of your invited members** stay for **30+ days**, click **Request Payout**\n' +
+        '<:Dot:1496643767585865818> A PR Manager will review and process your **50 Robux** reward'
+      )
+    )
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addActionRowComponents(new ActionRowBuilder().addComponents(assetsMenu))
+    .addActionRowComponents(new ActionRowBuilder().addComponents(handbookMenu))
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addActionRowComponents(
+      new ActionRowBuilder().addComponents(statsBtn, registerBtn, payoutBtn)
     );
 
-  const handbookRow = new ActionRowBuilder().addComponents(handbookMenu);
-  await interaction.channel.send({ embeds: [handbookEmbed], components: [handbookRow] });
-
-  // ── Message 4: Footer Strip ──────────────────────────────────────
-  const footerEmbed = new EmbedBuilder()
-    .setColor(config.colors.primary)
-    .setDescription(
-      'By being part of the PR team you agree to represent **HowToERLC** professionally in all outreach.\n' +
-      'Misuse of outreach assets or the invite system may result in removal. • Est. 2024'
+  if (hasMediaGallery) {
+    container.addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(FOOTER_IMAGE)
+      )
     );
+  }
 
-  await interaction.channel.send({ embeds: [footerEmbed] });
+  await interaction.channel.send({
+    components: [container],
+    flags: MessageFlags.IsComponentsV2,
+  });
 }
 
 module.exports = { sendPrPanel };
