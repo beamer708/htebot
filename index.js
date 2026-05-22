@@ -23,4 +23,9 @@ require('./handlers/commandHandler')(client);
 require('./handlers/eventHandler')(client);
 require('./web/server')(client);
 
+client.once('ready', () => {
+  const { startServer } = require('./server');
+  startServer(client);
+});
+
 client.login(process.env.BOT_TOKEN);
