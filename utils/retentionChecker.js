@@ -29,7 +29,7 @@ async function runRetentionCheck(client) {
     // ── Log retention event to pr-logs ──────────────────────────────
     const retainedEmbed = new EmbedBuilder()
       .setColor(config.colors.success)
-      .setTitle('📅 Invite Retained — 30 Days')
+      .setTitle('<:Calendar:1507191492500918422> Invite Retained — 30 Days')
       .addFields(
         { name: 'User',       value: `<@${entry.invitedUserId}> (${entry.invitedUserId})`, inline: true },
         { name: 'Invited By', value: `<@${entry.inviterId}>`,                              inline: true },
@@ -49,7 +49,7 @@ async function runRetentionCheck(client) {
     if (retainedCount > 0 && retainedCount % 10 === 0) {
       const milestoneEmbed = new EmbedBuilder()
         .setColor(config.colors.warning)
-        .setTitle('🏆 Payout Milestone Reached!')
+        .setTitle('<:crown:1507191516274360492> Payout Milestone Reached!')
         .setDescription(
           `<@${entry.inviterId}> has **${retainedCount} retained invites** and is eligible for a **50 Robux payout**!\n\n` +
           `They can click **Request Payout** on the PR Team panel to claim their reward.`

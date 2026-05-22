@@ -27,9 +27,9 @@ function buildStickyMessage() {
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        '<:Check:1494830681484824616> **ERLC-related only**\n' +
+        '<:circlecheck:1507191508066107532> **ERLC-related only**\n' +
         'Advertisements must be for ERLC or Roblox emergency services communities.\n\n' +
-        '<:Check:1494830681484824616> **Valid invite link required**\n' +
+        '<:circlecheck:1507191508066107532> **Valid invite link required**\n' +
         'Ensure your link is active before posting. Expired or broken links result in an automatic **warning**.'
       )
     )

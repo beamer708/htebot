@@ -21,9 +21,24 @@ async function sendMainDashboard(interaction) {
     .setMinValues(1)
     .setMaxValues(1)
     .addOptions([
-      { label: 'About', description: 'Learn about HowToERLC', value: 'info_about' },
-      { label: 'Server Guidelines', description: 'Rules and conduct expectations', value: 'info_guidelines' },
-      { label: 'Advertising Guidelines', description: 'Rules for advertising here', value: 'info_advertising' },
+      {
+        label: 'About',
+        description: 'Learn about HowToERLC',
+        value: 'info_about',
+        emoji: { name: 'infocircle', id: '1507191522024755342' },
+      },
+      {
+        label: 'Server Guidelines',
+        description: 'Rules and conduct expectations',
+        value: 'info_guidelines',
+        emoji: { name: 'shieldcheck', id: '1507191534003552277' },
+      },
+      {
+        label: 'Advertising Guidelines',
+        description: 'Rules for advertising here',
+        value: 'info_advertising',
+        emoji: { name: 'Megaphone', id: '1507191527099596800' },
+      },
     ]);
 
   const rolesMenu = new StringSelectMenuBuilder()
@@ -32,9 +47,24 @@ async function sendMainDashboard(interaction) {
     .setMinValues(0)
     .setMaxValues(3)
     .addOptions([
-      { label: 'Change Log', description: 'Get notified about change logs', value: config.roles.notifications.updates || 'updates' },
-      { label: 'New Resources', description: 'Get notified when resources drop', value: config.roles.notifications.resources || 'resources' },
-      { label: 'Announcements', description: 'Get notified about announcements', value: config.roles.notifications.announcements || 'announcements' },
+      {
+        label: 'Change Log',
+        description: 'Get notified about change logs',
+        value: config.roles.notifications.updates || 'updates',
+        emoji: { name: 'Bell', id: '1507191488667320390' },
+      },
+      {
+        label: 'New Resources',
+        description: 'Get notified when resources drop',
+        value: config.roles.notifications.resources || 'resources',
+        emoji: { name: 'Book', id: '1507191489174700203' },
+      },
+      {
+        label: 'Announcements',
+        description: 'Get notified about announcements',
+        value: config.roles.notifications.announcements || 'announcements',
+        emoji: { name: 'Megaphone', id: '1507191527099596800' },
+      },
     ]);
 
   const websiteBtn = new ButtonBuilder()

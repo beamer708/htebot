@@ -15,7 +15,7 @@ module.exports = {
 
     if (count >= 3) {
       return interaction.reply({
-        content: "<:Cancel:1494830662581092482> You've reached the suggestion limit for today. Try again tomorrow.",
+        content: "<:circlex:1507191508657508503> You've reached the suggestion limit for today. Try again tomorrow.",
         flags: MessageFlags.Ephemeral,
       });
     }

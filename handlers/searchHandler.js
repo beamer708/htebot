@@ -7,9 +7,9 @@ const PAGE_SIZE = 10;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function statusBadge(status) {
-  if (status === 'approved') return '<:Check:1494830681484824616> Approved';
-  if (status === 'denied')   return '<:Cancel:1494830662581092482> Denied';
-  return '<:Dot:1496643767585865818> Pending';
+  if (status === 'approved') return '<:circlecheck:1507191508066107532> Approved';
+  if (status === 'denied')   return '<:circlex:1507191508657508503> Denied';
+  return '<:clockhour4:1507191510792142868> Pending';
 }
 
 function statusColor() {
@@ -52,7 +52,7 @@ function buildListEmbed(type, rows, page, total) {
 
   return new EmbedBuilder()
     .setColor(0x4ADE80)
-    .setTitle(`<:Dot:1496643767585865818> ${typeLabel} Search Results`)
+    .setTitle(`<:list:1507191524448932002> ${typeLabel} Search Results`)
     .setDescription(lines.join('\n') || 'No results.')
     .setFooter({ text: `Page ${page + 1} of ${totalPages} • ${total} total` })
     .setTimestamp();

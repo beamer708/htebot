@@ -32,7 +32,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.warning)
-      .setTitle('✏️ Message Edited')
+      .setTitle('<:pencil:1507191529062797312> Message Edited')
       .setThumbnail(newMessage.author.displayAvatarURL({ dynamic: true }))
       .addFields(
         { name: 'Author', value: `${newMessage.author.tag} (<@${newMessage.author.id}>)`, inline: true },

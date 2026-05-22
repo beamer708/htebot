@@ -130,7 +130,7 @@ module.exports = {
 
     const logEmbed = new EmbedBuilder()
       .setColor(logColor)
-      .setTitle('<:RightArrow:1498148469284667562> Member Joined')
+      .setTitle('<:userplus:1507191546813091841> Member Joined')
       .setAuthor({ name: member.user.tag, iconURL: member.user.displayAvatarURL({ dynamic: true }) })
       .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
       .addFields(logFields)

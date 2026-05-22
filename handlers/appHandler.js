@@ -19,7 +19,7 @@ async function handleStaffApplyButton(interaction) {
 
   if (recent) {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> You already submitted an application (ID: **${recent.id}**). Please wait before applying again.`,
+      content: `<:circlex:1507191508657508503> You already submitted an application (ID: **${recent.id}**). Please wait before applying again.`,
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -91,7 +91,7 @@ async function handleStaffApplyModal(interaction, client) {
   ).get(interaction.user.id, cutoff);
   if (recent) {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> You already submitted an application (ID: **${recent.id}**). Please wait before applying again.`,
+      content: `<:circlex:1507191508657508503> You already submitted an application (ID: **${recent.id}**). Please wait before applying again.`,
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -118,7 +118,7 @@ async function handleStaffApplyModal(interaction, client) {
           { name: 'Role Applying For', value: role,        inline: true },
           { name: 'Age',               value: age,         inline: true },
           { name: 'Timezone',          value: timezone,    inline: true },
-          { name: 'Status',            value: '<:Dot:1496643767585865818> Pending', inline: true },
+          { name: 'Status',            value: '<:clockhour4:1507191510792142868> Pending', inline: true },
           { name: 'Application ID',    value: appId,       inline: true },
           { name: 'Why do you want to join?', value: reason,     inline: false },
           { name: 'Previous Experience',      value: experience, inline: false },
@@ -163,7 +163,7 @@ async function handleStaffApplyModal(interaction, client) {
           .setDescription(
             `<@${interaction.user.id}> has submitted a staff application.\n\n` +
             `This channel is **locked**. Unlock it to begin a conversation with the applicant before coming to a decision.\n\n` +
-            `<:RightArrow:1498148469284667562> [View Full Application](${threadUrl})`
+            `<:Link:1507191523094167573> [View Full Application](${threadUrl})`
           )
           .addFields(
             { name: 'Applicant', value: `<@${interaction.user.id}>`, inline: true },
@@ -176,7 +176,8 @@ async function handleStaffApplyModal(interaction, client) {
           new ButtonBuilder()
             .setCustomId(`app_unlock:${appId}:${interaction.user.id}`)
             .setLabel('Unlock Channel')
-            .setStyle(ButtonStyle.Primary),
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji({ name: 'lockopen', id: '1507191525627658330' }),
         );
 
         await reviewChannel.send({
@@ -193,12 +194,12 @@ async function handleStaffApplyModal(interaction, client) {
     ).catch(() => {});
 
     await interaction.editReply({
-      content: `<:Check:1494830681484824616> Application submitted! ID: **${appId}**`,
+      content: `<:circlecheck:1507191508066107532> Application submitted! ID: **${appId}**`,
     });
   } catch (err) {
     console.error('[AppHandler] Modal submit error:', err);
     await interaction.editReply({
-      content: '<:Cancel:1494830662581092482> Something went wrong submitting your application. Please try again.',
+      content: '<:circlex:1507191508657508503> Something went wrong submitting your application. Please try again.',
     });
   }
 }
@@ -214,7 +215,7 @@ async function approveApplication(interaction, client, rawId, reason) {
   );
   if (!isStaff) {
     return interaction.reply({
-      content: '<:Cancel:1494830662581092482> Only staff can review applications.',
+      content: '<:circlex:1507191508657508503> Only staff can review applications.',
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -222,13 +223,13 @@ async function approveApplication(interaction, client, rawId, reason) {
   const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(rawId.toUpperCase());
   if (!app) {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> No application found with ID **${rawId}**.`,
+      content: `<:circlex:1507191508657508503> No application found with ID **${rawId}**.`,
       flags: MessageFlags.Ephemeral,
     });
   }
   if (app.status !== 'pending') {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> Application **${app.id}** has already been ${app.status}.`,
+      content: `<:circlex:1507191508657508503> Application **${app.id}** has already been ${app.status}.`,
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -248,7 +249,7 @@ async function approveApplication(interaction, client, rawId, reason) {
         if (starter?.embeds[0]) {
           const fields = starter.embeds[0].fields.map(f =>
             f.name === 'Status'
-              ? { name: 'Status', value: '<:Check:1494830681484824616> Approved', inline: f.inline }
+              ? { name: 'Status', value: '<:circlecheck:1507191508066107532> Approved', inline: f.inline }
               : f
           );
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
@@ -268,7 +269,7 @@ async function approveApplication(interaction, client, rawId, reason) {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
       .setColor(0x57F287)
-      .setTitle('<:Check:1494830681484824616> Application Approved')
+      .setTitle('<:circlecheck:1507191508066107532> Application Approved')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved! A staff member will reach out with next steps.`)
       .setTimestamp();
     if (reason) dmEmbed.addFields({ name: 'Note', value: reason, inline: false });
@@ -276,7 +277,7 @@ async function approveApplication(interaction, client, rawId, reason) {
   } catch { /* DMs disabled */ }
 
   await interaction.editReply({
-    content: `<:Check:1494830681484824616> Application **${app.id}** approved.`,
+    content: `<:circlecheck:1507191508066107532> Application **${app.id}** approved.`,
   });
 }
 
@@ -291,7 +292,7 @@ async function denyApplication(interaction, client, rawId, reason) {
   );
   if (!isStaff) {
     return interaction.reply({
-      content: '<:Cancel:1494830662581092482> Only staff can review applications.',
+      content: '<:circlex:1507191508657508503> Only staff can review applications.',
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -299,13 +300,13 @@ async function denyApplication(interaction, client, rawId, reason) {
   const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(rawId.toUpperCase());
   if (!app) {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> No application found with ID **${rawId}**.`,
+      content: `<:circlex:1507191508657508503> No application found with ID **${rawId}**.`,
       flags: MessageFlags.Ephemeral,
     });
   }
   if (app.status !== 'pending') {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> Application **${app.id}** has already been ${app.status}.`,
+      content: `<:circlex:1507191508657508503> Application **${app.id}** has already been ${app.status}.`,
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -325,7 +326,7 @@ async function denyApplication(interaction, client, rawId, reason) {
         if (starter?.embeds[0]) {
           const fields = starter.embeds[0].fields.map(f =>
             f.name === 'Status'
-              ? { name: 'Status', value: '<:Cancel:1494830662581092482> Denied', inline: f.inline }
+              ? { name: 'Status', value: '<:circlex:1507191508657508503> Denied', inline: f.inline }
               : f
           );
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
@@ -345,7 +346,7 @@ async function denyApplication(interaction, client, rawId, reason) {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
       .setColor(0xED4245)
-      .setTitle('<:Cancel:1494830662581092482> Application Denied')
+      .setTitle('<:circlex:1507191508657508503> Application Denied')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
       .setTimestamp();
     if (reason) dmEmbed.addFields({ name: 'Reason', value: reason, inline: false });
@@ -353,7 +354,7 @@ async function denyApplication(interaction, client, rawId, reason) {
   } catch { /* DMs disabled */ }
 
   await interaction.editReply({
-    content: `<:Check:1494830681484824616> Application **${app.id}** denied.`,
+    content: `<:circlecheck:1507191508066107532> Application **${app.id}** denied.`,
   });
 }
 
@@ -369,7 +370,7 @@ async function handleAppReviewButton(interaction, client) {
   );
   if (!isAdmin) {
     return interaction.reply({
-      content: '<:Cancel:1494830662581092482> Only management can review applications.',
+      content: '<:circlex:1507191508657508503> Only management can review applications.',
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -377,13 +378,13 @@ async function handleAppReviewButton(interaction, client) {
   const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
   if (!app) {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> Application **${appId}** not found.`,
+      content: `<:circlex:1507191508657508503> Application **${appId}** not found.`,
       flags: MessageFlags.Ephemeral,
     });
   }
   if (app.status !== 'pending') {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> This application has already been **${app.status}**.`,
+      content: `<:circlex:1507191508657508503> This application has already been **${app.status}**.`,
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -447,8 +448,8 @@ async function postAppLog(client, guild, app, action, reviewerId, extra = {}) {
   const embed = new EmbedBuilder()
     .setColor(APP_COLOR)
     .setTitle(isApproved
-      ? '<:Check:1494830681484824616> Application Approved'
-      : '<:Cancel:1494830662581092482> Application Denied')
+      ? '<:circlecheck:1507191508066107532> Application Approved'
+      : '<:circlex:1507191508657508503> Application Denied')
     .addFields(
       { name: 'Applicant',        value: `<@${app.user_id}> (${app.username})`, inline: true },
       { name: 'Application ID',   value: app.id,  inline: true },
@@ -478,7 +479,7 @@ async function handleAppApproveModal(interaction, client) {
   const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
   if (!app || app.status !== 'pending') {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> Application **${appId}** is no longer pending.`,
+      content: `<:circlex:1507191508657508503> Application **${appId}** is no longer pending.`,
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -498,7 +499,7 @@ async function handleAppApproveModal(interaction, client) {
         if (starter?.embeds[0]) {
           const fields = starter.embeds[0].fields.map(f =>
             f.name === 'Status'
-              ? { name: 'Status', value: '<:Check:1494830681484824616> Approved', inline: f.inline }
+              ? { name: 'Status', value: '<:circlecheck:1507191508066107532> Approved', inline: f.inline }
               : f
           );
           fields.push({ name: 'Reviewed By',  value: `<@${interaction.user.id}>`, inline: true });
@@ -510,7 +511,7 @@ async function handleAppApproveModal(interaction, client) {
           }).catch(() => {});
 
           await thread.send(
-            `<:Check:1494830681484824616> **Decision logged** — Approved by <@${interaction.user.id}>. Starting rank: **${startingRank}**.`
+            `<:circlecheck:1507191508066107532> **Decision logged** — Approved by <@${interaction.user.id}>. Starting rank: **${startingRank}**.`
           ).catch(() => {});
         }
       }
@@ -524,7 +525,7 @@ async function handleAppApproveModal(interaction, client) {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
       .setColor(APP_COLOR)
-      .setTitle('<:Check:1494830681484824616> Application Approved')
+      .setTitle('<:circlecheck:1507191508066107532> Application Approved')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been approved.`)
       .addFields(
         { name: 'Starting Rank', value: startingRank, inline: true },
@@ -538,7 +539,7 @@ async function handleAppApproveModal(interaction, client) {
   await postAppLog(client, interaction.guild, app, 'approved', interaction.user.id, { startingRank, message });
 
   await interaction.editReply({
-    content: `<:Check:1494830681484824616> Application **${app.id}** approved. Starting rank: **${startingRank}**.`,
+    content: `<:circlecheck:1507191508066107532> Application **${app.id}** approved. Starting rank: **${startingRank}**.`,
   });
 }
 
@@ -551,7 +552,7 @@ async function handleAppDenyModal(interaction, client) {
   const app = db.prepare('SELECT * FROM applications WHERE id = ?').get(appId);
   if (!app || app.status !== 'pending') {
     return interaction.reply({
-      content: `<:Cancel:1494830662581092482> Application **${appId}** is no longer pending.`,
+      content: `<:circlex:1507191508657508503> Application **${appId}** is no longer pending.`,
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -571,7 +572,7 @@ async function handleAppDenyModal(interaction, client) {
         if (starter?.embeds[0]) {
           const fields = starter.embeds[0].fields.map(f =>
             f.name === 'Status'
-              ? { name: 'Status', value: '<:Cancel:1494830662581092482> Denied', inline: f.inline }
+              ? { name: 'Status', value: '<:circlex:1507191508657508503> Denied', inline: f.inline }
               : f
           );
           fields.push({ name: 'Reviewed By', value: `<@${interaction.user.id}>`, inline: true });
@@ -582,7 +583,7 @@ async function handleAppDenyModal(interaction, client) {
           }).catch(() => {});
 
           await thread.send(
-            `<:Cancel:1494830662581092482> **Decision logged** — Denied by <@${interaction.user.id}>.${reason ? ` Reason: ${reason}` : ''}`
+            `<:circlex:1507191508657508503> **Decision logged** — Denied by <@${interaction.user.id}>.${reason ? ` Reason: ${reason}` : ''}`
           ).catch(() => {});
         }
       }
@@ -596,7 +597,7 @@ async function handleAppDenyModal(interaction, client) {
     const user = await client.users.fetch(app.user_id);
     const dmEmbed = new EmbedBuilder()
       .setColor(APP_COLOR)
-      .setTitle('<:Cancel:1494830662581092482> Application Denied')
+      .setTitle('<:circlex:1507191508657508503> Application Denied')
       .setDescription(`Your staff application (**${app.id}**) for **${app.role}** has been denied.`)
       .setTimestamp();
     if (reason) dmEmbed.addFields({ name: 'Reason', value: reason, inline: false });
@@ -619,7 +620,7 @@ async function handleAppUnlock(interaction, client) {
   );
   if (!isAdmin) {
     return interaction.reply({
-      content: '<:Cancel:1494830662581092482> Only management can unlock this channel.',
+      content: '<:circlex:1507191508657508503> Only management can unlock this channel.',
       flags: MessageFlags.Ephemeral,
     });
   }

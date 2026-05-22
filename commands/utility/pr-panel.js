@@ -21,7 +21,7 @@ module.exports = {
 
     if (!hasPrRole) {
       return interaction.reply({
-        content: '<:Cancel:1494830662581092482> This command is restricted to PR Team members only.',
+        content: '<:circlex:1507191508657508503> This command is restricted to PR Team members only.',
         flags: MessageFlags.Ephemeral,
       });
     }
@@ -37,13 +37,13 @@ module.exports = {
           label: 'Server Advertisement',
           description: 'General server ad for posting in advertisement channels',
           value: 'advertisement',
-          emoji: { name: 'RightArrow', id: '1498148469284667562' },
+          emoji: { name: 'Megaphone', id: '1507191527099596800' },
         },
         {
           label: 'Invitation Offer',
           description: 'Personal outreach message for inviting specific servers',
           value: 'invitation',
-          emoji: { name: 'RightArrow', id: '1498148469284667562' },
+          emoji: { name: 'Select', id: '1507191532875153519' },
         },
       ]);
 
@@ -57,25 +57,25 @@ module.exports = {
           label: 'What is the PR Team?',
           description: 'Your role and responsibilities as a PR Team member',
           value: 'role',
-          emoji: { name: 'Dot', id: '1496643767585865818' },
+          emoji: { name: 'Target', id: '1507191539892224211' },
         },
         {
           label: 'Invite Link Setup',
           description: 'How to create and register your permanent invite link',
           value: 'invite_setup',
-          emoji: { name: 'Dot', id: '1496643767585865818' },
+          emoji: { name: 'Link', id: '1507191523094167573' },
         },
         {
           label: 'Payout System',
           description: 'How the 50 Robux payout works and how to claim it',
           value: 'payouts',
-          emoji: { name: 'Dot', id: '1496643767585865818' },
+          emoji: { name: 'Coin', id: '1507191513418039388' },
         },
         {
           label: 'Tracking and Stats',
           description: 'How invites are tracked and what the numbers mean',
           value: 'tracking',
-          emoji: { name: 'Dot', id: '1496643767585865818' },
+          emoji: { name: 'chartbar', id: '1507191493603885256' },
         },
       ]);
 
@@ -83,19 +83,18 @@ module.exports = {
       .setCustomId('pr:mystats')
       .setLabel('My Stats')
       .setStyle(ButtonStyle.Primary)
-      .setEmoji({ name: 'On', id: '1498148402180001942' });
+      .setEmoji({ name: 'chartbar', id: '1507191493603885256' });
 
     const registerBtn = new ButtonBuilder()
       .setCustomId('pr:register')
       .setLabel('Register Invite')
-      .setStyle(ButtonStyle.Success)
-      .setEmoji({ name: 'RightArrow', id: '1498148469284667562' });
+      .setStyle(ButtonStyle.Success);
 
     const payoutBtn = new ButtonBuilder()
       .setCustomId('pr:payout')
       .setLabel('Request Payout')
       .setStyle(ButtonStyle.Secondary)
-      .setEmoji({ name: 'Dot', id: '1496643767585865818' });
+      .setEmoji({ name: 'Coin', id: '1507191513418039388' });
 
     const container = new ContainerBuilder()
       .setAccentColor(resolveColor('#4ade80'))
@@ -104,9 +103,9 @@ module.exports = {
           '<:howtoglogo:1494830728113033327> **PR Team — Your Personal Panel**\n\n' +
           'Track your invites, grab outreach templates, browse the handbook, and manage your payouts. ' +
           'This panel is only visible to you.\n\n' +
-          '<:Dot:1496643767585865818> **My Stats** — View your invite count and payout eligibility\n' +
-          '<:Dot:1496643767585865818> **Register Invite** — Link your permanent invite code to your account\n' +
-          '<:Dot:1496643767585865818> **Request Payout** — Claim your 50 Robux once you reach 10 retained invites'
+          '<:squaredot:1507191535693860974> **My Stats** — View your invite count and payout eligibility\n' +
+          '<:squaredot:1507191535693860974> **Register Invite** — Link your permanent invite code to your account\n' +
+          '<:squaredot:1507191535693860974> **Request Payout** — Claim your 50 Robux once you reach 10 retained invites'
         )
       )
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))

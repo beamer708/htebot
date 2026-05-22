@@ -19,7 +19,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.error)
-      .setTitle('🗑️ Message Deleted')
+      .setTitle('<:trash:1507191542190964816> Message Deleted')
       .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
       .addFields(
         { name: 'Author', value: `${message.author.tag} (<@${message.author.id}>)`, inline: true },

@@ -17,7 +17,7 @@ module.exports = {
         const expiry = timestamps.get(interaction.user.id) + cooldownAmount;
         if (now < expiry) {
           const left = ((expiry - now) / 1000).toFixed(1);
-          return interaction.reply({ content: `⏳ Please wait ${left}s before using \`/${command.data.name}\` again.`, ephemeral: true });
+          return interaction.reply({ content: `<:clockhour4:1507191510792142868> Please wait ${left}s before using \`/${command.data.name}\` again.`, ephemeral: true });
         }
       }
 

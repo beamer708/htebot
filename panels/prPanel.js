@@ -25,13 +25,13 @@ async function sendPrPanel(interaction) {
         label: 'Server Advertisement',
         description: 'General server ad for posting in advertisement channels',
         value: 'advertisement',
-        emoji: { name: 'RightArrow', id: '1498148469284667562' },
+        emoji: { name: 'Megaphone', id: '1507191527099596800' },
       },
       {
         label: 'Invitation Offer',
         description: 'Personal outreach message for inviting specific servers',
         value: 'invitation',
-        emoji: { name: 'RightArrow', id: '1498148469284667562' },
+        emoji: { name: 'Select', id: '1507191532875153519' },
       },
     ]);
 
@@ -45,25 +45,25 @@ async function sendPrPanel(interaction) {
         label: 'What is the PR Team?',
         description: 'Your role and responsibilities as a PR Team member',
         value: 'role',
-        emoji: { name: 'Dot', id: '1496643767585865818' },
+        emoji: { name: 'Target', id: '1507191539892224211' },
       },
       {
         label: 'Invite Link Setup',
         description: 'How to create and register your permanent invite link',
         value: 'invite_setup',
-        emoji: { name: 'Dot', id: '1496643767585865818' },
+        emoji: { name: 'Link', id: '1507191523094167573' },
       },
       {
         label: 'Payout System',
         description: 'How the 50 Robux payout works and how to claim it',
         value: 'payouts',
-        emoji: { name: 'Dot', id: '1496643767585865818' },
+        emoji: { name: 'Coin', id: '1507191513418039388' },
       },
       {
         label: 'Tracking and Stats',
         description: 'How invites are tracked and what the numbers mean',
         value: 'tracking',
-        emoji: { name: 'Dot', id: '1496643767585865818' },
+        emoji: { name: 'chartbar', id: '1507191493603885256' },
       },
     ]);
 
@@ -71,19 +71,18 @@ async function sendPrPanel(interaction) {
     .setCustomId('pr:mystats')
     .setLabel('My Stats')
     .setStyle(ButtonStyle.Primary)
-    .setEmoji({ name: 'On', id: '1498148402180001942' });
+    .setEmoji({ name: 'chartbar', id: '1507191493603885256' });
 
   const registerBtn = new ButtonBuilder()
     .setCustomId('pr:register')
     .setLabel('Register Invite')
-    .setStyle(ButtonStyle.Success)
-    .setEmoji({ name: 'RightArrow', id: '1498148469284667562' });
+    .setStyle(ButtonStyle.Success);
 
   const payoutBtn = new ButtonBuilder()
     .setCustomId('pr:payout')
     .setLabel('Request Payout')
     .setStyle(ButtonStyle.Secondary)
-    .setEmoji({ name: 'Dot', id: '1496643767585865818' });
+    .setEmoji({ name: 'Coin', id: '1507191513418039388' });
 
   const container = new ContainerBuilder()
     .setAccentColor(resolveColor('#4ade80'))
@@ -92,10 +91,10 @@ async function sendPrPanel(interaction) {
         '<:howtoglogo:1494830728113033327> **HowToERLC PR Team — Invite Program**\n\n' +
         'Earn **50 Robux** for every **10 members** you successfully invite and retain for 30+ days. ' +
         'Use the menus below to access outreach templates, browse the handbook, and manage your invites.\n\n' +
-        '<:Dot:1496643767585865818> Register a **permanent** (non-expiring) invite link using **Register Invite**\n' +
-        '<:Dot:1496643767585865818> Share your link across ERLC communities and servers\n' +
-        '<:Dot:1496643767585865818> When **10 of your invited members** stay for **30+ days**, click **Request Payout**\n' +
-        '<:Dot:1496643767585865818> A PR Manager will review and process your **50 Robux** reward'
+        '<:squaredot:1507191535693860974> Register a **permanent** (non-expiring) invite link using **Register Invite**\n' +
+        '<:squaredot:1507191535693860974> Share your link across ERLC communities and servers\n' +
+        '<:squaredot:1507191535693860974> When **10 of your invited members** stay for **30+ days**, click **Request Payout**\n' +
+        '<:squaredot:1507191535693860974> A PR Manager will review and process your **50 Robux** reward'
       )
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))

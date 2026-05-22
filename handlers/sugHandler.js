@@ -20,7 +20,7 @@ async function handleSuggestModal(interaction, client) {
   ).get(interaction.user.id, cutoff).count;
   if (recentCount >= 3) {
     return interaction.reply({
-      content: "<:Cancel:1494830662581092482> You've reached the suggestion limit for today. Try again tomorrow.",
+      content: "<:circlex:1507191508657508503> You've reached the suggestion limit for today. Try again tomorrow.",
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -47,7 +47,7 @@ async function handleSuggestModal(interaction, client) {
         .addFields(
           { name: 'Category',      value: category, inline: true },
           { name: 'Suggestion ID', value: sugId,    inline: true },
-          { name: 'Status',        value: '<:Dot:1496643767585865818> Pending', inline: true },
+          { name: 'Status',        value: '<:clockhour4:1507191510792142868> Pending', inline: true },
           { name: 'Submitted By',  value: `<@${interaction.user.id}> (${interaction.user.id})`, inline: false },
           { name: 'Details',       value: details,  inline: false },
         )
@@ -90,7 +90,8 @@ async function handleSuggestModal(interaction, client) {
         new ButtonBuilder()
           .setCustomId(`sug_deny:${sugId}`)
           .setLabel('Deny')
-          .setStyle(ButtonStyle.Danger),
+          .setStyle(ButtonStyle.Danger)
+          .setEmoji({ name: 'circlex', id: '1507191508657508503' }),
       );
 
       const approvalMsg = await approvalChannel.send({ embeds: [approvalEmbed], components: [row] });
@@ -101,12 +102,12 @@ async function handleSuggestModal(interaction, client) {
       .run(threadId, approvalMsgId, sugId);
 
     await interaction.editReply({
-      content: `<:Check:1494830681484824616> Suggestion submitted! ID: **${sugId}**. Check <#${config.channels.suggestions}> to see it.`,
+      content: `<:circlecheck:1507191508066107532> Suggestion submitted! ID: **${sugId}**. Check <#${config.channels.suggestions}> to see it.`,
     });
   } catch (err) {
     console.error('[SugHandler] Modal submit error:', err);
     await interaction.editReply({
-      content: '<:Cancel:1494830662581092482> Something went wrong submitting your suggestion. Please try again.',
+      content: '<:circlex:1507191508657508503> Something went wrong submitting your suggestion. Please try again.',
     });
   }
 }
@@ -122,7 +123,7 @@ async function reviewSuggestion(interaction, client, sugId, approved) {
   );
   if (!isStaff) {
     return interaction.reply({
-      content: '<:Cancel:1494830662581092482> Only staff can review suggestions.',
+      content: '<:circlex:1507191508657508503> Only staff can review suggestions.',
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -130,7 +131,7 @@ async function reviewSuggestion(interaction, client, sugId, approved) {
   const sug = db.prepare('SELECT * FROM suggestions WHERE id = ?').get(sugId);
   if (!sug || sug.status !== 'pending') {
     return interaction.reply({
-      content: '<:Cancel:1494830662581092482> Suggestion not found or already reviewed.',
+      content: '<:circlex:1507191508657508503> Suggestion not found or already reviewed.',
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -142,9 +143,9 @@ async function reviewSuggestion(interaction, client, sugId, approved) {
 
   const statusColor   = 0x4ADE80;
   const statusLabel   = approved
-    ? `<:Check:1494830681484824616> Approved`
-    : `<:Cancel:1494830662581092482> Denied`;
-  const titlePrefix   = approved ? '<:Check:1494830681484824616>' : '<:Cancel:1494830662581092482>';
+    ? `<:circlecheck:1507191508066107532> Approved`
+    : `<:circlex:1507191508657508503> Denied`;
+  const titlePrefix   = approved ? '<:circlecheck:1507191508066107532>' : '<:circlex:1507191508657508503>';
 
   // Disable approval channel buttons + update embed
   const updatedApproval = EmbedBuilder.from(interaction.message.embeds[0])
@@ -164,6 +165,7 @@ async function reviewSuggestion(interaction, client, sugId, approved) {
           .setCustomId(`sug_deny:${sugId}`)
           .setLabel('Deny')
           .setStyle(ButtonStyle.Danger)
+          .setEmoji({ name: 'circlex', id: '1507191508657508503' })
           .setDisabled(true),
       ),
     ],

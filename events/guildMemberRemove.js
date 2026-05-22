@@ -26,7 +26,7 @@ module.exports = {
 
       const inviteLeaveEmbed = new EmbedBuilder()
         .setColor(config.colors.error)
-        .setTitle('<:LeftArrow:1498148495683751947> PR Invite — Member Left (Not Retained)')
+        .setTitle('<:userminus:1507191545583894598> PR Invite — Member Left (Not Retained)')
         .addFields(
           { name: 'User',                value: `${member.user.tag} (${member.id})`,             inline: true },
           { name: 'Originally Invited By', value: `<@${entry.inviterId}>`,                       inline: true },
@@ -51,7 +51,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor(config.colors.error)
-      .setTitle('<:LeftArrow:1498148495683751947> Member Left')
+      .setTitle('<:userminus:1507191545583894598> Member Left')
       .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
       .addFields(
         { name: 'User', value: `${member.user.tag} (${member.id})`, inline: true },

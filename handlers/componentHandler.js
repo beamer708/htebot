@@ -48,7 +48,7 @@ async function handleApplicationButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const applications = readJSON('applications.json');
   const idx = applications.findIndex(a => a.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: '<:Cancel:1494830662581092482> Application not found.', flags: MessageFlags.Ephemeral });
+  if (idx === -1) return interaction.reply({ content: '<:circlex:1507191508657508503> Application not found.', flags: MessageFlags.Ephemeral });
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
@@ -56,7 +56,7 @@ async function handleApplicationButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can review applications.', flags: MessageFlags.Ephemeral });
+  if (!isStaff) return interaction.reply({ content: '<:circlex:1507191508657508503> Only staff can review applications.', flags: MessageFlags.Ephemeral });
 
   const app = applications[idx];
   const accepted = action === 'accept';
@@ -89,7 +89,7 @@ async function handleSuggestionButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const suggestions = readJSON('suggestions.json');
   const idx = suggestions.findIndex(s => s.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: '<:Cancel:1494830662581092482> Suggestion not found.', flags: MessageFlags.Ephemeral });
+  if (idx === -1) return interaction.reply({ content: '<:circlex:1507191508657508503> Suggestion not found.', flags: MessageFlags.Ephemeral });
 
   const suggestion = suggestions[idx];
 
@@ -139,7 +139,7 @@ async function handleSuggestionButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can approve or decline suggestions.', flags: MessageFlags.Ephemeral });
+  if (!isStaff) return interaction.reply({ content: '<:circlex:1507191508657508503> Only staff can approve or decline suggestions.', flags: MessageFlags.Ephemeral });
 
   const accepted = action === 'approve';
   const staffName = interaction.user.username;
@@ -169,7 +169,7 @@ async function handlePartnershipButton(interaction, client) {
   const [, action, submissionId] = interaction.customId.split(':');
   const partnerships = readJSON('partnerships.json');
   const idx = partnerships.findIndex(p => p.id === submissionId);
-  if (idx === -1) return interaction.reply({ content: '<:Cancel:1494830662581092482> Partnership not found.', flags: MessageFlags.Ephemeral });
+  if (idx === -1) return interaction.reply({ content: '<:circlex:1507191508657508503> Partnership not found.', flags: MessageFlags.Ephemeral });
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
   const isStaff = member && (
@@ -177,7 +177,7 @@ async function handlePartnershipButton(interaction, client) {
     member.roles.cache.has(config.roles.admin) ||
     member.permissions.has('ManageGuild')
   );
-  if (!isStaff) return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can review partnership requests.', flags: MessageFlags.Ephemeral });
+  if (!isStaff) return interaction.reply({ content: '<:circlex:1507191508657508503> Only staff can review partnership requests.', flags: MessageFlags.Ephemeral });
 
   const partnership = partnerships[idx];
   const accepted = action === 'approve';
@@ -259,7 +259,7 @@ async function handleTicketTranscript(interaction, client) {
     member.permissions.has('ManageChannels')
   );
   if (!isStaff) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> Only staff can generate transcripts.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> Only staff can generate transcripts.', flags: MessageFlags.Ephemeral });
   }
 
   const ticket = getOpenTicketByChannel(interaction.channel.id);
@@ -327,7 +327,7 @@ async function handleTicketModal(interaction, client) {
 
   const ticketEmbed = new EmbedBuilder()
     .setColor(config.colors.primary)
-    .setTitle(`<:On:1498148402180001942> Ticket #${String(ticketNum).padStart(4, '0')} — ${subject}`)
+    .setTitle(`<:Headset:1507191521407926322> Ticket #${String(ticketNum).padStart(4, '0')} — ${subject}`)
     .setDescription(description)
     .addFields(
       { name: 'Opened By', value: `<@${user.id}> (${user.id})`,                             inline: true },
@@ -338,11 +338,23 @@ async function handleTicketModal(interaction, client) {
     .setTimestamp();
 
   const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('ticket:close').setLabel('Close Ticket').setStyle(ButtonStyle.Danger),
-    new ButtonBuilder().setCustomId('ticket:claim').setLabel('Claim Ticket').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId('ticket:close')
+      .setLabel('Close Ticket')
+      .setStyle(ButtonStyle.Danger)
+      .setEmoji({ name: 'circlex', id: '1507191508657508503' }),
+    new ButtonBuilder()
+      .setCustomId('ticket:claim')
+      .setLabel('Claim Ticket')
+      .setStyle(ButtonStyle.Primary)
+      .setEmoji({ name: 'usercheck', id: '1507191543952310404' }),
   );
   const row2 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('ticket:transcript').setLabel('Transcript').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId('ticket:transcript')
+      .setLabel('Transcript')
+      .setStyle(ButtonStyle.Secondary)
+      .setEmoji({ name: 'FileText', id: '1507191520636436510' }),
   );
 
   await channel.send({
@@ -351,7 +363,7 @@ async function handleTicketModal(interaction, client) {
     components: [row1, row2],
   });
 
-  await interaction.reply({ content: `<:Check:1494830681484824616> Your ticket has been created: ${channel}`, flags: MessageFlags.Ephemeral });
+  await interaction.reply({ content: `<:circlecheck:1507191508066107532> Your ticket has been created: ${channel}`, flags: MessageFlags.Ephemeral });
 }
 
 // ── Role panel buttons ────────────────────────────────────────────────────────
@@ -372,15 +384,15 @@ async function handleRolePanelButton(interaction) {
 const INFO_EMBEDS = {
   info_about: {
     title: '<:howtoglogo:1494830728113033327> About HowToERLC',
-    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\n<:RightArrow:1498148469284667562> Visit **howtoerlc.xyz** to submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
+    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\n<:Link:1507191523094167573> Visit **howtoerlc.xyz** to submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
   },
   info_guidelines: {
-    title: '<:Dot:1496643767585865818> Server Guidelines',
-    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n<:Check:1494830681484824616> **Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n<:Check:1494830681484824616> **Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n<:Cancel:1494830662581092482> **No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n<:Check:1494830681484824616> **Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n<:Dot:1496643767585865818> **Staff decisions are final.** Repeated violations will result in removal from the server.',
+    title: '<:shieldcheck:1507191534003552277> Server Guidelines',
+    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n<:circlecheck:1507191508066107532> **Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n<:circlecheck:1507191508066107532> **Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n<:circlex:1507191508657508503> **No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n<:circlecheck:1507191508066107532> **Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n<:squaredot:1507191535693860974> **Staff decisions are final.** Repeated violations will result in removal from the server.',
   },
   info_advertising: {
-    title: '<:Dot:1496643767585865818> Advertising Guidelines',
-    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n<:Check:1494830681484824616> **ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n<:Cancel:1494830662581092482> **No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n<:Check:1494830681484824616> **Valid invite required.** All advertisements must include a valid Discord invite link.\n\n<:Dot:1496643767585865818> **Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
+    title: '<:Megaphone:1507191527099596800> Advertising Guidelines',
+    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n<:circlecheck:1507191508066107532> **ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n<:circlex:1507191508657508503> **No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n<:circlecheck:1507191508066107532> **Valid invite required.** All advertisements must include a valid Discord invite link.\n\n<:squaredot:1507191535693860974> **Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
   },
 };
 
@@ -408,7 +420,7 @@ async function handleRoleSelect(interaction) {
   ].filter(Boolean);
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
-  if (!member) return interaction.reply({ content: '<:Cancel:1494830662581092482> Could not fetch your member data.', flags: MessageFlags.Ephemeral });
+  if (!member) return interaction.reply({ content: '<:circlex:1507191508657508503> Could not fetch your member data.', flags: MessageFlags.Ephemeral });
 
   const added = [];
   const removed = [];
@@ -429,9 +441,9 @@ async function handleRoleSelect(interaction) {
   }
 
   const lines = [];
-  if (added.length) lines.push(`<:On:1498148402180001942> ${added.join(', ')}`);
-  if (removed.length) lines.push(`<:Off:1498148430634160248> ${removed.join(', ')}`);
-  if (!lines.length) lines.push('<:Dot:1496643767585865818> No changes made.');
+  if (added.length) lines.push(`<:toggleright:1507191541574271076> ${added.join(', ')}`);
+  if (removed.length) lines.push(`<:toggleleft:1507191540563312731> ${removed.join(', ')}`);
+  if (!lines.length) lines.push('<:squaredot:1507191535693860974> No changes made.');
 
   await interaction.reply({ content: `Your notification roles have been updated.\n${lines.join('\n')}`, flags: MessageFlags.Ephemeral });
 }
@@ -482,7 +494,7 @@ async function logToPr(guild, embed, content) {
 // ── Assets select menu ────────────────────────────────────────────────────────
 async function handlePrAssets(interaction) {
   if (!await hasPrAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
   }
   const value = interaction.values[0];
   if (value === 'advertisement') {
@@ -508,7 +520,7 @@ async function handlePrAssets(interaction) {
 // ── Handbook select menu ──────────────────────────────────────────────────────
 async function handlePrHandbook(interaction) {
   if (!await hasPrAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
   }
   const value = interaction.values[0];
   let embed;
@@ -516,7 +528,7 @@ async function handlePrHandbook(interaction) {
   if (value === 'role') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('🎯 What is the PR Team?')
+      .setTitle('<:Target:1507191539892224211> What is the PR Team?')
       .setDescription(
         'The **HowToERLC PR (Public Relations) Team** is responsible for growing the server by building partnerships across the ERLC community.\n\n' +
         '**As a PR Team member, your job is to:**\n' +
@@ -530,7 +542,7 @@ async function handlePrHandbook(interaction) {
   } else if (value === 'invite_setup') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('🔗 Invite Link Setup')
+      .setTitle('<:Link:1507191523094167573> Invite Link Setup')
       .setDescription(
         '**Step 1 — Create a permanent invite**\n' +
         '• Right-click any channel → **Invite People**\n' +
@@ -543,13 +555,13 @@ async function handlePrHandbook(interaction) {
         '**Step 3 — Share it!**\n' +
         '• Use the **Assets** menu for ready-to-use outreach templates\n' +
         '• The bot automatically tracks everyone who joins via your link\n\n' +
-        '⚠️ Only **one invite code** per member. Contact a PR Manager to change yours.'
+        '<:alerttriangle:1507191481906106398> Only **one invite code** per member. Contact a PR Manager to change yours.'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
   } else if (value === 'payouts') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('💰 Payout System')
+      .setTitle('<:Coin:1507191513418039388> Payout System')
       .setDescription(
         '**Earning a Payout:**\n' +
         '• Earn **50 Robux** for every **10 retained invites**\n' +
@@ -568,18 +580,18 @@ async function handlePrHandbook(interaction) {
   } else if (value === 'tracking') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('📊 Tracking & Stats')
+      .setTitle('<:chartbar:1507191493603885256> Tracking & Stats')
       .setDescription(
         '**How tracking works:**\n' +
         '• When someone joins via your registered invite, the bot records the event\n' +
         '• Each invited member starts a **30-day retention timer**\n' +
-        '• After 30 days still in server → **Retained** ✅\n' +
-        '• If they leave before 30 days → **Lost** ❌\n\n' +
+        '• After 30 days still in server → **Retained** <:circlecheck:1507191508066107532>\n' +
+        '• If they leave before 30 days → **Lost** <:circlex:1507191508657508503>\n\n' +
         '**Your Stats:**\n' +
-        '📨 **Total** — All who ever joined via your link\n' +
-        '✅ **Retained** — Stayed 30+ days (count toward payout)\n' +
-        '⏳ **Pending** — Still within their 30-day window\n' +
-        '❌ **Lost** — Left before 30 days\n\n' +
+        '<:Select:1507191532875153519> **Total** — All who ever joined via your link\n' +
+        '<:circlecheck:1507191508066107532> **Retained** — Stayed 30+ days (count toward payout)\n' +
+        '<:clockhour4:1507191510792142868> **Pending** — Still within their 30-day window\n' +
+        '<:circlex:1507191508657508503> **Lost** — Left before 30 days\n\n' +
         '**All activity is logged** in `#pr-logs` for the PR Manager to monitor.'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
@@ -591,7 +603,7 @@ async function handlePrHandbook(interaction) {
 // ── My Stats button ───────────────────────────────────────────────────────────
 async function handlePrMyStats(interaction) {
   if (!await hasPrAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
   }
 
   const userId         = interaction.user.id;
@@ -612,28 +624,28 @@ async function handlePrMyStats(interaction) {
 
   const embed = new EmbedBuilder()
     .setColor(eligible ? config.colors.success : config.colors.info)
-    .setTitle(`📊 PR Stats — ${interaction.user.username}`)
+    .setTitle(`<:chartbar:1507191493603885256> PR Stats — ${interaction.user.username}`)
     .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
     .addFields(
       {
-        name: '🔗 Registered Invite',
+        name: '<:Link:1507191523094167573> Registered Invite',
         value: myReg
           ? `\`discord.gg/${myReg.inviteCode}\``
-          : '❌ Not registered — click **Register Invite**',
+          : '<:circlex:1507191508657508503> Not registered — click **Register Invite**',
         inline: false,
       },
-      { name: '📨 Total Invites',  value: `${all.length}`,       inline: true },
-      { name: '✅ Retained (30d)', value: `${retained.length}`,   inline: true },
-      { name: '⏳ Pending',        value: `${pending.length}`,    inline: true },
-      { name: '❌ Lost',           value: `${lost.length}`,       inline: true },
-      { name: '🏆 Payouts Earned', value: `${paidOut}`,           inline: true },
+      { name: '<:Select:1507191532875153519> Total Invites',          value: `${all.length}`,       inline: true },
+      { name: '<:circlecheck:1507191508066107532> Retained (30d)',    value: `${retained.length}`,   inline: true },
+      { name: '<:clockhour4:1507191510792142868> Pending',            value: `${pending.length}`,    inline: true },
+      { name: '<:circlex:1507191508657508503> Lost',                  value: `${lost.length}`,       inline: true },
+      { name: '<:crown:1507191516274360492> Payouts Earned',          value: `${paidOut}`,           inline: true },
       {
-        name: '💰 Payout Status',
+        name: '<:Coin:1507191513418039388> Payout Status',
         value: pendingPayout
-          ? '⏳ Payout request **pending review** by a PR Manager'
+          ? '<:clockhour4:1507191510792142868> Payout request **pending review** by a PR Manager'
           : eligible
-            ? '✅ **Eligible!** Click **Request Payout** to claim your 50 Robux'
-            : `❌ Need **${needed}** more retained invite${needed !== 1 ? 's' : ''} (${unpaidRetained.length}/10)`,
+            ? '<:circlecheck:1507191508066107532> **Eligible!** Click **Request Payout** to claim your 50 Robux'
+            : `<:circlex:1507191508657508503> Need **${needed}** more retained invite${needed !== 1 ? 's' : ''} (${unpaidRetained.length}/10)`,
         inline: false,
       },
     )
@@ -646,7 +658,7 @@ async function handlePrMyStats(interaction) {
 // ── Register Invite button ────────────────────────────────────────────────────
 async function handlePrRegister(interaction) {
   if (!await hasPrAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
   }
   const modal = new ModalBuilder()
     .setCustomId('pr_register_modal')
@@ -670,7 +682,7 @@ async function handlePrRegister(interaction) {
 // ── Register modal submit ─────────────────────────────────────────────────────
 async function handlePrRegisterModal(interaction, client) {
   if (!await hasPrAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
   }
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -683,7 +695,7 @@ async function handlePrRegisterModal(interaction, client) {
     invite = await interaction.guild.invites.fetch(inviteCode);
   } catch {
     return interaction.editReply({
-      content: `<:Cancel:1494830662581092482> Could not find invite code \`${inviteCode}\` in this server. Make sure it's a valid server invite.`,
+      content: `<:circlex:1507191508657508503> Could not find invite code \`${inviteCode}\` in this server. Make sure it's a valid server invite.`,
     });
   }
 
@@ -699,18 +711,18 @@ async function handlePrRegisterModal(interaction, client) {
 
   const logEmbed = new EmbedBuilder()
     .setColor(config.colors.success)
-    .setTitle('🔗 PR Invite Registered')
+    .setTitle('<:Link:1507191523094167573> PR Invite Registered')
     .addFields(
       { name: 'Member',      value: `<@${userId}> (${interaction.user.tag})`, inline: true },
       { name: 'Invite Code', value: `\`discord.gg/${inviteCode}\``,           inline: true },
-      { name: 'Action',      value: existing ? '📝 Updated' : '✅ New',       inline: true },
+      { name: 'Action',      value: existing ? '<:pencil:1507191529062797312> Updated' : '<:circlecheck:1507191508066107532> New', inline: true },
     )
     .setTimestamp();
   await logToPr(interaction.guild, logEmbed);
 
-  let reply = `✅ Your invite \`discord.gg/${inviteCode}\` has been registered! The bot will now track everyone who joins via this link.`;
+  let reply = `<:circlecheck:1507191508066107532> Your invite \`discord.gg/${inviteCode}\` has been registered! The bot will now track everyone who joins via this link.`;
   if (invite.maxAge && invite.maxAge !== 0) {
-    reply += '\n\n⚠️ This invite has an expiry set. Please recreate it as **permanent (Never expires)** and re-register as soon as possible.';
+    reply += '\n\n<:alerttriangle:1507191481906106398> This invite has an expiry set. Please recreate it as **permanent (Never expires)** and re-register as soon as possible.';
   }
   await interaction.editReply({ content: reply });
 }
@@ -718,7 +730,7 @@ async function handlePrRegisterModal(interaction, client) {
 // ── Request Payout button ─────────────────────────────────────────────────────
 async function handlePrPayout(interaction) {
   if (!await hasPrAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> This panel is restricted to PR Team members only.', flags: MessageFlags.Ephemeral });
   }
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -728,7 +740,7 @@ async function handlePrPayout(interaction) {
 
   const existingPending = Object.values(payouts).find(p => p.memberId === userId && p.status === 'pending');
   if (existingPending) {
-    return interaction.editReply({ content: '⏳ You already have a **pending payout request**. Wait for a PR Manager to review it before submitting another.' });
+    return interaction.editReply({ content: '<:clockhour4:1507191510792142868> You already have a **pending payout request**. Wait for a PR Manager to review it before submitting another.' });
   }
 
   const unpaidRetained = Object.entries(invites).filter(
@@ -738,7 +750,7 @@ async function handlePrPayout(interaction) {
   if (unpaidRetained.length < 10) {
     const needed = 10 - unpaidRetained.length;
     return interaction.editReply({
-      content: `<:Cancel:1494830662581092482> You need **${needed} more retained invite${needed !== 1 ? 's' : ''}** before requesting a payout.\n\nCurrent: **${unpaidRetained.length}/10** retained invites.`,
+      content: `<:circlex:1507191508657508503> You need **${needed} more retained invite${needed !== 1 ? 's' : ''}** before requesting a payout.\n\nCurrent: **${unpaidRetained.length}/10** retained invites.`,
     });
   }
 
@@ -760,7 +772,7 @@ async function handlePrPayout(interaction) {
   if (prLogChannel) {
     const payoutEmbed = new EmbedBuilder()
       .setColor(config.colors.warning)
-      .setTitle('💰 Payout Request — Pending Review')
+      .setTitle('<:Coin:1507191513418039388> Payout Request — Pending Review')
       .setDescription(`<@&${config.roles.prManager}> — A PR Team member has requested their payout.`)
       .addFields(
         { name: 'Member',         value: `<@${userId}> (${interaction.user.tag})`,        inline: true },
@@ -773,40 +785,47 @@ async function handlePrPayout(interaction) {
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId(`pr:approve:${payoutId}`).setLabel('✅ Approve Payout').setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId(`pr:deny:${payoutId}`).setLabel('❌ Deny Payout').setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId(`pr:approve:${payoutId}`)
+        .setLabel('Approve Payout')
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId(`pr:deny:${payoutId}`)
+        .setLabel('Deny Payout')
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji({ name: 'circlex', id: '1507191508657508503' }),
     );
     await prLogChannel.send({ embeds: [payoutEmbed], components: [row] }).catch(() => {});
   }
 
   return interaction.editReply({
-    content: `✅ Payout request submitted! A **PR Manager** will review it in <#${config.channels.prLogs}>. You'll be notified when it's processed.`,
+    content: `<:circlecheck:1507191508066107532> Payout request submitted! A **PR Manager** will review it in <#${config.channels.prLogs}>. You'll be notified when it's processed.`,
   });
 }
 
 // ── Approve payout ────────────────────────────────────────────────────────────
 async function handlePrPayoutApprove(interaction, client) {
   if (!await hasPrManagerAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> Only PR Managers can approve payout requests.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> Only PR Managers can approve payout requests.', flags: MessageFlags.Ephemeral });
   }
   const payoutId = interaction.customId.split(':')[2];
   const payouts  = readPrPayouts();
   const payout   = payouts[payoutId];
-  if (!payout) return interaction.reply({ content: '<:Cancel:1494830662581092482> Payout record not found.', flags: MessageFlags.Ephemeral });
-  if (payout.status !== 'pending') return interaction.reply({ content: `<:Cancel:1494830662581092482> This payout is already **${payout.status}**.`, flags: MessageFlags.Ephemeral });
+  if (!payout) return interaction.reply({ content: '<:circlex:1507191508657508503> Payout record not found.', flags: MessageFlags.Ephemeral });
+  if (payout.status !== 'pending') return interaction.reply({ content: `<:circlex:1507191508657508503> This payout is already **${payout.status}**.`, flags: MessageFlags.Ephemeral });
 
   payout.status = 'approved'; payout.reviewedBy = interaction.user.tag; payout.reviewedAt = new Date().toISOString();
   writePrPayouts(payouts);
 
   const approvedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(config.colors.success)
-    .setTitle('💰 Payout Request — Approved ✅')
+    .setTitle('<:Confetti:1507191514042994748> Payout Request — Approved')
     .setFooter({ text: `Approved by ${interaction.user.tag} • ${new Date().toLocaleString()}` });
   await interaction.update({ embeds: [approvedEmbed], components: [] });
 
   const dmEmbed = new EmbedBuilder()
     .setColor(config.colors.success)
-    .setTitle('🎉 Payout Approved!')
+    .setTitle('<:Confetti:1507191514042994748> Payout Approved!')
     .setDescription('Your payout request for **HowToERLC** has been approved! You will receive your **50 Robux** shortly. Thank you for your contributions to the PR Team!')
     .addFields(
       { name: 'Retained Invites', value: `${payout.retainedCount}`, inline: true },
@@ -821,13 +840,13 @@ async function handlePrPayoutApprove(interaction, client) {
 // ── Deny payout ───────────────────────────────────────────────────────────────
 async function handlePrPayoutDeny(interaction, client) {
   if (!await hasPrManagerAccess(interaction)) {
-    return interaction.reply({ content: '<:Cancel:1494830662581092482> Only PR Managers can deny payout requests.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({ content: '<:circlex:1507191508657508503> Only PR Managers can deny payout requests.', flags: MessageFlags.Ephemeral });
   }
   const payoutId = interaction.customId.split(':')[2];
   const payouts  = readPrPayouts();
   const payout   = payouts[payoutId];
-  if (!payout) return interaction.reply({ content: '<:Cancel:1494830662581092482> Payout record not found.', flags: MessageFlags.Ephemeral });
-  if (payout.status !== 'pending') return interaction.reply({ content: `<:Cancel:1494830662581092482> This payout is already **${payout.status}**.`, flags: MessageFlags.Ephemeral });
+  if (!payout) return interaction.reply({ content: '<:circlex:1507191508657508503> Payout record not found.', flags: MessageFlags.Ephemeral });
+  if (payout.status !== 'pending') return interaction.reply({ content: `<:circlex:1507191508657508503> This payout is already **${payout.status}**.`, flags: MessageFlags.Ephemeral });
 
   payout.status = 'denied'; payout.reviewedBy = interaction.user.tag; payout.reviewedAt = new Date().toISOString();
   writePrPayouts(payouts);
@@ -839,13 +858,13 @@ async function handlePrPayoutDeny(interaction, client) {
 
   const deniedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(config.colors.error)
-    .setTitle('💰 Payout Request — Denied ❌')
+    .setTitle('<:Coin:1507191513418039388> Payout Request — Denied')
     .setFooter({ text: `Denied by ${interaction.user.tag} • ${new Date().toLocaleString()}` });
   await interaction.update({ embeds: [deniedEmbed], components: [] });
 
   const dmEmbed = new EmbedBuilder()
     .setColor(config.colors.error)
-    .setTitle('❌ Payout Request Denied')
+    .setTitle('<:circlex:1507191508657508503> Payout Request Denied')
     .setDescription('Your payout request for **HowToERLC** has been denied by the PR Team Manager. Your retained invites have been restored — you may submit a new request. Contact a PR Manager with any questions.')
     .addFields({ name: 'Denied By', value: interaction.user.tag, inline: true })
     .setFooter({ text: 'HowToERLC PR Team' })
