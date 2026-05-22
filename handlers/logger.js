@@ -1,9 +1,10 @@
 // handlers/logger.js
 const { EmbedBuilder } = require('discord.js');
+const config = require('../config.json');
 
 async function log(client, message) {
   try {
-    const channel = await client.channels.fetch(process.env.CHANNEL_LOG).catch(() => null);
+    const channel = await client.channels.fetch(config.channels.notifyLog).catch(() => null);
     if (!channel) return;
     const embed = new EmbedBuilder()
       .setDescription(message)

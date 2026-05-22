@@ -1,5 +1,6 @@
 // handlers/marketplace.js
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const config = require('../config.json');
 const { log } = require('./logger');
 
 async function handleMarketplace(client, req, res) {
@@ -10,7 +11,7 @@ async function handleMarketplace(client, req, res) {
   }
 
   try {
-    const channel = await client.channels.fetch(process.env.CHANNEL_MARKETPLACE).catch(() => null);
+    const channel = await client.channels.fetch(config.channels.marketplace).catch(() => null);
     if (!channel) return res.status(500).json({ success: false, error: 'Marketplace channel not found.' });
 
     const embed = new EmbedBuilder()

@@ -1,5 +1,6 @@
 // handlers/directory.js
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const config = require('../config.json');
 const { log } = require('./logger');
 
 async function handleDirectory(client, req, res) {
@@ -10,7 +11,7 @@ async function handleDirectory(client, req, res) {
   }
 
   try {
-    const channel = await client.channels.fetch(process.env.CHANNEL_DIRECTORY).catch(() => null);
+    const channel = await client.channels.fetch(config.channels.directory).catch(() => null);
     if (!channel) return res.status(500).json({ success: false, error: 'Directory channel not found.' });
 
     const embed = new EmbedBuilder()

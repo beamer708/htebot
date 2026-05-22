@@ -1,5 +1,6 @@
 // handlers/tools.js
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const config = require('../config.json');
 const { log } = require('./logger');
 
 async function handleTool(client, req, res) {
@@ -10,7 +11,7 @@ async function handleTool(client, req, res) {
   }
 
   try {
-    const channel = await client.channels.fetch(process.env.CHANNEL_TOOLS).catch(() => null);
+    const channel = await client.channels.fetch(config.channels.tools).catch(() => null);
     if (!channel) return res.status(500).json({ success: false, error: 'Tools channel not found.' });
 
     const embed = new EmbedBuilder()
