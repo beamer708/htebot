@@ -444,7 +444,7 @@ const STAFF_HANDBOOK = {
       'Use `/add @user` inside a ticket to give another member access if they are involved in the issue.',
   },
   commands: {
-    title: '<:clipboardlist:1507191512171577455> Bot Commands',
+    title: '<:clipboardlist:1507191509563473962> Bot Commands',
     description:
       'As a staff member you have access to the following bot commands:\n\n' +
       '**Application Management**\n' +

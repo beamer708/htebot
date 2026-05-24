@@ -39,7 +39,7 @@ async function sendStaffHandbook(interaction) {
         label: 'Bot Commands',
         description: 'What commands you have access to and what they do',
         value: 'commands',
-        emoji: { name: 'clipboardlist', id: '1507191512171577455' },
+        emoji: { name: 'clipboardlist', id: '1507191509563473962' },
       },
     ]);
 
