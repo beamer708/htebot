@@ -10,8 +10,9 @@ module.exports = {
       .setDescription('Which panel to post')
       .setRequired(true)
       .addChoices(
-        { name: 'Main Dashboard', value: 'main' },
-        { name: 'PR Team Panel',  value: 'pr'   },
+        { name: 'Main Dashboard', value: 'main'     },
+        { name: 'PR Team Panel',  value: 'pr'       },
+        { name: 'Staff Handbook', value: 'handbook' },
       )),
 
   async execute(interaction, client) {
@@ -33,6 +34,12 @@ module.exports = {
       const { sendPrPanel } = require('../../panels/prPanel');
       await sendPrPanel(interaction);
       return interaction.editReply({ content: 'PR Team panel posted.' });
+    }
+
+    if (type === 'handbook') {
+      const { sendStaffHandbook } = require('../../panels/staffHandbook');
+      await sendStaffHandbook(interaction);
+      return interaction.editReply({ content: 'Staff handbook posted.' });
     }
   },
 };

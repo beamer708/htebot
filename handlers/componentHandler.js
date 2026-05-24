@@ -380,6 +380,102 @@ async function handleRolePanelButton(interaction) {
   }
 }
 
+// ── Staff handbook select menu ────────────────────────────────────────────────
+const STAFF_HANDBOOK = {
+  role: {
+    title: '<:Target:1507191539892224211> Your Role',
+    description:
+      'As a staff member at HowToERLC your job is to keep the server safe, welcoming, and on-topic at all times. ' +
+      'You are the first line of response for rule violations, member questions, and support tickets.\n\n' +
+      '<:squaredot:1507191535693860974> Monitor all public channels for rule violations\n' +
+      '<:squaredot:1507191535693860974> Keep the advertising channels clean and compliant\n' +
+      '<:squaredot:1507191535693860974> Welcome new members and point them in the right direction\n' +
+      '<:squaredot:1507191535693860974> Handle or escalate support tickets when needed\n' +
+      '<:squaredot:1507191535693860974> Represent HowToERLC professionally at all times\n\n' +
+      '-# When in doubt, escalate to a senior staff member or admin rather than acting alone.',
+  },
+  rules: {
+    title: '<:shieldcheck:1507191534003552277> Server & Advertising Rules',
+    description:
+      '**Server Rules**\n' +
+      'Watch for the following violations in all public channels:\n' +
+      '<:circlex:1507191508657508503> Disrespect, harassment, or hate speech toward any member\n' +
+      '<:circlex:1507191508657508503> Spam, excessive pinging, or flooding any channel\n' +
+      '<:circlex:1507191508657508503> Off-topic content or self-promotion outside designated channels\n' +
+      '<:circlex:1507191508657508503> Sharing content that violates Roblox or Discord ToS\n\n' +
+      '**Advertising Rules**\n' +
+      'Advertisements must follow these rules or be removed immediately:\n' +
+      '<:circlex:1507191508657508503> Must be ERLC or Roblox emergency services related\n' +
+      '<:circlex:1507191508657508503> Must include a valid Discord invite link\n' +
+      '<:circlex:1507191508657508503> No recruiting members away from HowToERLC\n' +
+      '<:circlex:1507191508657508503> Paid promotions must be clearly disclosed\n\n' +
+      '**How to respond**\n' +
+      '<:squaredot:1507191535693860974> Issue a verbal warning in the channel or via DM for minor violations\n' +
+      '<:squaredot:1507191535693860974> Remove non-compliant advertisements immediately\n' +
+      '<:squaredot:1507191535693860974> Escalate repeated violations to a senior staff member',
+  },
+  welcoming: {
+    title: '<:userplus:1507191546813091841> Welcoming Members',
+    description:
+      'First impressions matter. When a new member joins, make them feel welcome and help them get oriented.\n\n' +
+      '<:squaredot:1507191535693860974> Greet new members in the welcome channel if one is active\n' +
+      '<:squaredot:1507191535693860974> If a member asks where to start, point them to the main dashboard and the website **howtoerlc.xyz**\n' +
+      '<:squaredot:1507191535693860974> If a member is lost or confused, answer their question directly — do not just send a rules link\n' +
+      '<:squaredot:1507191535693860974> Encourage members to grab their notification roles from the dashboard\n\n' +
+      '**What to say if asked about resources:**\n' +
+      'Direct them to the resources, tools, and templates channels or to **howtoerlc.xyz** for the full library.\n\n' +
+      '-# You do not need to greet every single member. Focus on those who ask questions or seem lost.',
+  },
+  tickets: {
+    title: '<:Headset:1507191521407926322> Support Tickets',
+    description:
+      'Support tickets are opened by members who need help. As staff you are responsible for monitoring and responding to them.\n\n' +
+      '**How tickets work**\n' +
+      '<:squaredot:1507191535693860974> When a ticket is created, a private channel is opened with the member and the staff team\n' +
+      '<:squaredot:1507191535693860974> Click **Claim** to take ownership of the ticket — this hides it from other staff so there is no overlap\n' +
+      '<:squaredot:1507191535693860974> Once resolved, click **Close** to close the ticket and delete the channel\n' +
+      '<:squaredot:1507191535693860974> Use **Transcript** before closing if a record is needed\n\n' +
+      '**When to action a ticket**\n' +
+      '<:circlecheck:1507191508066107532> Claim a ticket if you can fully resolve the issue\n' +
+      '<:circlecheck:1507191508066107532> Leave it open if a more qualified staff member should handle it\n' +
+      '<:circlex:1507191508657508503> Do not close a ticket without resolving the member\'s issue\n' +
+      '<:circlex:1507191508657508503> Do not share ticket contents outside of the ticket channel\n\n' +
+      '**Adding other members**\n' +
+      'Use `/add @user` inside a ticket to give another member access if they are involved in the issue.',
+  },
+  commands: {
+    title: '<:clipboardlist:1507191512171577455> Bot Commands',
+    description:
+      'As a staff member you have access to the following bot commands:\n\n' +
+      '**Application Management**\n' +
+      '<:squaredot:1507191535693860974> `/approve` — Approve a staff application and notify the applicant via DM\n' +
+      '<:squaredot:1507191535693860974> `/deny` — Deny a staff application and notify the applicant via DM\n' +
+      '<:squaredot:1507191535693860974> `/search` — Search for an application, member, or invite record by username or ID\n\n' +
+      '**Ticket Management**\n' +
+      '<:squaredot:1507191535693860974> `/add @user` — Add a member to the current ticket channel with view and send access\n' +
+      '<:squaredot:1507191535693860974> **Claim** button — Take ownership of an open ticket\n' +
+      '<:squaredot:1507191535693860974> **Close** button — Close a ticket and delete its channel after 10 seconds\n' +
+      '<:squaredot:1507191535693860974> **Transcript** button — Export a copy of the ticket conversation\n\n' +
+      '**Admin Only**\n' +
+      '<:squaredot:1507191535693860974> `/panel` — Post a server panel (Main Dashboard, PR Team, Staff Handbook) to the current channel\n\n' +
+      '-# Do not use admin commands in public channels. All actions are logged.',
+  },
+};
+
+async function handleStaffHandbook(interaction) {
+  const value = interaction.values[0];
+  const data  = STAFF_HANDBOOK[value];
+  if (!data) return interaction.reply({ content: 'Unknown section.', flags: MessageFlags.Ephemeral });
+
+  const embed = new EmbedBuilder()
+    .setColor(config.colors.primary)
+    .setTitle(data.title)
+    .setDescription(data.description)
+    .setThumbnail(config.branding.thumbnail);
+
+  return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+}
+
 // ── Dashboard info select menu ────────────────────────────────────────────────
 const INFO_EMBEDS = {
   info_about: {
@@ -916,6 +1012,7 @@ module.exports = async (interaction, client) => {
       if (prefix === 'pr')                                    return handlePrInteraction(interaction, client);
       if (interaction.customId === 'dashboard:info')          return handleDashboardSelect(interaction);
       if (interaction.customId === 'rolepanel:notifications') return handleRoleSelect(interaction);
+      if (interaction.customId === 'staff:handbook')          return handleStaffHandbook(interaction);
     }
 
     if (interaction.isModalSubmit()) {
