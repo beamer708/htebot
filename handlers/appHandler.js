@@ -141,7 +141,7 @@ async function handleStaffApplyModal(interaction, client) {
       // Create locked review channel for the applicant
       const reviewChannel = await interaction.guild.channels.create({
         name: `app-${appId.toLowerCase()}`,
-        parent: config.categories.tickets || null,
+        parent: config.categories.applications || null,
         permissionOverwrites: [
           { id: interaction.guild.id,      deny:  [PermissionFlagsBits.ViewChannel] },
           { id: interaction.user.id,       allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory],
