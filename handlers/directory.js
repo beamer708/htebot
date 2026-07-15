@@ -1,45 +1,25 @@
-// handlers/directory.js
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const config = require('../config.json');
-const { log } = require('./logger');
+// handlers/directory.js — legacy push endpoint wrapper (see utils/postListing.js)
+const { postListing } = require('../utils/postListing');
 
 async function handleDirectory(client, req, res) {
   const { title, description, inviteUrl, logoUrl, category, submitterUsername } = req.body;
 
-  if (!title || !description || !inviteUrl || !category || !submitterUsername) {
-    return res.status(400).json({ success: false, error: 'Missing required fields: title, description, inviteUrl, category, submitterUsername.' });
+  if (!title || !description || !inviteUrl || !submitterUsername) {
+    return res.status(400).json({ success: false, error: 'Missing required fields: title, description, inviteUrl, submitterUsername.' });
   }
 
   try {
-    const channel = await client.channels.fetch(config.channels.directory).catch(() => null);
-    if (!channel) return res.status(500).json({ success: false, error: 'Directory channel not found.' });
-
-    const embed = new EmbedBuilder()
-      .setTitle(title)
-      .setDescription(description)
-      .setColor(0x52D973)
-      .addFields(
-        { name: 'Category',     value: category,          inline: true },
-        { name: 'Submitted By', value: submitterUsername, inline: true },
-      )
-      .setTimestamp();
-
-    if (logoUrl) embed.setThumbnail(logoUrl);
-
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setLabel('Join Server')
-        .setStyle(ButtonStyle.Link)
-        .setURL(inviteUrl),
-    );
-
-    const thread = await channel.threads.create({
-      name: title.slice(0, 100),
-      message: { embeds: [embed], components: [row] },
+    const result = await postListing(client, 'directory', {
+      id: req.body.id ?? null,
+      title,
+      shortDescription: category ? `${description}\n\n**Category:** ${category}` : description,
+      authorUsername: submitterUsername,
+      thumbnailUrl: logoUrl,
+      url: inviteUrl,
     });
 
-    await log(client, `📋 New directory listing: **${title}** by ${submitterUsername}`);
-    return res.json({ success: true, threadId: thread.id });
+    if (!result.ok) return res.status(500).json({ success: false, error: result.error });
+    return res.json({ success: true, threadId: result.threadId });
   } catch (err) {
     console.error('[Directory] Error creating listing:', err);
     return res.status(500).json({ success: false, error: 'Failed to create directory listing.' });

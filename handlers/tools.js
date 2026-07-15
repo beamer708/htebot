@@ -1,43 +1,29 @@
-// handlers/tools.js
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const config = require('../config.json');
-const { log } = require('./logger');
+// handlers/tools.js — RETIRED legacy push endpoint wrapper.
+// The "tools" listing type is retired by default; re-enable by setting
+// "KEEP_TOOLS_TYPE": true in config.json. See utils/postListing.js.
+const { postListing } = require('../utils/postListing');
 
 async function handleTool(client, req, res) {
   const { title, description, url, category, creator } = req.body;
 
-  if (!title || !description || !url || !category || !creator) {
-    return res.status(400).json({ success: false, error: 'Missing required fields: title, description, url, category, creator.' });
+  if (!title || !description || !url || !creator) {
+    return res.status(400).json({ success: false, error: 'Missing required fields: title, description, url, creator.' });
   }
 
   try {
-    const channel = await client.channels.fetch(config.channels.tools).catch(() => null);
-    if (!channel) return res.status(500).json({ success: false, error: 'Tools channel not found.' });
-
-    const embed = new EmbedBuilder()
-      .setTitle(title)
-      .setDescription(description)
-      .setColor(0xA78BFA)
-      .addFields(
-        { name: 'Category', value: category, inline: true },
-        { name: 'Creator',  value: creator,  inline: true },
-      )
-      .setTimestamp();
-
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setLabel('Open Tool')
-        .setStyle(ButtonStyle.Link)
-        .setURL(url),
-    );
-
-    const thread = await channel.threads.create({
-      name: title.slice(0, 100),
-      message: { embeds: [embed], components: [row] },
+    const result = await postListing(client, 'tools', {
+      id: req.body.id ?? null,
+      title,
+      shortDescription: category ? `${description}\n\n**Category:** ${category}` : description,
+      authorUsername: creator,
+      url,
     });
 
-    await log(client, `🔧 New tool posted: **${title}**`);
-    return res.json({ success: true, threadId: thread.id });
+    if (!result.ok) {
+      const status = result.error.startsWith('Unknown listing type') ? 410 : 500;
+      return res.status(status).json({ success: false, error: status === 410 ? 'The tools listing type has been retired.' : result.error });
+    }
+    return res.json({ success: true, threadId: result.threadId });
   } catch (err) {
     console.error('[Tools] Error creating tool post:', err);
     return res.status(500).json({ success: false, error: 'Failed to create tool post.' });

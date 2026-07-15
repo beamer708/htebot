@@ -1,5 +1,6 @@
 const { ActivityType, Collection } = require('discord.js');
 const { startRetentionChecker } = require('../utils/retentionChecker');
+const { startListingPoller } = require('../utils/listingPoller');
 const { db } = require('../utils/appDb');
 const config = require('../config.json');
 
@@ -52,6 +53,7 @@ module.exports = {
     console.log('[Ready] Invite cache populated.');
 
     startRetentionChecker(client);
+    startListingPoller(client);
 
     // Forum channel setup posts (one-time, tracked in DB)
     await ensureForumSetupPost(

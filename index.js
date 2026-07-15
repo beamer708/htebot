@@ -23,9 +23,13 @@ require('./handlers/commandHandler')(client);
 require('./handlers/eventHandler')(client);
 require('./web/server')(client);
 
-client.once('ready', () => {
-  const { startServer } = require('./server');
-  startServer(client);
-});
+// Legacy push server — replaced by the listing poller (utils/listingPoller.js).
+// Only starts when ENABLE_PUSH_SERVER=true; running both would double-post.
+if (process.env.ENABLE_PUSH_SERVER === 'true') {
+  client.once('ready', () => {
+    const { startServer } = require('./server');
+    startServer(client);
+  });
+}
 
 client.login(process.env.BOT_TOKEN);

@@ -15,6 +15,8 @@
     "templates": "1494468440105156789",
     "marketplace": "1494866015501291601",
     "directory": "1494779336614482070",
+    "assets": "",
+    "guides": "",
     "notifyLog": "1507486000132264149",
     "rolePanels": "1495134864687628318",
     "prLogs": "1506387128039510177"
@@ -46,6 +48,7 @@
     "flagAlert": "#4ade80"
   },
   "website": "https://howtoerlc.xyz",
+  "KEEP_TOOLS_TYPE": false,
   "advertisingChannels": [
     "1494470236538404905",
     "1494470209879281794",
