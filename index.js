@@ -1,5 +1,22 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
+const config = require('./config.json');
+
+// ── Startup validation — listing moderation requires both of these ───────────
+{
+  const SNOWFLAKE = /^\d{17,20}$/;
+  const missing = [];
+  if (!SNOWFLAKE.test(config.moderationForum   || '')) missing.push('moderationForum (forum channel ID for listing review)');
+  if (!SNOWFLAKE.test(config.managementRoleId  || '')) missing.push('managementRoleId (role allowed to approve/deny listings)');
+  if (missing.length) {
+    console.error(
+      '[Startup] Refusing to start — config.json is missing or has invalid values for:\n' +
+      missing.map(m => `  • ${m}`).join('\n') +
+      '\nSet these to valid Discord IDs in config.json and restart.'
+    );
+    process.exit(1);
+  }
+}
 
 const client = new Client({
   intents: [

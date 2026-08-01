@@ -1,4 +1,7 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const {
+  ContainerBuilder, SectionBuilder, TextDisplayBuilder, ThumbnailBuilder,
+  SeparatorBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags,
+} = require('discord.js');
 const config = require('../config.json');
 const { db } = require('./appDb');
 const { log } = require('../handlers/logger');
@@ -24,6 +27,45 @@ const LISTING_TYPES = {
 // Legacy type — retired unless explicitly kept via config flag
 if (config.KEEP_TOOLS_TYPE === true) {
   LISTING_TYPES.tools = { channelKey: 'tools', color: 0xA78BFA, buttonLabel: 'Open Tool', logEmoji: '🔧', logLabel: 'tool' };
+}
+
+/**
+ * Components V2 public showcase card — shared by the poller-approved public
+ * post and any place that needs the "live listing" look.
+ */
+function buildListingCard(listing, meta) {
+  const container = new ContainerBuilder().setAccentColor(meta.color);
+
+  const created = listing.createdAt ? new Date(listing.createdAt) : new Date();
+  const textLines = [
+    `## ${listing.title.slice(0, 200)}`,
+    listing.authorUsername ? `-# by **${listing.authorUsername}**` : null,
+    listing.shortDescription ? `\n${listing.shortDescription.slice(0, 2000)}` : null,
+    `\n-# Posted <t:${Math.floor(created.getTime() / 1000)}:R>`,
+  ].filter(Boolean).join('\n');
+
+  if (listing.thumbnailUrl) {
+    container.addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(new TextDisplayBuilder().setContent(textLines))
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(listing.thumbnailUrl))
+    );
+  } else {
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(textLines));
+  }
+
+  container
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addActionRowComponents(
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setLabel(meta.buttonLabel || 'View More')
+          .setStyle(ButtonStyle.Link)
+          .setURL(listing.url),
+      )
+    );
+
+  return container;
 }
 
 function isListingPosted(listingId) {
@@ -64,30 +106,11 @@ async function postListing(client, type, listing) {
     return { ok: false, error: `Channel ${channelId} (config.channels.${meta.channelKey}) not found or not accessible` };
   }
 
-  const embed = new EmbedBuilder()
-    .setTitle(listing.title.slice(0, 256))
-    .setColor(meta.color);
-
-  if (listing.shortDescription) embed.setDescription(listing.shortDescription.slice(0, 4096));
-  if (listing.authorUsername) {
-    embed.setAuthor({
-      name: listing.authorUsername,
-      iconURL: listing.authorAvatarUrl || undefined,
-    });
-  }
-  if (listing.thumbnailUrl) embed.setThumbnail(listing.thumbnailUrl);
-  embed.setTimestamp(listing.createdAt ? new Date(listing.createdAt) : new Date());
-
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setLabel(meta.buttonLabel || 'View More')
-      .setStyle(ButtonStyle.Link)
-      .setURL(listing.url),
-  );
+  const card = buildListingCard(listing, meta);
 
   const thread = await channel.threads.create({
     name: listing.title.slice(0, 100),
-    message: { embeds: [embed], components: [row] },
+    message: { components: [card], flags: MessageFlags.IsComponentsV2 },
   });
 
   if (listing.id != null) markListingPosted(listing.id, thread.id);
@@ -97,4 +120,4 @@ async function postListing(client, type, listing) {
   return { ok: true, threadId: thread.id };
 }
 
-module.exports = { postListing, isListingPosted, markListingPosted, LISTING_TYPES };
+module.exports = { postListing, buildListingCard, isListingPosted, markListingPosted, LISTING_TYPES };

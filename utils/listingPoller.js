@@ -1,7 +1,8 @@
 // utils/listingPoller.js — pulls pending listings from the website and posts
-// them to their forum channels. Website is the source of truth.
-// Contract: BOT_API_CONTRACT.md
-const { postListing, isListingPosted } = require('./postListing');
+// them into the MODERATION forum for management review. Approved listings are
+// posted publicly by the review buttons (handlers/listingModHandler.js).
+// Website is the source of truth. Contract: BOT_API_CONTRACT.md
+const { postListingForReview, getModerationRecord } = require('./moderationListing');
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -59,21 +60,22 @@ async function runPollCycle(client) {
           continue;
         }
 
-        // Dedup guard — protects even if mark-posted failed last cycle
-        if (isListingPosted(listing.id)) {
-          await markPosted(baseUrl, secret, listing.id);
+        // Dedup guard — protects even if mark-moderation-posted failed last cycle
+        const existing = getModerationRecord(listing.id);
+        if (existing) {
+          await markModerationPosted(baseUrl, secret, listing.id, existing.moderation_thread_id);
           continue;
         }
 
-        const result = await postListing(client, listing.type, listing);
+        const result = await postListingForReview(client, listing);
 
         if (!result.ok) {
-          console.warn(`[ListingPoller] Listing ${listing.id} not posted: ${result.error}`);
-          continue; // don't mark-posted; unknown type / missing channel can be fixed and retried
+          console.warn(`[ListingPoller] Listing ${listing.id} not posted for review: ${result.error}`);
+          continue; // don't mark; missing moderation forum can be fixed and retried
         }
 
-        await markPosted(baseUrl, secret, listing.id);
-        console.log(`[ListingPoller] Posted listing ${listing.id} (${listing.type}) → thread ${result.threadId}`);
+        await markModerationPosted(baseUrl, secret, listing.id, result.threadId);
+        console.log(`[ListingPoller] Listing ${listing.id} (${listing.type}) → moderation thread ${result.threadId}`);
         await sleep(1500);
       } catch (err) {
         console.error(`[ListingPoller] Error handling listing ${listing?.id}:`, err);
@@ -86,20 +88,20 @@ async function runPollCycle(client) {
   }
 }
 
-async function markPosted(baseUrl, secret, id) {
+async function markModerationPosted(baseUrl, secret, id, moderationThreadId) {
   try {
-    const res = await fetch(`${baseUrl}/api/bot/mark-posted`, {
+    const res = await fetch(`${baseUrl}/api/bot/mark-moderation-posted`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${secret}`,
       },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, moderationThreadId }),
       signal: AbortSignal.timeout(15_000),
     });
-    if (!res.ok) console.warn(`[ListingPoller] mark-posted for ${id} responded ${res.status} — local dedup will prevent a double post.`);
+    if (!res.ok) console.warn(`[ListingPoller] mark-moderation-posted for ${id} responded ${res.status} — local dedup will prevent a double post.`);
   } catch (err) {
-    console.warn(`[ListingPoller] mark-posted for ${id} failed: ${err.message} — local dedup will prevent a double post.`);
+    console.warn(`[ListingPoller] mark-moderation-posted for ${id} failed: ${err.message} — local dedup will prevent a double post.`);
   }
 }
 

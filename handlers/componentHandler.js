@@ -13,6 +13,10 @@ const {
   closeTicket, requestCloseTicket, approveCloseRequest, denyCloseRequest, claimTicket,
 } = require('../utils/ticketUtils');
 const { handleStaffApplyButton, handleStaffApplyModal, handleAppReviewButton, handleAppApproveModal, handleAppDenyModal, handleAppUnlock } = require('./appHandler');
+const {
+  handleListingApprove, handleListingDenyButton, handleListingDenyModal,
+  APPROVE_PREFIX: LISTING_APPROVE_PREFIX, DENY_PREFIX: LISTING_DENY_PREFIX, DENY_MODAL_PREFIX: LISTING_DENY_MODAL_PREFIX,
+} = require('./listingModHandler');
 const { handleSuggestModal, handleSugApprove, handleSugDeny } = require('./sugHandler');
 const { handleSearchNav } = require('./searchHandler');
 
@@ -991,6 +995,10 @@ async function handlePrInteraction(interaction, client) {
 module.exports = async (interaction, client) => {
   try {
     if (interaction.isButton()) {
+      // Listing moderation buttons use underscore customIds (listing_approve_{id})
+      if (interaction.customId.startsWith(LISTING_APPROVE_PREFIX)) return handleListingApprove(interaction, client);
+      if (interaction.customId.startsWith(LISTING_DENY_PREFIX))    return handleListingDenyButton(interaction);
+
       const prefix = interaction.customId.split(':')[0];
       if (prefix === 'pr')           return handlePrInteraction(interaction, client);
       if (interaction.customId === 'staff_apply') return handleStaffApplyButton(interaction);
@@ -1016,6 +1024,7 @@ module.exports = async (interaction, client) => {
     }
 
     if (interaction.isModalSubmit()) {
+      if (interaction.customId.startsWith(LISTING_DENY_MODAL_PREFIX)) return handleListingDenyModal(interaction, client);
       if (interaction.customId === 'pr_register_modal')              return handlePrInteraction(interaction, client);
       if (interaction.customId === 'ticket_modal')                   return handleTicketModal(interaction, client);
       if (interaction.customId === 'staff_apply_modal')              return handleStaffApplyModal(interaction, client);
