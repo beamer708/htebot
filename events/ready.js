@@ -1,6 +1,8 @@
 const { ActivityType, Collection } = require('discord.js');
 const { startRetentionChecker } = require('../utils/retentionChecker');
 const { startListingPoller } = require('../utils/listingPoller');
+const { loadApplicationEmojis } = require('../utils/appEmojis');
+const { verifyBanners } = require('../utils/banners');
 const { db } = require('../utils/appDb');
 const config = require('../config.json');
 
@@ -32,6 +34,12 @@ module.exports = {
   once: true,
   async execute(client) {
     console.log(`[Ready] Logged in as ${client.user.tag}`);
+
+    // Panel prerequisites. verifyBanners is synchronous and runs first so the
+    // banner map is ready even if an interaction arrives during the emoji fetch.
+    verifyBanners();
+    await loadApplicationEmojis(client);
+
     client.user.setPresence({
       activities: [{ name: 'howtoerlc.xyz', type: ActivityType.Watching }],
       status: 'online',

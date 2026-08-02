@@ -1,122 +1,33 @@
-const {
-  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
-  ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder,
-  MessageFlags, resolveColor,
-} = require('discord.js');
-const config = require('../config.json');
+// panels/prPanel.js — public PR Team panel, built to the same V2 layout
+// contract as every other panel (see panels/renderPanel.js). Copy lives in
+// panels/panelContent.js. The old two-menu layout was merged into one select
+// (customId pr:menu); the legacy pr:assets / pr:handbook customIds on already
+// posted panels keep working through their original handlers.
+const { ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } = require('discord.js');
+const content = require('./panelContent');
 
-const FOOTER_IMAGE = 'https://cdn.discordapp.com/attachments/1461879573707882610/1499184076383588502/Embed_Footer_Banner.png';
+/**
+ * Build the PR panel as { components, files }. Assembly is delegated to
+ * renderPanel's shared layout so banner/footer/accent behavior stays uniform.
+ */
+function buildPrPanel() {
+  // Late require avoids a load-order cycle (renderPanel requires this module)
+  const { assemble, selectOption } = require('./renderPanel');
+  const c = content.prPanel();
 
-// MediaGallery was added in discord.js 14.18 — guard for older installs
-let MediaGalleryBuilder, MediaGalleryItemBuilder;
-try {
-  ({ MediaGalleryBuilder, MediaGalleryItemBuilder } = require('discord.js'));
-} catch { /* not available */ }
-const hasMediaGallery = typeof MediaGalleryBuilder === 'function';
+  const select = new StringSelectMenuBuilder()
+    .setCustomId('pr:menu')
+    .setPlaceholder(c.selectPlaceholder)
+    .setMinValues(1).setMaxValues(1)
+    .addOptions(c.selectOptions.map(selectOption));
 
-async function sendPrPanel(interaction) {
-  const assetsMenu = new StringSelectMenuBuilder()
-    .setCustomId('pr:assets')
-    .setPlaceholder('Outreach Assets')
-    .setMinValues(1)
-    .setMaxValues(1)
-    .addOptions([
-      {
-        label: 'Server Advertisement',
-        description: 'General server ad for posting in advertisement channels',
-        value: 'advertisement',
-        emoji: { name: 'Megaphone', id: '1507191527099596800' },
-      },
-      {
-        label: 'Invitation Offer',
-        description: 'Personal outreach message for inviting specific servers',
-        value: 'invitation',
-        emoji: { name: 'Select', id: '1507191532875153519' },
-      },
-    ]);
+  const buttons = [
+    new ButtonBuilder().setCustomId('pr:mystats').setLabel('My Stats').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('pr:register').setLabel('Register Invite').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('pr:payout').setLabel('Request Payout').setStyle(ButtonStyle.Secondary),
+  ];
 
-  const handbookMenu = new StringSelectMenuBuilder()
-    .setCustomId('pr:handbook')
-    .setPlaceholder('PR Team Handbook')
-    .setMinValues(1)
-    .setMaxValues(1)
-    .addOptions([
-      {
-        label: 'What is the PR Team?',
-        description: 'Your role and responsibilities as a PR Team member',
-        value: 'role',
-        emoji: { name: 'Target', id: '1507191539892224211' },
-      },
-      {
-        label: 'Invite Link Setup',
-        description: 'How to create and register your permanent invite link',
-        value: 'invite_setup',
-        emoji: { name: 'Link', id: '1507191523094167573' },
-      },
-      {
-        label: 'Payout System',
-        description: 'How the 50 Robux payout works and how to claim it',
-        value: 'payouts',
-        emoji: { name: 'Coin', id: '1507191513418039388' },
-      },
-      {
-        label: 'Tracking and Stats',
-        description: 'How invites are tracked and what the numbers mean',
-        value: 'tracking',
-        emoji: { name: 'chartbar', id: '1507191493603885256' },
-      },
-    ]);
-
-  const statsBtn = new ButtonBuilder()
-    .setCustomId('pr:mystats')
-    .setLabel('My Stats')
-    .setStyle(ButtonStyle.Primary)
-    .setEmoji({ name: 'chartbar', id: '1507191493603885256' });
-
-  const registerBtn = new ButtonBuilder()
-    .setCustomId('pr:register')
-    .setLabel('Register Invite')
-    .setStyle(ButtonStyle.Success);
-
-  const payoutBtn = new ButtonBuilder()
-    .setCustomId('pr:payout')
-    .setLabel('Request Payout')
-    .setStyle(ButtonStyle.Secondary)
-    .setEmoji({ name: 'Coin', id: '1507191513418039388' });
-
-  const container = new ContainerBuilder()
-    .setAccentColor(resolveColor('#4ade80'))
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(
-        '<:howtoglogo:1494830728113033327> **HowToERLC PR Team — Invite Program**\n\n' +
-        'Earn **50 Robux** for every **10 members** you successfully invite and retain for 30+ days. ' +
-        'Use the menus below to access outreach templates, browse the handbook, and manage your invites.\n\n' +
-        '<:squaredot:1507191535693860974> Register a **permanent** (non-expiring) invite link using **Register Invite**\n' +
-        '<:squaredot:1507191535693860974> Share your link across ERLC communities and servers\n' +
-        '<:squaredot:1507191535693860974> When **10 of your invited members** stay for **30+ days**, click **Request Payout**\n' +
-        '<:squaredot:1507191535693860974> A PR Manager will review and process your **50 Robux** reward'
-      )
-    )
-    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addActionRowComponents(new ActionRowBuilder().addComponents(assetsMenu))
-    .addActionRowComponents(new ActionRowBuilder().addComponents(handbookMenu))
-    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addActionRowComponents(
-      new ActionRowBuilder().addComponents(statsBtn, registerBtn, payoutBtn)
-    );
-
-  if (hasMediaGallery) {
-    container.addMediaGalleryComponents(
-      new MediaGalleryBuilder().addItems(
-        new MediaGalleryItemBuilder().setURL(FOOTER_IMAGE)
-      )
-    );
-  }
-
-  await interaction.channel.send({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-  });
+  return assemble(content.PANEL_BANNERS['pr'], [`${c.heading}\n${c.intro}`, ...c.body], { select, buttons });
 }
 
-module.exports = { sendPrPanel };
+module.exports = { buildPrPanel };

@@ -19,6 +19,7 @@ const {
 } = require('./listingModHandler');
 const { handleSuggestModal, handleSugApprove, handleSugDeny } = require('./sugHandler');
 const { handleSearchNav } = require('./searchHandler');
+const { handlePanelInteraction } = require('./panelHandler');
 
 const dataPath = (file) => path.join(__dirname, '..', 'data', file);
 
@@ -461,7 +462,7 @@ const STAFF_HANDBOOK = {
       '<:squaredot:1507191535693860974> **Close** button — Close a ticket and delete its channel after 10 seconds\n' +
       '<:squaredot:1507191535693860974> **Transcript** button — Export a copy of the ticket conversation\n\n' +
       '**Admin Only**\n' +
-      '<:squaredot:1507191535693860974> `/panel` — Post a server panel (Main Dashboard, PR Team, Staff Handbook) to the current channel\n\n' +
+      '<:squaredot:1507191535693860974> `/panel` — Post or refresh a server panel (Dashboard, Rules, Campaigns, Get Started, Handbooks) in a channel\n\n' +
       '-# Do not use admin commands in public channels. All actions are logged.',
   },
 };
@@ -513,10 +514,13 @@ async function handleDashboardSelect(interaction) {
 // ── Notification role select menu ─────────────────────────────────────────────
 async function handleRoleSelect(interaction) {
   const selectedValues = interaction.values;
+  // Must exactly match the options offered by the notification menu in
+  // handlers/panelHandler (and any legacy panels still posted). A role listed
+  // here but not offered would be silently stripped from anyone who has it.
   const allNotifRoles = [
     config.roles.notifications.updates,
     config.roles.notifications.resources,
-    config.roles.notifications.partnerships,
+    config.roles.notifications.announcements,
   ].filter(Boolean);
 
   const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
@@ -985,6 +989,14 @@ async function handlePrInteraction(interaction, client) {
   if (interaction.isStringSelectMenu()) {
     if (interaction.customId === 'pr:assets')   return handlePrAssets(interaction);
     if (interaction.customId === 'pr:handbook') return handlePrHandbook(interaction);
+    if (interaction.customId === 'pr:menu') {
+      // Merged panel menu: asset values go to the assets handler, handbook
+      // values to the handbook handler. Legacy customIds above stay working
+      // for panels posted before the redesign.
+      const value = interaction.values[0];
+      if (value === 'advertisement' || value === 'invitation') return handlePrAssets(interaction);
+      return handlePrHandbook(interaction);
+    }
   }
   if (interaction.isModalSubmit()) {
     if (interaction.customId === 'pr_register_modal') return handlePrRegisterModal(interaction, client);
@@ -993,44 +1005,48 @@ async function handlePrInteraction(interaction, client) {
 
 // ── Main router ───────────────────────────────────────────────────────────────
 module.exports = async (interaction, client) => {
+  // NOTE: every dispatch below is `return await` — returning the bare promise
+  // would skip this try/catch, and an unhandled rejection kills the process.
   try {
     if (interaction.isButton()) {
       // Listing moderation buttons use underscore customIds (listing_approve_{id})
-      if (interaction.customId.startsWith(LISTING_APPROVE_PREFIX)) return handleListingApprove(interaction, client);
-      if (interaction.customId.startsWith(LISTING_DENY_PREFIX))    return handleListingDenyButton(interaction);
+      if (interaction.customId.startsWith(LISTING_APPROVE_PREFIX)) return await handleListingApprove(interaction, client);
+      if (interaction.customId.startsWith(LISTING_DENY_PREFIX))    return await handleListingDenyButton(interaction);
 
       const prefix = interaction.customId.split(':')[0];
-      if (prefix === 'pr')           return handlePrInteraction(interaction, client);
-      if (interaction.customId === 'staff_apply') return handleStaffApplyButton(interaction);
-      if (prefix === 'app_review')   return handleAppReviewButton(interaction, client);
-      if (prefix === 'app_unlock')   return handleAppUnlock(interaction, client);
-      if (prefix === 'sug_approve')  return handleSugApprove(interaction, client);
-      if (prefix === 'sug_deny')     return handleSugDeny(interaction, client);
-      if (prefix === 'search_nav')   return handleSearchNav(interaction);
-      if (prefix === 'app')          return handleApplicationButton(interaction, client);
-      if (prefix === 'suggestion')   return handleSuggestionButton(interaction, client);
-      if (prefix === 'partnership')  return handlePartnershipButton(interaction, client);
-      if (prefix === 'ticket')       return handleTicketButton(interaction, client);
-      if (prefix === 'role')         return handleRolePanelButton(interaction);
-      if (prefix === 'invitereset')  return handleInviteResetButton(interaction);
+      if (prefix === 'panelsel')     return await handlePanelInteraction(interaction);
+      if (prefix === 'pr')           return await handlePrInteraction(interaction, client);
+      if (interaction.customId === 'staff_apply') return await handleStaffApplyButton(interaction);
+      if (prefix === 'app_review')   return await handleAppReviewButton(interaction, client);
+      if (prefix === 'app_unlock')   return await handleAppUnlock(interaction, client);
+      if (prefix === 'sug_approve')  return await handleSugApprove(interaction, client);
+      if (prefix === 'sug_deny')     return await handleSugDeny(interaction, client);
+      if (prefix === 'search_nav')   return await handleSearchNav(interaction);
+      if (prefix === 'app')          return await handleApplicationButton(interaction, client);
+      if (prefix === 'suggestion')   return await handleSuggestionButton(interaction, client);
+      if (prefix === 'partnership')  return await handlePartnershipButton(interaction, client);
+      if (prefix === 'ticket')       return await handleTicketButton(interaction, client);
+      if (prefix === 'role')         return await handleRolePanelButton(interaction);
+      if (prefix === 'invitereset')  return await handleInviteResetButton(interaction);
     }
 
     if (interaction.isStringSelectMenu()) {
       const prefix = interaction.customId.split(':')[0];
-      if (prefix === 'pr')                                    return handlePrInteraction(interaction, client);
-      if (interaction.customId === 'dashboard:info')          return handleDashboardSelect(interaction);
-      if (interaction.customId === 'rolepanel:notifications') return handleRoleSelect(interaction);
-      if (interaction.customId === 'staff:handbook')          return handleStaffHandbook(interaction);
+      if (prefix === 'panelsel')                              return await handlePanelInteraction(interaction);
+      if (prefix === 'pr')                                    return await handlePrInteraction(interaction, client);
+      if (interaction.customId === 'dashboard:info')          return await handleDashboardSelect(interaction);
+      if (interaction.customId === 'rolepanel:notifications') return await handleRoleSelect(interaction);
+      if (interaction.customId === 'staff:handbook')          return await handleStaffHandbook(interaction);
     }
 
     if (interaction.isModalSubmit()) {
-      if (interaction.customId.startsWith(LISTING_DENY_MODAL_PREFIX)) return handleListingDenyModal(interaction, client);
-      if (interaction.customId === 'pr_register_modal')              return handlePrInteraction(interaction, client);
-      if (interaction.customId === 'ticket_modal')                   return handleTicketModal(interaction, client);
-      if (interaction.customId === 'staff_apply_modal')              return handleStaffApplyModal(interaction, client);
-      if (interaction.customId === 'suggest_modal')                  return handleSuggestModal(interaction, client);
-      if (interaction.customId.startsWith('app_approve_modal:'))    return handleAppApproveModal(interaction, client);
-      if (interaction.customId.startsWith('app_deny_modal:'))       return handleAppDenyModal(interaction, client);
+      if (interaction.customId.startsWith(LISTING_DENY_MODAL_PREFIX)) return await handleListingDenyModal(interaction, client);
+      if (interaction.customId === 'pr_register_modal')              return await handlePrInteraction(interaction, client);
+      if (interaction.customId === 'ticket_modal')                   return await handleTicketModal(interaction, client);
+      if (interaction.customId === 'staff_apply_modal')              return await handleStaffApplyModal(interaction, client);
+      if (interaction.customId === 'suggest_modal')                  return await handleSuggestModal(interaction, client);
+      if (interaction.customId.startsWith('app_approve_modal:'))    return await handleAppApproveModal(interaction, client);
+      if (interaction.customId.startsWith('app_deny_modal:'))       return await handleAppDenyModal(interaction, client);
     }
   } catch (err) {
     console.error('[ComponentHandler] Error:', err);

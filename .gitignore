@@ -7,3 +7,5 @@ data/tickets.db-wal
 data/db.sqlite
 data/db.sqlite-shm
 data/db.sqlite-wal
+
+assets/banners/*.png
