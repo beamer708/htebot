@@ -3,6 +3,7 @@ const { startRetentionChecker } = require('../utils/retentionChecker');
 const { startListingPoller } = require('../utils/listingPoller');
 const { loadApplicationEmojis } = require('../utils/appEmojis');
 const { verifyBanners } = require('../utils/banners');
+const { startupSweep } = require('../utils/stickyManager');
 const { db } = require('../utils/appDb');
 const config = require('../config.json');
 
@@ -62,6 +63,9 @@ module.exports = {
 
     startRetentionChecker(client);
     startListingPoller(client);
+
+    // Re-post stickies wherever ours is no longer the last message
+    startupSweep(client).catch(err => console.warn('[Sticky] Startup sweep failed:', err.message));
 
     // Forum channel setup posts (one-time, tracked in DB)
     await ensureForumSetupPost(
