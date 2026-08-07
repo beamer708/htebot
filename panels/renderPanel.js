@@ -106,7 +106,7 @@ function buildDashboard() {
     .addOptions(c.selectOptions.map(selectOption));
 
   const buttons = [
-    new ButtonBuilder().setCustomId('ticket:create').setLabel('Get Assistance').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('ticket:create').setLabel('Get Assistance').setStyle(ButtonStyle.Success),
     new ButtonBuilder().setCustomId('staff_apply').setLabel('Apply').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('panelsel:roles').setLabel('Notification Roles').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setLabel('Website').setStyle(ButtonStyle.Link).setURL(config.website),
