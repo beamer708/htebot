@@ -49,4 +49,29 @@ if (process.env.ENABLE_PUSH_SERVER === 'true') {
   });
 }
 
-client.login(process.env.BOT_TOKEN);
+// Discord's API occasionally returns 5xx (outages, or the host IP getting
+// rate limited). Retrying with backoff rides those out instead of crash
+// looping the host panel. Unfixable errors (bad token, missing intents)
+// still exit immediately so the panel surfaces them.
+async function loginWithRetry(attempts = 6, delayMs = 20_000) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      await client.login(process.env.BOT_TOKEN);
+      return;
+    } catch (err) {
+      const msg = err?.message || String(err);
+      if (/token/i.test(msg) || /intent/i.test(msg)) {
+        console.error(`[Startup] Fatal login error (not retryable): ${msg}`);
+        process.exit(1);
+      }
+      if (attempt === attempts) {
+        console.error(`[Startup] Could not reach Discord after ${attempts} attempts: ${msg}. Exiting.`);
+        process.exit(1);
+      }
+      console.warn(`[Startup] Login attempt ${attempt}/${attempts} failed: ${msg}. Retrying in ${delayMs / 1000}s...`);
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+}
+
+loginWithRetry();
