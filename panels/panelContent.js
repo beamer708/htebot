@@ -91,17 +91,19 @@ function marketingCampaigns() {
   return {
     heading: `## ${e('Megaphone', '📣')} Marketing Campaigns`,
     intro:
-      'This is where How To ERLC runs **official campaigns and events**. ' +
-      'Every campaign is built with our **partnered servers**, and every one has something to win.',
+      'Marketing Campaigns are **paid promotions run through How To ERLC** that put your community in front of the whole player base. ' +
+      'Grow your server or push a specific listing, we handle the reach.',
     body: [
-      `${e('Confetti', '🎉')} **Current Campaign: 2.0 Launch Countdown**\n` +
-      `${e('squaredot', '▪️')} **5 days** of features, giveaways, and reveals\n` +
-      `${e('squaredot', '▪️')} **One partnered server featured per day**, August 3rd to August 7th\n` +
-      `${e('squaredot', '▪️')} Each day's giveaway: **300 Robux** from How To ERLC, a **Premium Role**, plus the featured server's **added prize**\n` +
-      `${e('squaredot', '▪️')} **2.0 goes live August 8th**`,
+      `${e('Target', '🎯')} **What you can promote**\n` +
+      `${e('squaredot', '▪️')} Run **paid ads for your server** to bring in new members\n` +
+      `${e('squaredot', '▪️')} Promote a **specific marketplace listing** to boost its sales and visibility`,
 
-      `${e('crown', '👑')} **Want your server featured?**\n` +
-      `${e('squaredot', '▪️')} Partners get **priority placement** in campaigns like this one. Use the button below to apply.`,
+      `${e('crown', '👑')} **What every campaign includes**\n` +
+      `${e('squaredot', '▪️')} Every server that enters is **featured on the directory page**\n` +
+      `${e('squaredot', '▪️')} Your promotion runs across **How To ERLC's channels and website**, not buried in the free ad feeds`,
+
+      `${e('Confetti', '🎉')} **How to start**\n` +
+      `${e('squaredot', '▪️')} Use the button below to **become a partner** and set up your campaign`,
     ],
     partnerButtonLabel: 'Become a Partner',
     partnerButtonUrl: channelUrl(PARTNER_CHANNEL_ID),
