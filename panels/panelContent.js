@@ -322,7 +322,7 @@ function prHandbook() {
         description: 'What top partners receive',
         title: `${e('crown', '👑')} **Premium Partner Perks**`,
         content:
-          `${e('squaredot', '▪️')} **Featured campaign days.** Premium partners headline official events like the 2.0 Launch Countdown.\n` +
+          `${e('squaredot', '▪️')} **Featured campaign days.** Premium partners headline official marketing campaigns and events.\n` +
           `${e('squaredot', '▪️')} **Priority placement** in the directory and announcement shoutouts.\n` +
           `${e('squaredot', '▪️')} **Co-hosted giveaways** backed by How To ERLC prizes.\n` +
           `${e('squaredot', '▪️')} **A direct line to the <@&${config.roles.prManager}> team** for planning and support.\n` +
