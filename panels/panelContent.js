@@ -103,10 +103,10 @@ function marketingCampaigns() {
       `${e('squaredot', '▪️')} Your promotion runs across **How To ERLC's channels and website**, not buried in the free ad feeds`,
 
       `${e('Confetti', '🎉')} **How to start**\n` +
-      `${e('squaredot', '▪️')} Use the button below to **become a partner** and set up your campaign`,
+      `${e('squaredot', '▪️')} Use the button below to **purchase a paid ad** and set up your campaign`,
     ],
-    partnerButtonLabel: 'Become a Partner',
-    partnerButtonUrl: channelUrl(PARTNER_CHANNEL_ID),
+    partnerButtonLabel: 'Purchase a Paid AD',
+    partnerButtonUrl: `${WEBSITE_URL}/directory`,
   };
 }
 
