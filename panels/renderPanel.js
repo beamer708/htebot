@@ -248,6 +248,14 @@ const BUILDERS = {
   'marketing-campaigns': buildMarketingCampaigns,
   'get-started':         buildGetStarted,
   'community':           buildCommunity,
+  'trial-staff':         () => {
+    const c = content.trialStaff();
+    return assemble(content.PANEL_BANNERS['trial-staff'], [`${c.heading}\n${c.intro}`, ...c.body], {});
+  },
+  'staff-promotions':    () => {
+    const c = content.staffPromotions();
+    return assemble(content.PANEL_BANNERS['staff-promotions'], [`${c.heading}\n${c.intro}`, ...c.body], {});
+  },
   'management-handbook': () => buildHandbook('management-handbook', content.managementHandbook(), 'panelsel:mgmt'),
   'staff-handbook':      () => buildHandbook('staff-handbook', content.staffHandbook(), 'panelsel:staffhb'),
   'pr-handbook':         () => buildHandbook('pr-handbook', content.prHandbook(), 'panelsel:prhb'),

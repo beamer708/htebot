@@ -411,6 +411,79 @@ function prHandbook() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// TRIAL STAFF — the process a trial staff member follows to earn a full rank
+// ═══════════════════════════════════════════════════════════════════════════
+function trialStaff() {
+  return {
+    heading: `## ${e('Target', '🎯')} Trial Staff, Passing Your Trial`,
+    intro:
+      '-# Every new staff member starts on trial. Here is exactly what the trial ' +
+      'covers, what we look at, and how you move up.',
+    body: [
+      { divider: true },
+
+      `**1. Know the expectations**\n` +
+      `-# Be active most days, stay professional in every channel, and follow the staff handbook. Your trial starts the day you are accepted and runs for at least [TRIAL_LENGTH].`,
+
+      `**2. Do the work you're evaluated on**\n` +
+      `- **Moderation**: handle violations correctly and log actions through the bot\n` +
+      `- **Tickets**: claim, resolve, and close at least [MIN_TICKETS] tickets\n` +
+      `- **Advertising or invites**: depending on your track, post ads on schedule or bring in invites through the PR program`,
+
+      `**3. Hit the minimums**\n` +
+      `-# You need [MIN_ACTIVITY] activity across the trial and no unexplained absences. Going quiet for a week without notice can end the trial early.`,
+
+      `**4. Get evaluated**\n` +
+      `-# At the end of your trial, management reviews your activity, moderation quality, and conduct, with input from the senior staff you worked with.`,
+
+      `**5. Get promoted**\n` +
+      `-# Pass the evaluation and management signs off on your promotion to your full rank. Either way you get a decision and feedback, trials never just drag on.`,
+
+      { divider: true },
+
+      `-# Questions about your trial? Open a ticket or message a member of management directly.`,
+    ],
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STAFF PROMOTIONS — what earns a promotion
+// ═══════════════════════════════════════════════════════════════════════════
+function staffPromotions() {
+  return {
+    heading: `## ${e('crown', '👑')} Staff Promotions`,
+    intro:
+      '-# Promotions here are earned, not asked for. This is what management ' +
+      'looks at when deciding who moves up.',
+    body: [
+      { divider: true },
+
+      `**Consistent activity**\n` +
+      `-# Show up most days and be visible in public channels. Consistency over weeks beats bursts of activity.`,
+
+      `**Handle tickets well**\n` +
+      `-# Claim tickets, resolve the actual issue, and close them cleanly. Members leaving tickets happy is one of the strongest signals we track.`,
+
+      `**Hit your advertising and invite goals**\n` +
+      `-# Post ads on schedule and grow your tracked invites through the PR program. Growth work counts as much as moderation.`,
+
+      `**Professionalism and conduct**\n` +
+      `-# Stay calm in public, enforce rules fairly, and represent How To ERLC well everywhere, including other servers.`,
+
+      `**Help members and take initiative**\n` +
+      `-# Answer questions without being asked, spot problems before they grow, and propose improvements instead of waiting for direction.`,
+
+      `**A clean record and good feedback**\n` +
+      `-# No active warnings, and positive feedback from management and the staff you work with.`,
+
+      { divider: true },
+
+      `**Do these consistently and the promotion follows. Management tracks contributions, the work speaks for itself.**`,
+    ],
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PR TEAM PANEL (public) — invite program hub
 // ═══════════════════════════════════════════════════════════════════════════
 function prPanel() {
@@ -443,5 +516,6 @@ function prPanel() {
 module.exports = {
   PANEL_BANNERS, FORUMS, PARTNER_CHANNEL_ID, NOTIFY_ROLES_CHANNEL_ID, channelUrl,
   dashboard, serverRules, marketingCampaigns, getStarted, community,
+  trialStaff, staffPromotions,
   managementHandbook, staffHandbook, prHandbook, prPanel,
 };

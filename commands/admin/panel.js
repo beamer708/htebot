@@ -16,6 +16,8 @@ module.exports = {
         { name: 'Marketing Campaigns', value: 'marketing-campaigns' },
         { name: 'Get Started',         value: 'get-started' },
         { name: 'Community',           value: 'community' },
+        { name: 'Trial Staff Info',    value: 'trial-staff' },
+        { name: 'Staff Promotions',    value: 'staff-promotions' },
         { name: 'Management Handbook', value: 'management-handbook' },
         { name: 'Staff Handbook',      value: 'staff-handbook' },
         { name: 'PR Handbook',         value: 'pr-handbook' },
