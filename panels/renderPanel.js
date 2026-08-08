@@ -250,7 +250,12 @@ const BUILDERS = {
   'community':           buildCommunity,
   'trial-staff':         () => {
     const c = content.trialStaff();
-    return assemble(content.PANEL_BANNERS['trial-staff'], [`${c.heading}\n${c.intro}`, ...c.body], {});
+    // Stable customIds; handled by handlers/trialHandler.js after any restart
+    const buttons = [
+      new ButtonBuilder().setCustomId('trial:agree').setLabel('I Agree').setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId('trial:deny').setLabel('Deny').setStyle(ButtonStyle.Danger),
+    ];
+    return assemble(content.PANEL_BANNERS['trial-staff'], [`${c.heading}\n${c.intro}`, ...c.body], { buttons });
   },
   'staff-promotions':    () => {
     const c = content.staffPromotions();

@@ -21,6 +21,7 @@ const { handleSuggestModal, handleSugApprove, handleSugDeny } = require('./sugHa
 const { handleSearchNav } = require('./searchHandler');
 const { handlePanelInteraction } = require('./panelHandler');
 const { handleStickyInteraction } = require('./stickyHandler');
+const { handleTrialButton } = require('./trialHandler');
 
 const dataPath = (file) => path.join(__dirname, '..', 'data', file);
 
@@ -1051,6 +1052,7 @@ module.exports = async (interaction, client) => {
       const prefix = interaction.customId.split(':')[0];
       if (prefix === 'panelsel')     return await handlePanelInteraction(interaction);
       if (prefix === 'sticky')       return await handleStickyInteraction(interaction, client);
+      if (prefix === 'trial')        return await handleTrialButton(interaction);
       if (prefix === 'pr')           return await handlePrInteraction(interaction, client);
       if (interaction.customId === 'staff_apply') return await handleStaffApplyButton(interaction);
       if (prefix === 'app_review')   return await handleAppReviewButton(interaction, client);

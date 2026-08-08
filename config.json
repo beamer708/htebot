@@ -57,6 +57,8 @@
   },
   "moderationForum": "1533125097060176138",
   "managementRoleId": "1485009683671552010",
+  "trialAgreeRoleId": "1495136039717703921",
+  "trialProcessRoleId": "",
   "KEEP_TOOLS_TYPE": false,
   "advertisingChannels": [
     "1494470236538404905",
