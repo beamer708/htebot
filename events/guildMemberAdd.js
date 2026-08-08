@@ -146,7 +146,8 @@ module.exports = {
       if (prLogChannel) {
         const prInviteEmbed = new EmbedBuilder()
           .setColor(config.colors.info)
-          .setTitle('📨 PR Invite — Member Joined')
+          .setTitle('PR Invite, Member Joined')
+          .setDescription('-# A new member joined through a tracked staff invite.')
           .addFields(
             { name: 'New Member',    value: `<@${member.id}> (${member.user.tag})`,                         inline: true },
             { name: 'Invited By',    value: `<@${inviter.id}> (${inviter.tag})`,                            inline: true },

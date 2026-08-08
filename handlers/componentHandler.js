@@ -821,11 +821,13 @@ async function handlePrRegisterModal(interaction, client) {
 
   const logEmbed = new EmbedBuilder()
     .setColor(config.colors.success)
-    .setTitle('<:Link:1507191523094167573> PR Invite Registered')
+    .setTitle('PR Invite Registered')
+    .setDescription('-# A PR Team member linked an invite to their account.')
     .addFields(
       { name: 'Member',      value: `<@${userId}> (${interaction.user.tag})`, inline: true },
       { name: 'Invite Code', value: `\`discord.gg/${inviteCode}\``,           inline: true },
-      { name: 'Action',      value: existing ? '<:pencil:1507191529062797312> Updated' : '<:circlecheck:1507191508066107532> New', inline: true },
+      { name: 'Action',      value: existing ? 'Updated existing registration' : 'New registration', inline: true },
+      { name: 'Registered At', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true },
     )
     .setTimestamp();
   await logToPr(interaction.guild, logEmbed);
@@ -882,8 +884,8 @@ async function handlePrPayout(interaction) {
   if (prLogChannel) {
     const payoutEmbed = new EmbedBuilder()
       .setColor(config.colors.warning)
-      .setTitle('<:Coin:1507191513418039388> Payout Request — Pending Review')
-      .setDescription(`<@&${config.roles.prManager}> — A PR Team member has requested their payout.`)
+      .setTitle('Payout Request, Pending Review')
+      .setDescription(`<@&${config.roles.prManager}>\n-# A PR Team member has requested their payout.`)
       .addFields(
         { name: 'Member',         value: `<@${userId}> (${interaction.user.tag})`,        inline: true },
         { name: 'Retained Count', value: `${toClaim.length} invites`,                     inline: true },
@@ -929,9 +931,23 @@ async function handlePrPayoutApprove(interaction, client) {
 
   const approvedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(config.colors.success)
-    .setTitle('<:Confetti:1507191514042994748> Payout Request — Approved')
+    .setTitle('Payout Request, Approved')
     .setFooter({ text: `Approved by ${interaction.user.tag} • ${new Date().toLocaleString()}` });
   await interaction.update({ embeds: [approvedEmbed], components: [] });
+
+  const approvedLog = new EmbedBuilder()
+    .setColor(config.colors.success)
+    .setTitle('Payout Approved')
+    .setDescription(`-# Payout \`${payoutId}\` was approved and is being paid out.`)
+    .addFields(
+      { name: 'Member',           value: `<@${payout.memberId}> (${payout.memberTag})`, inline: true },
+      { name: 'Retained Invites', value: `${payout.retainedCount}`,                     inline: true },
+      { name: 'Amount',           value: `${PR_ROBUX} Robux`,                           inline: true },
+      { name: 'Approved By',      value: `<@${interaction.user.id}>`,                   inline: true },
+      { name: 'Approved At',      value: `<t:${Math.floor(Date.now() / 1000)}:F>`,      inline: true },
+    )
+    .setTimestamp();
+  await logToPr(interaction.guild, approvedLog);
 
   const dmEmbed = new EmbedBuilder()
     .setColor(config.colors.success)
@@ -968,9 +984,22 @@ async function handlePrPayoutDeny(interaction, client) {
 
   const deniedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
     .setColor(config.colors.error)
-    .setTitle('<:Coin:1507191513418039388> Payout Request — Denied')
+    .setTitle('Payout Request, Denied')
     .setFooter({ text: `Denied by ${interaction.user.tag} • ${new Date().toLocaleString()}` });
   await interaction.update({ embeds: [deniedEmbed], components: [] });
+
+  const deniedLog = new EmbedBuilder()
+    .setColor(config.colors.error)
+    .setTitle('Payout Denied')
+    .setDescription(`-# Payout \`${payoutId}\` was denied. The member's retained invites were restored.`)
+    .addFields(
+      { name: 'Member',           value: `<@${payout.memberId}> (${payout.memberTag})`, inline: true },
+      { name: 'Retained Invites', value: `${payout.retainedCount}`,                     inline: true },
+      { name: 'Denied By',        value: `<@${interaction.user.id}>`,                   inline: true },
+      { name: 'Denied At',        value: `<t:${Math.floor(Date.now() / 1000)}:F>`,      inline: true },
+    )
+    .setTimestamp();
+  await logToPr(interaction.guild, deniedLog);
 
   const dmEmbed = new EmbedBuilder()
     .setColor(config.colors.error)

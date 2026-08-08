@@ -24,15 +24,21 @@ module.exports = {
       const days     = Math.floor(elapsed / 86_400_000);
       const hours    = Math.floor((elapsed % 86_400_000) / 3_600_000);
 
+      const remaining = Object.values(invites).filter(
+        e => e.inviterId === entry.inviterId && e.retained && !e.payoutId
+      ).length;
+
       const inviteLeaveEmbed = new EmbedBuilder()
         .setColor(config.colors.error)
-        .setTitle('<:userminus:1507191545583894598> PR Invite — Member Left (Not Retained)')
+        .setTitle('PR Invite, Member Left (Not Retained)')
+        .setDescription('-# An invited member left before the retention window, so they will not count toward a payout.')
         .addFields(
           { name: 'User',                value: `${member.user.tag} (${member.id})`,             inline: true },
           { name: 'Originally Invited By', value: `<@${entry.inviterId}>`,                       inline: true },
           { name: 'Time in Server',      value: `${days}d ${hours}h`,                            inline: true },
           { name: 'Invite Code',         value: `\`${entry.inviteCode || 'unknown'}\``,          inline: true },
-          { name: 'Status',              value: '❌ Will NOT count toward payout',               inline: false },
+          { name: 'Inviter Qualifying Count', value: `${remaining} retained invite${remaining !== 1 ? 's' : ''} still counting`, inline: true },
+          { name: 'Left At',             value: `<t:${Math.floor(Date.now() / 1000)}:F>`,        inline: true },
         )
         .setTimestamp();
 
