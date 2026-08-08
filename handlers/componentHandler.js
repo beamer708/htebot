@@ -393,11 +393,11 @@ const STAFF_HANDBOOK = {
     description:
       'As a staff member at HowToERLC your job is to keep the server safe, welcoming, and on-topic at all times. ' +
       'You are the first line of response for rule violations, member questions, and support tickets.\n\n' +
-      '<:squaredot:1507191535693860974> Monitor all public channels for rule violations\n' +
-      '<:squaredot:1507191535693860974> Keep the advertising channels clean and compliant\n' +
-      '<:squaredot:1507191535693860974> Welcome new members and point them in the right direction\n' +
-      '<:squaredot:1507191535693860974> Handle or escalate support tickets when needed\n' +
-      '<:squaredot:1507191535693860974> Represent HowToERLC professionally at all times\n\n' +
+      '- Monitor all public channels for rule violations\n' +
+      '- Keep the advertising channels clean and compliant\n' +
+      '- Welcome new members and point them in the right direction\n' +
+      '- Handle or escalate support tickets when needed\n' +
+      '- Represent HowToERLC professionally at all times\n\n' +
       '-# When in doubt, escalate to a senior staff member or admin rather than acting alone.',
   },
   rules: {
@@ -416,18 +416,18 @@ const STAFF_HANDBOOK = {
       '<:circlex:1507191508657508503> No recruiting members away from HowToERLC\n' +
       '<:circlex:1507191508657508503> Paid promotions must be clearly disclosed\n\n' +
       '**How to respond**\n' +
-      '<:squaredot:1507191535693860974> Issue a verbal warning in the channel or via DM for minor violations\n' +
-      '<:squaredot:1507191535693860974> Remove non-compliant advertisements immediately\n' +
-      '<:squaredot:1507191535693860974> Escalate repeated violations to a senior staff member',
+      '- Issue a verbal warning in the channel or via DM for minor violations\n' +
+      '- Remove non-compliant advertisements immediately\n' +
+      '- Escalate repeated violations to a senior staff member',
   },
   welcoming: {
     title: '<:userplus:1507191546813091841> Welcoming Members',
     description:
       'First impressions matter. When a new member joins, make them feel welcome and help them get oriented.\n\n' +
-      '<:squaredot:1507191535693860974> Greet new members in the welcome channel if one is active\n' +
-      '<:squaredot:1507191535693860974> If a member asks where to start, point them to the main dashboard and the website **howtoerlc.xyz**\n' +
-      '<:squaredot:1507191535693860974> If a member is lost or confused, answer their question directly — do not just send a rules link\n' +
-      '<:squaredot:1507191535693860974> Encourage members to grab their notification roles from the dashboard\n\n' +
+      '- Greet new members in the welcome channel if one is active\n' +
+      '- If a member asks where to start, point them to the main dashboard and the website **howtoerlc.xyz**\n' +
+      '- If a member is lost or confused, answer their question directly — do not just send a rules link\n' +
+      '- Encourage members to grab their notification roles from the dashboard\n\n' +
       '**What to say if asked about resources:**\n' +
       'Direct them to the resources, tools, and templates channels or to **howtoerlc.xyz** for the full library.\n\n' +
       '-# You do not need to greet every single member. Focus on those who ask questions or seem lost.',
@@ -437,10 +437,10 @@ const STAFF_HANDBOOK = {
     description:
       'Support tickets are opened by members who need help. As staff you are responsible for monitoring and responding to them.\n\n' +
       '**How tickets work**\n' +
-      '<:squaredot:1507191535693860974> When a ticket is created, a private channel is opened with the member and the staff team\n' +
-      '<:squaredot:1507191535693860974> Click **Claim** to take ownership of the ticket — this hides it from other staff so there is no overlap\n' +
-      '<:squaredot:1507191535693860974> Once resolved, click **Close** to close the ticket and delete the channel\n' +
-      '<:squaredot:1507191535693860974> Use **Transcript** before closing if a record is needed\n\n' +
+      '- When a ticket is created, a private channel is opened with the member and the staff team\n' +
+      '- Click **Claim** to take ownership of the ticket — this hides it from other staff so there is no overlap\n' +
+      '- Once resolved, click **Close** to close the ticket and delete the channel\n' +
+      '- Use **Transcript** before closing if a record is needed\n\n' +
       '**When to action a ticket**\n' +
       '<:circlecheck:1507191508066107532> Claim a ticket if you can fully resolve the issue\n' +
       '<:circlecheck:1507191508066107532> Leave it open if a more qualified staff member should handle it\n' +
@@ -454,16 +454,16 @@ const STAFF_HANDBOOK = {
     description:
       'As a staff member you have access to the following bot commands:\n\n' +
       '**Application Management**\n' +
-      '<:squaredot:1507191535693860974> `/approve` — Approve a staff application and notify the applicant via DM\n' +
-      '<:squaredot:1507191535693860974> `/deny` — Deny a staff application and notify the applicant via DM\n' +
-      '<:squaredot:1507191535693860974> `/search` — Search for an application, member, or invite record by username or ID\n\n' +
+      '- `/approve` — Approve a staff application and notify the applicant via DM\n' +
+      '- `/deny` — Deny a staff application and notify the applicant via DM\n' +
+      '- `/search` — Search for an application, member, or invite record by username or ID\n\n' +
       '**Ticket Management**\n' +
-      '<:squaredot:1507191535693860974> `/add @user` — Add a member to the current ticket channel with view and send access\n' +
-      '<:squaredot:1507191535693860974> **Claim** button — Take ownership of an open ticket\n' +
-      '<:squaredot:1507191535693860974> **Close** button — Close a ticket and delete its channel after 10 seconds\n' +
-      '<:squaredot:1507191535693860974> **Transcript** button — Export a copy of the ticket conversation\n\n' +
+      '- `/add @user` — Add a member to the current ticket channel with view and send access\n' +
+      '- **Claim** button — Take ownership of an open ticket\n' +
+      '- **Close** button — Close a ticket and delete its channel after 10 seconds\n' +
+      '- **Transcript** button — Export a copy of the ticket conversation\n\n' +
       '**Admin Only**\n' +
-      '<:squaredot:1507191535693860974> `/panel` — Post or refresh a server panel (Dashboard, Rules, Campaigns, Get Started, Handbooks) in a channel\n\n' +
+      '- `/panel` — Post or refresh a server panel (Dashboard, Rules, Campaigns, Get Started, Handbooks) in a channel\n\n' +
       '-# Do not use admin commands in public channels. All actions are logged.',
   },
 };
@@ -490,11 +490,11 @@ const INFO_EMBEDS = {
   },
   info_guidelines: {
     title: '<:shieldcheck:1507191534003552277> Server Guidelines',
-    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n<:circlecheck:1507191508066107532> **Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n<:circlecheck:1507191508066107532> **Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n<:circlex:1507191508657508503> **No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n<:circlecheck:1507191508066107532> **Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n<:squaredot:1507191535693860974> **Staff decisions are final.** Repeated violations will result in removal from the server.',
+    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n<:circlecheck:1507191508066107532> **Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n<:circlecheck:1507191508066107532> **Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n<:circlex:1507191508657508503> **No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n<:circlecheck:1507191508066107532> **Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n- **Staff decisions are final.** Repeated violations will result in removal from the server.',
   },
   info_advertising: {
     title: '<:Megaphone:1507191527099596800> Advertising Guidelines',
-    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n<:circlecheck:1507191508066107532> **ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n<:circlex:1507191508657508503> **No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n<:circlecheck:1507191508066107532> **Valid invite required.** All advertisements must include a valid Discord invite link.\n\n<:squaredot:1507191535693860974> **Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
+    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n<:circlecheck:1507191508066107532> **ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n<:circlex:1507191508657508503> **No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n<:circlecheck:1507191508066107532> **Valid invite required.** All advertisements must include a valid Discord invite link.\n\n- **Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
   },
 };
 
@@ -548,7 +548,7 @@ async function handleRoleSelect(interaction) {
   const lines = [];
   if (added.length) lines.push(`<:toggleright:1507191541574271076> ${added.join(', ')}`);
   if (removed.length) lines.push(`<:toggleleft:1507191540563312731> ${removed.join(', ')}`);
-  if (!lines.length) lines.push('<:squaredot:1507191535693860974> No changes made.');
+  if (!lines.length) lines.push('- No changes made.');
 
   await interaction.reply({ content: `Your notification roles have been updated.\n${lines.join('\n')}`, flags: MessageFlags.Ephemeral });
 }

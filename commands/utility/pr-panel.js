@@ -51,9 +51,9 @@ module.exports = {
           `## ${e('HTELogo', '🤝')} PR Team, Your Personal Panel\n` +
           'Track your invites, grab outreach templates, browse the handbook, and manage your payouts. ' +
           'This panel is **only visible to you**.\n\n' +
-          `${e('squaredot', '▪️')} **My Stats** shows your invite count and payout eligibility\n` +
-          `${e('squaredot', '▪️')} **Register Invite** links your permanent invite code to your account\n` +
-          `${e('squaredot', '▪️')} **Request Payout** claims your **50 Robux** at 10 retained invites`
+          `- **My Stats** shows your invite count and payout eligibility\n` +
+          `- **Register Invite** links your permanent invite code to your account\n` +
+          `- **Request Payout** claims your **50 Robux** at 10 retained invites`
         )
       )
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))

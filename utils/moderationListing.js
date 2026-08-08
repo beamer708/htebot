@@ -79,7 +79,7 @@ function buildReviewCard(listing, outcome = null) {
     [
       `<:Link:1507191523094167573> ${listing.url}`,
       listing.authorUsername ? `<:usercheck:1507191543952310404> Author: **${listing.authorUsername}**` : null,
-      listing.submitterDiscordId ? `<:squaredot:1507191535693860974> Submitter: <@${listing.submitterDiscordId}>` : null,
+      listing.submitterDiscordId ? `- Submitter: <@${listing.submitterDiscordId}>` : null,
     ].filter(Boolean).join('\n')
   );
   const bodyText = `${headerLines}\n\n${bodyLines.join('\n\n')}`.slice(0, 3800);
