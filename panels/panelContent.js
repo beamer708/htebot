@@ -40,24 +40,17 @@ const PANEL_BANNERS = {
 // ═══════════════════════════════════════════════════════════════════════════
 function dashboard() {
   return {
-    heading: `## ${e('HTELogo', '🏠')} How To ERLC Dashboard`,
+    heading: `## ${e('HTELogo', '👋')} Welcome to How To ERLC`,
     intro:
-      'Welcome to the **control center** of How To ERLC. This is where members ' +
-      'get **support**, submit **partnerships**, and reach the **management team** directly. ' +
-      'Everything below is one click away.',
+      '-# Glad you\'re here. This dashboard is your one stop for getting help, ' +
+      'joining the team, and staying in the loop.',
     body: [
-      `${e('Headset', '🎧')} **Support Tickets**\n` +
-      `- Click **Get Assistance** to open a **private ticket** with the team\n` +
-      `- Tickets are handled by staff and **claimed by one member** so nothing gets lost\n` +
-      `- Use tickets for questions, reports, and **anything that needs privacy**`,
-
-      `${e('Link', '🔗')} **Partner Submissions**\n` +
-      `- Head to <#${PARTNER_CHANNEL_ID}> to **become a partner**\n` +
-      `- Partnered servers get **featured placements** during official campaigns`,
-
-      `${e('shieldcheck', '🛡️')} **Reach Management Privately**\n` +
-      `- Open a ticket and ask for **management** and it will be escalated\n` +
-      `- Applications for the team are open through the **Apply** button below`,
+      { divider: true },
+      `**From here you can:**\n` +
+      `- **Get Assistance**, open a private support ticket\n` +
+      `- **Apply** to join the staff team\n` +
+      `- Pick your **Notification Roles**\n` +
+      `- Become a partner in <#${PARTNER_CHANNEL_ID}>`,
     ],
     selectPlaceholder: 'Server Information',
     selectOptions: [
