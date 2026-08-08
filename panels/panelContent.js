@@ -428,15 +428,15 @@ function trialStaff() {
       { divider: true },
 
       `**1. Know the expectations**\n` +
-      `-# Be active most days, stay professional in every channel, and follow the staff handbook. Your trial starts the day you are accepted and runs for at least [TRIAL_LENGTH].`,
+      `-# Be active most days, stay professional in every channel, and follow the staff handbook. Your trial starts the day you are accepted and runs for **2 to 3 weeks**. The rank that fits you best is determined by your activity and effort in the staff team.`,
 
       `**2. Do the work you're evaluated on**\n` +
       `- **Moderation**: handle violations correctly and log actions through the bot\n` +
-      `- **Tickets**: claim, resolve, and close at least [MIN_TICKETS] tickets\n` +
+      `- **Tickets**: claim, resolve, and close at least **3 tickets**\n` +
       `- **Advertising or invites**: depending on your track, post ads on schedule or bring in invites through the PR program`,
 
       `**3. Hit the minimums**\n` +
-      `-# You need [MIN_ACTIVITY] activity across the trial and no unexplained absences. Going quiet for a week without notice can end the trial early.`,
+      `-# Spend **at least 30 minutes a day in the server**, starting conversations and interacting with the community, with no unexplained absences. Going quiet for a week without notice can end the trial early.`,
 
       `**4. Get evaluated**\n` +
       `-# At the end of your trial, management reviews your activity, moderation quality, and conduct, with input from the senior staff you worked with.`,
@@ -446,7 +446,18 @@ function trialStaff() {
 
       { divider: true },
 
-      `-# Questions about your trial? Open a ticket or message a member of management directly.`,
+      `**Trial Staff Rules**\n` +
+      `- Stay active and meet the daily activity requirement\n` +
+      `- Be respectful and professional with members and staff at all times\n` +
+      `- Follow all staff directions and the staff handbook\n` +
+      `- Do not abuse permissions or moderation powers\n` +
+      `- Ask before acting when unsure\n` +
+      `- Represent How To ERLC well at all times\n` +
+      `- Follow all server rules, plus Discord, Roblox, and PRC ToS`,
+
+      { divider: true },
+
+      `-# Clicking **I Agree** confirms you accept the trial terms and rules above. Questions about your trial? Open a ticket or message a member of management directly.`,
     ],
   };
 }
