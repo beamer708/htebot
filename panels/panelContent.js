@@ -33,7 +33,13 @@ const PANEL_BANNERS = {
   'staff-handbook':      'Dashboard.png',
   'pr-handbook':         'Dashboard.png',
   'pr':                  'Dashboard.png',
+  'community':           'Dashboard.png',
+  'trial-staff':         'Dashboard.png',
+  'staff-promotions':    'Dashboard.png',
 };
+
+// Channel members grab notification roles from (referenced by the community panel)
+const NOTIFY_ROLES_CHANNEL_ID = '1485008262821843225';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DASHBOARD
@@ -170,6 +176,45 @@ function getStarted() {
     websiteButtonLabel: 'Visit the Website',
     websiteUrl: WEBSITE_URL,
     forums: FORUMS,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMMUNITY
+// ═══════════════════════════════════════════════════════════════════════════
+function community() {
+  return {
+    heading: `## 🎉 Community`,
+    intro:
+      '-# This is where everything fun happens: giveaways, events, and everything ' +
+      'we run with and for the community.',
+    body: [
+      { divider: true },
+
+      `**What you'll find here**\n` +
+      `- 🎁 **How To ERLC Giveaways**, hosted by us, free to enter\n` +
+      `- 🤝 **Partnered Giveaways**, collabs with our verified partners\n` +
+      `- 📅 **Server Events**, community nights, launch events, and more`,
+
+      { divider: true },
+
+      `**How to take part**\n` +
+      `-# Most giveaways and events are announced right here with entry instructions attached, usually a button or reaction. No purchases, no catches. Just be a member.`,
+
+      {
+        text:
+          `**Want a heads-up?**\n` +
+          `-# Grab the notification roles in <#${NOTIFY_ROLES_CHANNEL_ID}> so you never miss a drop.`,
+        buttonKey: 'notifyRoles',
+      },
+
+      `**Hosting something with us?**\n` +
+      `-# Partners and creators can run giveaways or events through the server. Open a ticket to pitch it.`,
+
+      { divider: true },
+
+      `**Free stuff, community events, and good vibes. That's the channel.**`,
+    ],
   };
 }
 
@@ -392,7 +437,7 @@ function prPanel() {
 }
 
 module.exports = {
-  PANEL_BANNERS, FORUMS, PARTNER_CHANNEL_ID, channelUrl,
-  dashboard, serverRules, marketingCampaigns, getStarted,
+  PANEL_BANNERS, FORUMS, PARTNER_CHANNEL_ID, NOTIFY_ROLES_CHANNEL_ID, channelUrl,
+  dashboard, serverRules, marketingCampaigns, getStarted, community,
   managementHandbook, staffHandbook, prHandbook, prPanel,
 };

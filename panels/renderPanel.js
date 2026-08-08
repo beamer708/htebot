@@ -210,11 +210,34 @@ function buildHandbook(type, sectionContent, customId) {
   return assemble(content.PANEL_BANNERS[type], [`${c.heading}\n${c.intro}`], { select });
 }
 
+function buildCommunity() {
+  const c = content.community();
+
+  // The "Want a heads-up?" section carries the Notification Roles button
+  // inline (V2 Section) instead of a bottom button row.
+  const body = c.body.map(block =>
+    block?.buttonKey === 'notifyRoles'
+      ? {
+          text: block.text,
+          button: new ButtonBuilder()
+            .setCustomId('panelsel:roles')
+            .setLabel('Notification Roles')
+            .setStyle(ButtonStyle.Secondary),
+        }
+      : block
+  );
+
+  return assemble(content.PANEL_BANNERS['community'],
+    [`${c.heading}\n${c.intro}`, ...body],
+    {});
+}
+
 const BUILDERS = {
   'dashboard':           buildDashboard,
   'server-rules':        buildServerRules,
   'marketing-campaigns': buildMarketingCampaigns,
   'get-started':         buildGetStarted,
+  'community':           buildCommunity,
   'management-handbook': () => buildHandbook('management-handbook', content.managementHandbook(), 'panelsel:mgmt'),
   'staff-handbook':      () => buildHandbook('staff-handbook', content.staffHandbook(), 'panelsel:staffhb'),
   'pr-handbook':         () => buildHandbook('pr-handbook', content.prHandbook(), 'panelsel:prhb'),

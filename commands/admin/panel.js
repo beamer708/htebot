@@ -15,6 +15,7 @@ module.exports = {
         { name: 'Server Rules',        value: 'server-rules' },
         { name: 'Marketing Campaigns', value: 'marketing-campaigns' },
         { name: 'Get Started',         value: 'get-started' },
+        { name: 'Community',           value: 'community' },
         { name: 'Management Handbook', value: 'management-handbook' },
         { name: 'Staff Handbook',      value: 'staff-handbook' },
         { name: 'PR Handbook',         value: 'pr-handbook' },
