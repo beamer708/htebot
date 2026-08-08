@@ -9,6 +9,64 @@ const config = require('../config.json');
 const APP_COLOR = 0x52D973;
 const RATE_LIMIT_DAYS = 7;
 
+// Roles automatically granted to an applicant when their application is approved
+const STAFF_APPROVED_ROLES = config.staffApprovedRoles || [];
+
+/**
+ * Grant every configured staff role to the approved applicant.
+ * Returns { granted: [roleId], failed: [{ id, reason }] } and never throws.
+ */
+async function grantApprovalRoles(guild, app) {
+  const granted = [];
+  const failed  = [];
+
+  const member = await guild.members.fetch(app.user_id).catch(() => null);
+  if (!member) {
+    return {
+      granted,
+      failed: STAFF_APPROVED_ROLES.map(id => ({ id, reason: 'applicant is no longer in the server' })),
+    };
+  }
+
+  for (const roleId of STAFF_APPROVED_ROLES) {
+    try {
+      await member.roles.add(roleId, `Staff application ${app.id} approved`);
+      granted.push(roleId);
+    } catch (err) {
+      // Missing permissions / role hierarchy / unknown role — report, don't crash
+      failed.push({ id: roleId, reason: err.message });
+    }
+  }
+  return { granted, failed };
+}
+
+/**
+ * Post the approval outcome (roles granted or errors) inside the
+ * application's forum thread.
+ */
+async function logApprovalToThread(client, app, reviewerId, roles, extra = {}) {
+  if (!app.thread_id) return;
+  const thread = await client.channels.fetch(app.thread_id).catch(() => null);
+  if (!thread) return;
+
+  const lines = [
+    '### Application Approved',
+    `-# <@${app.user_id}> was approved by <@${reviewerId}> on <t:${Math.floor(Date.now() / 1000)}:F>.`,
+  ];
+  if (extra.startingRank) lines.push(`**Starting rank:** ${extra.startingRank}`);
+  if (roles.granted.length) {
+    lines.push(`**Roles granted:**\n${roles.granted.map(id => `- <@&${id}>`).join('\n')}`);
+  }
+  if (roles.failed.length) {
+    lines.push(`**Could not grant:**\n${roles.failed.map(f => `- <@&${f.id}>: ${f.reason}`).join('\n')}`);
+    lines.push('-# Check the bot\'s Manage Roles permission and that its highest role sits above these roles, then assign them manually.');
+  }
+
+  await thread.send({ content: lines.join('\n'), allowedMentions: { parse: [] } }).catch(err => {
+    console.error(`[AppHandler] Could not log approval in thread ${app.thread_id}:`, err.message);
+  });
+}
+
 // ── Staff Apply button → open modal ──────────────────────────────────────────
 
 async function handleStaffApplyButton(interaction) {
@@ -239,6 +297,10 @@ async function approveApplication(interaction, client, rawId, reason) {
   const now = Math.floor(Date.now() / 1000);
   db.prepare('UPDATE applications SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
     .run('approved', interaction.user.id, now, app.id);
+
+  // Grant staff roles and log the outcome in the application thread
+  const roles = await grantApprovalRoles(interaction.guild, app);
+  await logApprovalToThread(client, app, interaction.user.id, roles);
 
   // Edit forum thread embed
   if (app.thread_id) {
@@ -490,6 +552,9 @@ async function handleAppApproveModal(interaction, client) {
   db.prepare('UPDATE applications SET status = ?, reviewed_by = ?, reviewed_at = ? WHERE id = ?')
     .run('approved', interaction.user.id, now, app.id);
 
+  // Grant staff roles and log the outcome in the application thread
+  const roles = await grantApprovalRoles(interaction.guild, app);
+
   // Update forum thread starter embed
   if (app.thread_id) {
     try {
@@ -509,16 +574,14 @@ async function handleAppApproveModal(interaction, client) {
             embeds: [EmbedBuilder.from(starter.embeds[0]).setColor(APP_COLOR).setFields(fields)],
             components: [],
           }).catch(() => {});
-
-          await thread.send(
-            `<:circlecheck:1507191508066107532> **Decision logged** — Approved by <@${interaction.user.id}>. Starting rank: **${startingRank}**.`
-          ).catch(() => {});
         }
       }
     } catch (err) {
       console.error('[AppHandler] Forum edit error on approve modal:', err);
     }
   }
+
+  await logApprovalToThread(client, app, interaction.user.id, roles, { startingRank });
 
   // DM applicant
   try {

@@ -49,6 +49,7 @@
     "flagAlert": "#4ade80"
   },
   "website": "https://howtoerlc.xyz",
+  "staffApprovedRoles": ["1507209285954961428", "1495136039717703921"],
   "prPayout": {
     "requiredRetained": 5,
     "retentionDays": 14,
