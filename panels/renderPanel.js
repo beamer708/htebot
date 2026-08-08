@@ -159,13 +159,23 @@ function buildServerRules() {
 function buildMarketingCampaigns() {
   const c = content.marketingCampaigns();
 
-  const buttons = [
-    new ButtonBuilder().setLabel(c.partnerButtonLabel).setStyle(ButtonStyle.Link).setURL(c.partnerButtonUrl),
-  ];
+  // The purchase CTA sits inline beside "How to start" (V2 Section) instead
+  // of a bottom button row.
+  const body = c.body.map(block =>
+    block?.buttonKey === 'purchase'
+      ? {
+          text: block.text,
+          button: new ButtonBuilder()
+            .setLabel(c.partnerButtonLabel)
+            .setStyle(ButtonStyle.Link)
+            .setURL(c.partnerButtonUrl),
+        }
+      : block
+  );
 
   return assemble(content.PANEL_BANNERS['marketing-campaigns'],
-    [`${c.heading}\n${c.intro}`, ...c.body],
-    { buttons });
+    [`${c.heading}\n${c.intro}`, ...body],
+    {});
 }
 
 function buildGetStarted() {

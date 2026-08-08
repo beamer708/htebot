@@ -137,10 +137,14 @@ function marketingCampaigns() {
       `- Every server that enters is **featured on the directory page**\n` +
       `- Your promotion runs across **How To ERLC's channels and website**, not buried in the free ad feeds`,
 
-      `${e('Confetti', '🎉')} **How to start**\n` +
-      `- Use the button below to **purchase a paid ad** and set up your campaign`,
+      {
+        text:
+          `${e('Confetti', '🎉')} **How to start**\n` +
+          `-# Purchase a paid ad and set up your campaign in a couple of clicks.`,
+        buttonKey: 'purchase',
+      },
     ],
-    partnerButtonLabel: 'Purchase a Paid AD',
+    partnerButtonLabel: 'Get Started With Paid Ads',
     partnerButtonUrl: `${WEBSITE_URL}/directory`,
   };
 }
