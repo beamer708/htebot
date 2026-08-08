@@ -67,18 +67,47 @@ function dashboard() {
 function serverRules() {
   return {
     heading: `## ${e('shieldcheck', '🛡️')} Server Rules`,
-    intro: 'Rules keep this community **worth being in**. Read them once, follow them always.',
+    intro: '-# These rules apply in every channel, thread, ticket, and DM sent through this server. Read them once, follow them always.',
     body: [
-      `**\`1.\`** **Respect all members.** No harassment, hate speech, or targeted disrespect.\n` +
-      `**\`2.\`** **No NSFW or inappropriate content** in any channel, name, or profile.\n` +
-      `**\`3.\`** **No advertising** outside the designated advertising channels.\n` +
-      `**\`4.\`** **No scamming or unauthorized selling** of any kind.\n` +
-      `**\`5.\`** **English only** in public channels so everyone can take part.\n` +
-      `**\`6.\`** **No alt accounts** or evading punishments.\n` +
-      `**\`7.\`** **Follow Discord and Roblox ToS** at all times.\n` +
-      `**\`8.\`** **Staff decisions are final.** Take disputes to a ticket, not a public channel.`,
+      { divider: true },
 
-      `${e('alerttriangle', '⚠️')} Violations lead to **warnings, mutes, or bans** depending on severity.`,
+      `**1. General Conduct**\n` +
+      `-# Treat everyone with respect. No harassment, bullying, hate speech, or discrimination of any kind. Do not start or fuel drama, arguments belong in DMs or a ticket, not public channels.`,
+
+      `**2. Advertising**\n` +
+      `-# Advertising is allowed only in the designated advertising channels.\n` +
+      `- No advertising in DMs, ever\n` +
+      `- No promoting other communities outside the designated channels\n` +
+      `- Repeat offenders lose advertising access and may be removed from the server`,
+
+      `**3. Content Standards**\n` +
+      `-# Keep everything appropriate for the whole community.\n` +
+      `- No NSFW or shock content in any channel, name, or profile\n` +
+      `- No spam, flooding, or mass pinging\n` +
+      `- No self-bots or automation on member accounts\n` +
+      `- Usernames and avatars must be appropriate`,
+
+      `**4. Marketplace and Listings**\n` +
+      `-# The marketplace runs on trust.\n` +
+      `- No scams or bait listings, deliver exactly what you sell\n` +
+      `- No stolen assets and no reselling of stolen work\n` +
+      `- Be honest in every listing: real previews, real prices, real ownership`,
+
+      `**5. Respect Staff**\n` +
+      `-# Follow staff direction the first time. If you disagree with a decision, take it to a ticket, staff decisions stand until reviewed by management.`,
+
+      `**6. No Exploiting, Leaking, or Doxxing**\n` +
+      `-# No exploiting bugs or systems, no leaking private content or personal information, no doxxing, and no malicious or disguised links. These are instant-ban offenses.`,
+
+      { divider: true },
+
+      `**Platform Rules Are Mandatory**\n` +
+      `-# Everyone here must follow the **PRC (Police Roleplay Community / ER:LC) rules**, **Discord's Terms of Service and Community Guidelines**, and **Roblox's Terms of Service**. This is non-negotiable: a violation of PRC, Discord, or Roblox rules is a violation of ours and is punished here too.`,
+
+      { divider: true },
+
+      `**Consequences**\n` +
+      `-# Violations earn warnings, mutes, or bans depending on severity and history. **A ban from this server is an ecosystem ban**: you lose the website, your listings, and every How To ERLC feature with it.`,
     ],
     ticketButtonLabel: 'Open a Ticket',
   };
