@@ -95,20 +95,24 @@ module.exports = {
       ? `${accountAgeDays} days old — NEW ACCOUNT`
       : `${accountAgeDays} days old`;
 
-    const userFlags = await member.user.fetchFlags();
+    // User#fetch() populates public flags; fetchFlags() is deprecated in v14
+    const fetchedUser = await member.user.fetch().catch(() => null);
+    const userFlags = fetchedUser?.flags ?? member.user.flags ?? null;
     const flagLabels = [];
-    if (userFlags.has(UserFlags.Staff))                 flagLabels.push('Discord Employee');
-    if (userFlags.has(UserFlags.Partner))               flagLabels.push('Discord Partner');
-    if (userFlags.has(UserFlags.Hypesquad))             flagLabels.push('HypeSquad Events');
-    if (userFlags.has(UserFlags.BugHunterLevel1))       flagLabels.push('Bug Hunter Level 1');
-    if (userFlags.has(UserFlags.HypeSquadOnlineHouse1)) flagLabels.push('HypeSquad Bravery');
-    if (userFlags.has(UserFlags.HypeSquadOnlineHouse2)) flagLabels.push('HypeSquad Brilliance');
-    if (userFlags.has(UserFlags.HypeSquadOnlineHouse3)) flagLabels.push('HypeSquad Balance');
-    if (userFlags.has(UserFlags.PremiumEarlySupporter)) flagLabels.push('Early Supporter');
-    if (userFlags.has(UserFlags.BugHunterLevel2))       flagLabels.push('Bug Hunter Level 2');
-    if (userFlags.has(UserFlags.VerifiedDeveloper))     flagLabels.push('Verified Bot Developer');
-    if (userFlags.has(UserFlags.BotHTTPInteractions))   flagLabels.push('Bot HTTP Interactions');
-    if (userFlags.has(UserFlags.ActiveDeveloper))       flagLabels.push('Active Developer');
+    if (userFlags) {
+      if (userFlags.has(UserFlags.Staff))                 flagLabels.push('Discord Employee');
+      if (userFlags.has(UserFlags.Partner))               flagLabels.push('Discord Partner');
+      if (userFlags.has(UserFlags.Hypesquad))             flagLabels.push('HypeSquad Events');
+      if (userFlags.has(UserFlags.BugHunterLevel1))       flagLabels.push('Bug Hunter Level 1');
+      if (userFlags.has(UserFlags.HypeSquadOnlineHouse1)) flagLabels.push('HypeSquad Bravery');
+      if (userFlags.has(UserFlags.HypeSquadOnlineHouse2)) flagLabels.push('HypeSquad Brilliance');
+      if (userFlags.has(UserFlags.HypeSquadOnlineHouse3)) flagLabels.push('HypeSquad Balance');
+      if (userFlags.has(UserFlags.PremiumEarlySupporter)) flagLabels.push('Early Supporter');
+      if (userFlags.has(UserFlags.BugHunterLevel2))       flagLabels.push('Bug Hunter Level 2');
+      if (userFlags.has(UserFlags.VerifiedDeveloper))     flagLabels.push('Verified Bot Developer');
+      if (userFlags.has(UserFlags.BotHTTPInteractions))   flagLabels.push('Bot HTTP Interactions');
+      if (userFlags.has(UserFlags.ActiveDeveloper))       flagLabels.push('Active Developer');
+    }
 
     const flagsText = flagLabels.length > 0 ? flagLabels.join('\n') : 'None';
 
