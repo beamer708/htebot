@@ -12,6 +12,15 @@ const PR_DAYS = config.prPayout?.retentionDays ?? 14;
 module.exports = {
   name: 'guildMemberAdd',
   async execute(member, client) {
+    // ── Auto member role ─────────────────────────────────────────
+    if (/^\d{17,20}$/.test(config.memberRoleId || '')) {
+      try {
+        await member.roles.add(config.memberRoleId, 'Auto member role on join');
+      } catch (err) {
+        console.warn(`[MemberRole] Could not add member role to ${member.user.tag}: ${err.message}`);
+      }
+    }
+
     // ── Welcome message ──────────────────────────────────────────
     const welcomeChannel = member.guild.channels.cache.get(config.channels.welcome);
     if (welcomeChannel) {
