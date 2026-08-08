@@ -67,7 +67,7 @@ const STICKY_CHANNELS = [
   {
     key: 'spotlight',
     label: 'Spotlight',
-    channelId: '1522605219815489657',
+    channelId: '1522606563859103887',
     content:
       '# ⚡ Spotlight\n' +
       'The **Spotlight** is the advertising channel reserved for **premium members**.\n' +
@@ -78,7 +78,7 @@ const STICKY_CHANNELS = [
       '## Who can post here?\n' +
       "Premium members only. If that's you, post away, just keep it within the server's advertising rules (see <#1526351802562383882>).\n" +
       '## Want in?\n' +
-      'Ask about premium in a ticket or check <#1522605219815489657> for how campaigns work.',
+      'Ask about premium in a ticket or check <#1522606563859103887> for how campaigns work.',
   },
 ];
 
