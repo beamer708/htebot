@@ -24,7 +24,9 @@ async function safeReply(interaction, payload) {
 
 /** Ephemeral V2 card used for handbook sections. */
 function sectionCard(title, body) {
-  const text = `${title}\n\n${body}`.slice(0, 3800);
+  // Heading sits directly above its content, no blank line (the heading
+  // markdown already renders its own spacing)
+  const text = `${title}\n${body}`.slice(0, 3800);
   return {
     components: [
       new ContainerBuilder()
