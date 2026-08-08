@@ -38,7 +38,7 @@ module.exports = {
       return;
     }
 
-    if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu()) {
+    if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isChannelSelectMenu()) {
       await componentHandler(interaction, client);
     }
   },

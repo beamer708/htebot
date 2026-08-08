@@ -30,6 +30,12 @@ db.exec(`
     posted_at  INTEGER NOT NULL,
     PRIMARY KEY (panel_type, channel_id)
   );
+  CREATE TABLE IF NOT EXISTS panel_config (
+    panel_type TEXT PRIMARY KEY,
+    channel_id TEXT,
+    message_id TEXT,
+    updated_at INTEGER NOT NULL
+  );
 `);
 
 const ACCENT = resolveColor(config.colors.primary || '#4ade80');
@@ -47,12 +53,20 @@ function selectOption(opt) {
   return built;
 }
 
-/** Resolve where the dashboard panel lives, for deep links from other panels. */
+/**
+ * Resolve where the dashboard panel lives, for deep links from other panels.
+ * The /panel dashboard's panel_config mapping is authoritative (set even
+ * before first deploy), then legacy posted_panels, then config.
+ */
 function resolveDashboardChannelId() {
-  const row = db.prepare(
+  const configured = db.prepare(
+    "SELECT channel_id FROM panel_config WHERE panel_type = 'dashboard'"
+  ).get();
+  if (configured?.channel_id) return configured.channel_id;
+  const legacy = db.prepare(
     "SELECT channel_id FROM posted_panels WHERE panel_type = 'dashboard' ORDER BY posted_at DESC LIMIT 1"
   ).get();
-  if (row) return row.channel_id;
+  if (legacy) return legacy.channel_id;
   if (config.channels.dashboard) return config.channels.dashboard;
   return null;
 }
@@ -267,55 +281,6 @@ const BUILDERS = {
   'pr':                  () => require('./prPanel').buildPrPanel(),
 };
 
-/**
- * Post a panel to `channel`, or edit the previously posted one in place.
- * Returns { updated, messageId }.
- */
-async function postOrUpdatePanel(channel, type) {
-  const builder = BUILDERS[type];
-  if (!builder) throw new Error(`Unknown panel type "${type}"`);
-
-  const { components, files } = builder();
-  const payload = { components, files, flags: MessageFlags.IsComponentsV2 };
-
-  const existing = db.prepare(
-    'SELECT message_id FROM posted_panels WHERE panel_type = ? AND channel_id = ?'
-  ).get(type, channel.id);
-
-  if (existing) {
-    const message = await channel.messages.fetch(existing.message_id).catch(() => null);
-    if (message) {
-      // attachments: [] drops the previous upload so edits replace the banner
-      // instead of accumulating orphaned files on the message
-      await message.edit({ ...payload, attachments: [] });
-      return { updated: true, messageId: message.id };
-    }
-    // Tracked message was deleted; fall through to a fresh post
-  }
-
-  const message = await channel.send(payload);
-  db.prepare(`
-    INSERT INTO posted_panels (panel_type, channel_id, message_id, posted_at)
-    VALUES (?, ?, ?, ?)
-    ON CONFLICT(panel_type, channel_id) DO UPDATE SET message_id = excluded.message_id, posted_at = excluded.posted_at
-  `).run(type, channel.id, message.id, Math.floor(Date.now() / 1000));
-
-  // The server-rules ticket link resolves the dashboard's location. When the
-  // dashboard (re)posts, refresh any tracked rules panels so a missing link
-  // appears without a manual re-run.
-  if (type === 'dashboard') {
-    const rulesRows = db.prepare("SELECT channel_id FROM posted_panels WHERE panel_type = 'server-rules'").all();
-    for (const row of rulesRows) {
-      try {
-        const rulesChannel = await channel.client.channels.fetch(row.channel_id).catch(() => null);
-        if (rulesChannel) await postOrUpdatePanel(rulesChannel, 'server-rules');
-      } catch (err) {
-        console.warn(`[Panels] Could not refresh server-rules panel in ${row.channel_id}: ${err.message}`);
-      }
-    }
-  }
-
-  return { updated: false, messageId: message.id };
-}
-
-module.exports = { postOrUpdatePanel, BUILDERS, resolveDashboardChannelId, assemble, selectOption };
+// Panel lifecycle (deploy / update / channel mapping) lives in
+// panels/panelManager.js, driven by the /panel dashboard.
+module.exports = { BUILDERS, resolveDashboardChannelId, assemble, selectOption };

@@ -22,6 +22,7 @@ const { handleSearchNav } = require('./searchHandler');
 const { handlePanelInteraction } = require('./panelHandler');
 const { handleStickyInteraction } = require('./stickyHandler');
 const { handleTrialButton } = require('./trialHandler');
+const { handleDashboardInteraction } = require('./panelDashboard');
 
 const dataPath = (file) => path.join(__dirname, '..', 'data', file);
 
@@ -1051,6 +1052,7 @@ module.exports = async (interaction, client) => {
 
       const prefix = interaction.customId.split(':')[0];
       if (prefix === 'panelsel')     return await handlePanelInteraction(interaction);
+      if (prefix === 'cfgpanel')     return await handleDashboardInteraction(interaction, client);
       if (prefix === 'sticky')       return await handleStickyInteraction(interaction, client);
       if (prefix === 'trial')        return await handleTrialButton(interaction);
       if (prefix === 'pr')           return await handlePrInteraction(interaction, client);
@@ -1068,9 +1070,14 @@ module.exports = async (interaction, client) => {
       if (prefix === 'invitereset')  return await handleInviteResetButton(interaction);
     }
 
+    if (interaction.isChannelSelectMenu()) {
+      if (interaction.customId.split(':')[0] === 'cfgpanel') return await handleDashboardInteraction(interaction, client);
+    }
+
     if (interaction.isStringSelectMenu()) {
       const prefix = interaction.customId.split(':')[0];
       if (prefix === 'panelsel')                              return await handlePanelInteraction(interaction);
+      if (prefix === 'cfgpanel')                              return await handleDashboardInteraction(interaction, client);
       if (prefix === 'pr')                                    return await handlePrInteraction(interaction, client);
       if (interaction.customId === 'dashboard:info')          return await handleDashboardSelect(interaction);
       if (interaction.customId === 'rolepanel:notifications') return await handleRoleSelect(interaction);
