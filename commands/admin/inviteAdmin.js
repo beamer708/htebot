@@ -106,7 +106,7 @@ module.exports = {
           .setThumbnail(target.displayAvatarURL())
           .addFields(
             { name: '<:Select:1507191532875153519> Total Invites',  value: `${s.total}`,    inline: true },
-            { name: '<:circlecheck:1507191508066107532> Retained (30d)', value: `${s.retained}`, inline: true },
+            { name: `<:circlecheck:1507191508066107532> Retained (${config.prPayout?.retentionDays ?? 14}d)`, value: `${s.retained}`, inline: true },
             { name: '<:clockhour4:1507191510792142868> Pending',         value: `${s.pending}`,  inline: true },
             { name: '<:circlex:1507191508657508503> Lost',               value: `${s.lost}`,     inline: true },
           )

@@ -7,6 +7,8 @@ const invitesPath = path.join(__dirname, '..', 'data', 'invites.json');
 function readInvites() { try { return JSON.parse(fs.readFileSync(invitesPath, 'utf8')); } catch { return {}; } }
 function writeInvites(data) { fs.writeFileSync(invitesPath, JSON.stringify(data, null, 2)); }
 
+const PR_DAYS = config.prPayout?.retentionDays ?? 14;
+
 module.exports = {
   name: 'guildMemberAdd',
   async execute(member, client) {
@@ -121,7 +123,7 @@ module.exports = {
     }
 
     if (inviter) {
-      const retentionTs = Math.floor((Date.now() + 30 * 24 * 60 * 60 * 1000) / 1000);
+      const retentionTs = Math.floor((Date.now() + PR_DAYS * 24 * 60 * 60 * 1000) / 1000);
       logFields.push(
         { name: 'Invited By', value: `<@${inviter.id}> (\`${inviteCode}\`)`, inline: true },
         { name: 'Retention Check', value: `Scheduled for <t:${retentionTs}:F>`, inline: true },
@@ -150,7 +152,7 @@ module.exports = {
             { name: 'Invited By',    value: `<@${inviter.id}> (${inviter.tag})`,                            inline: true },
             { name: 'Invite Code',   value: `\`${inviteCode}\``,                                            inline: true },
             { name: 'Joined At',     value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:F>`,           inline: true },
-            { name: 'Retention Due', value: `<t:${Math.floor((Date.now() + 30 * 24 * 60 * 60 * 1000) / 1000)}:R>`, inline: true },
+            { name: 'Retention Due', value: `<t:${Math.floor((Date.now() + PR_DAYS * 24 * 60 * 60 * 1000) / 1000)}:R>`, inline: true },
           )
           .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
           .setTimestamp();

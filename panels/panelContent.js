@@ -20,6 +20,11 @@ const { e } = require('../utils/appEmojis');
 const WEBSITE_URL = config.website || 'https://howtoerlc.xyz';
 const PARTNER_CHANNEL_ID = '1533185338481184768';
 
+// PR payout thresholds — single source of truth in config.prPayout
+const PR_REQUIRED = config.prPayout?.requiredRetained ?? 5;
+const PR_DAYS     = config.prPayout?.retentionDays ?? 14;
+const PR_ROBUX    = config.prPayout?.rewardRobux ?? 50;
+
 // Channel link helper (guild-scoped deep link)
 const channelUrl = (channelId) => `https://discord.com/channels/${config.guildId}/${channelId}`;
 
@@ -369,8 +374,8 @@ function prHandbook() {
         content:
           `- **PR grows the server.** Members with the <@&${config.roles.prTeam}> role find communities, open conversations, and bring them in.\n` +
           `- **Invites are tracked.** Register your permanent invite on the PR panel and the bot credits every join to you.\n` +
-          `- **Retention is the metric.** An invite counts when the member stays 30 days, not when they click.\n` +
-          `- **Payouts reward results.** Every 10 retained invites earns 50 Robux, reviewed by the <@&${config.roles.prManager}> team.\n` +
+          `- **Retention is the metric.** An invite counts when the member stays ${PR_DAYS} days, not when they click.\n` +
+          `- **Payouts reward results.** Every ${PR_REQUIRED} retained invites earns ${PR_ROBUX} Robux, reviewed by the <@&${config.roles.prManager}> team.\n` +
           `- **PR feeds campaigns.** The partners you sign become the featured servers in official events.`,
       },
       partnership_standards: {
@@ -490,14 +495,15 @@ function prPanel() {
   return {
     heading: `## ${e('HTELogo', '🤝')} PR Team, Invite Program`,
     intro:
-      'Earn **50 Robux** for every **10 members** you invite who stay **30+ days**. ' +
+      `-# Earn **${PR_ROBUX} Robux** for every **${PR_REQUIRED} members** you invite who stay **${PR_DAYS}+ days**. ` +
       'Grab outreach templates, browse the handbook, and manage your invites right here.',
     body: [
-      `${e('Target', '🎯')} **How it works**\n` +
+      { divider: true },
+      `**How it works**\n` +
       `- Register a **permanent invite link** with **Register Invite**\n` +
       `- Share it across **ERLC communities** using the outreach templates\n` +
-      `- When **10 invited members** stay **30+ days**, click **Request Payout**\n` +
-      `- A **PR Manager** reviews and processes your **50 Robux** reward`,
+      `- When **${PR_REQUIRED} invited members** stay **${PR_DAYS}+ days**, click **Request Payout**\n` +
+      `- A **PR Manager** reviews and processes your **${PR_ROBUX} Robux** reward`,
     ],
     selectPlaceholder: 'Outreach assets and handbook',
     // Merged menu: asset values dispatch to the assets handler, the rest to the

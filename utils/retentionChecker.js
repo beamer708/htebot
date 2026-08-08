@@ -7,6 +7,11 @@ const invitesPath = path.join(__dirname, '..', 'data', 'invites.json');
 function readInvites()      { try { return JSON.parse(fs.readFileSync(invitesPath, 'utf8')); } catch { return {}; } }
 function writeInvites(data) { fs.writeFileSync(invitesPath, JSON.stringify(data, null, 2)); }
 
+// PR payout thresholds — single source of truth in config.prPayout
+const PR_REQUIRED = config.prPayout?.requiredRetained ?? 5;
+const PR_DAYS     = config.prPayout?.retentionDays ?? 14;
+const PR_ROBUX    = config.prPayout?.rewardRobux ?? 50;
+
 async function runRetentionCheck(client) {
   const invites = readInvites();
   let changed   = false;
@@ -20,7 +25,7 @@ async function runRetentionCheck(client) {
     if (entry.retained || entry.leftAt) continue;
 
     const joinedMs = new Date(entry.joinedAt).getTime();
-    if (Date.now() - joinedMs < 30 * 24 * 60 * 60 * 1000) continue;
+    if (Date.now() - joinedMs < PR_DAYS * 24 * 60 * 60 * 1000) continue;
 
     invites[userId].retained           = true;
     invites[userId].retentionCheckedAt = new Date().toISOString();
@@ -29,35 +34,35 @@ async function runRetentionCheck(client) {
     // ── Log retention event to pr-logs ──────────────────────────────
     const retainedEmbed = new EmbedBuilder()
       .setColor(config.colors.success)
-      .setTitle('<:Calendar:1507191492500918422> Invite Retained — 30 Days')
+      .setTitle(`Invite Retained, ${PR_DAYS} Days`)
       .addFields(
         { name: 'User',       value: `<@${entry.invitedUserId}> (${entry.invitedUserId})`, inline: true },
         { name: 'Invited By', value: `<@${entry.inviterId}>`,                              inline: true },
         { name: 'Joined',     value: `<t:${Math.floor(joinedMs / 1000)}:R>`,               inline: true },
-        { name: 'Status',     value: '✅ Still in server after 30 days',                   inline: false },
+        { name: 'Status',     value: `Still in server after ${PR_DAYS} days`,              inline: false },
       )
       .setTimestamp();
 
     if (prLogCh)    await prLogCh.send({ embeds: [retainedEmbed] }).catch(() => {});
     else if (fallbackCh) await fallbackCh.send({ embeds: [retainedEmbed] }).catch(() => {});
 
-    // ── Check payout milestone (every 10 retained by same inviter) ───
+    // ── Check payout milestone (every PR_REQUIRED retained by same inviter) ───
     const retainedCount = Object.values(invites).filter(
       e => e.inviterId === entry.inviterId && e.retained
     ).length;
 
-    if (retainedCount > 0 && retainedCount % 10 === 0) {
+    if (retainedCount > 0 && retainedCount % PR_REQUIRED === 0) {
       const milestoneEmbed = new EmbedBuilder()
         .setColor(config.colors.warning)
-        .setTitle('<:crown:1507191516274360492> Payout Milestone Reached!')
+        .setTitle('Payout Milestone Reached')
         .setDescription(
-          `<@${entry.inviterId}> has **${retainedCount} retained invites** and is eligible for a **50 Robux payout**!\n\n` +
-          `They can click **Request Payout** on the PR Team panel to claim their reward.`
+          `<@${entry.inviterId}> has **${retainedCount} retained invites** and is eligible for a **${PR_ROBUX} Robux payout**.\n` +
+          `-# They can click **Request Payout** on the PR Team panel to claim their reward.`
         )
         .addFields(
           { name: 'PR Member',      value: `<@${entry.inviterId}>`, inline: true },
           { name: 'Retained Total', value: `${retainedCount}`,      inline: true },
-          { name: 'Payout Amount',  value: '50 Robux',              inline: true },
+          { name: 'Payout Amount',  value: `${PR_ROBUX} Robux`,     inline: true },
         )
         .setFooter({ text: 'HowToERLC PR Team • Milestone auto-detected' })
         .setTimestamp();

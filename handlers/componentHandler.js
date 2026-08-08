@@ -40,6 +40,11 @@ function writePrPayouts(d)    { fs.writeFileSync(prPayoutsPath, JSON.stringify(d
 
 function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
+// PR payout thresholds — single source of truth in config.prPayout
+const PR_REQUIRED  = config.prPayout?.requiredRetained ?? 5;
+const PR_DAYS      = config.prPayout?.retentionDays ?? 14;
+const PR_ROBUX     = config.prPayout?.rewardRobux ?? 50;
+
 async function dmUser(client, userId, embed) {
   try {
     const user = await client.users.fetch(userId);
@@ -669,16 +674,16 @@ async function handlePrHandbook(interaction) {
       .setTitle('Payout System')
       .setDescription(
         '**Earning a payout**\n' +
-        '- Earn **50 Robux** for every **10 retained invites**\n' +
-        '- A retained invite is someone you invited who stayed **30+ days**\n\n' +
+        `- Earn **${PR_ROBUX} Robux** for every **${PR_REQUIRED} retained invites**\n` +
+        `- A retained invite is someone you invited who stayed **${PR_DAYS}+ days**\n\n` +
         '**How to claim**\n' +
-        '1. Reach **10 retained invites**, check with **My Stats**\n' +
+        `1. Reach **${PR_REQUIRED} retained invites**, check with **My Stats**\n` +
         '2. Click **Request Payout** on the PR Panel\n' +
         '3. A **PR Manager** reviews your request in `#pr-logs`\n' +
-        '4. Once approved, you will be contacted for your **50 Robux**\n\n' +
+        `4. Once approved, you will be contacted for your **${PR_ROBUX} Robux**\n\n` +
         '**Rules**\n' +
-        '- Members must stay **30 full days** to count as retained\n' +
-        '- After payout approval, your counter resets for the next 10\n' +
+        `- Members must stay **${PR_DAYS} full days** to count as retained\n` +
+        `- After payout approval, your counter resets for the next ${PR_REQUIRED}\n` +
         '- Do not submit duplicate payout requests'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
@@ -689,14 +694,14 @@ async function handlePrHandbook(interaction) {
       .setDescription(
         '**How tracking works**\n' +
         '- When someone joins via your registered invite, the bot records the event\n' +
-        '- Each invited member starts a **30-day retention timer**\n' +
-        '- Still in the server after 30 days: **Retained**\n' +
-        '- Left before 30 days: **Lost**\n\n' +
+        `- Each invited member starts a **${PR_DAYS}-day retention timer**\n` +
+        `- Still in the server after ${PR_DAYS} days: **Retained**\n` +
+        `- Left before ${PR_DAYS} days: **Lost**\n\n` +
         '**Your stats**\n' +
         '- **Total**: all who ever joined via your link\n' +
-        '- **Retained**: stayed 30+ days (count toward payout)\n' +
-        '- **Pending**: still within their 30-day window\n' +
-        '- **Lost**: left before 30 days\n\n' +
+        `- **Retained**: stayed ${PR_DAYS}+ days (count toward payout)\n` +
+        `- **Pending**: still within their ${PR_DAYS}-day window\n` +
+        `- **Lost**: left before ${PR_DAYS} days\n\n` +
         '-# All activity is logged in `#pr-logs` for the PR Manager to monitor.'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
@@ -723,8 +728,8 @@ async function handlePrMyStats(interaction) {
   const pending        = all.filter(e => !e.retained && !e.leftAt);
   const lost           = all.filter(e => e.leftAt && !e.retained);
   const paidOut        = Object.values(payouts).filter(p => p.memberId === userId && p.status === 'approved').length;
-  const eligible       = unpaidRetained.length >= 10;
-  const needed         = Math.max(0, 10 - unpaidRetained.length);
+  const eligible       = unpaidRetained.length >= PR_REQUIRED;
+  const needed         = Math.max(0, PR_REQUIRED - unpaidRetained.length);
   const pendingPayout  = Object.values(payouts).find(p => p.memberId === userId && p.status === 'pending');
 
   const embed = new EmbedBuilder()
@@ -740,7 +745,7 @@ async function handlePrMyStats(interaction) {
         inline: false,
       },
       { name: '<:Select:1507191532875153519> Total Invites',          value: `${all.length}`,       inline: true },
-      { name: '<:circlecheck:1507191508066107532> Retained (30d)',    value: `${retained.length}`,   inline: true },
+      { name: `<:circlecheck:1507191508066107532> Retained (${PR_DAYS}d)`, value: `${retained.length}`, inline: true },
       { name: '<:clockhour4:1507191510792142868> Pending',            value: `${pending.length}`,    inline: true },
       { name: '<:circlex:1507191508657508503> Lost',                  value: `${lost.length}`,       inline: true },
       { name: '<:crown:1507191516274360492> Payouts Earned',          value: `${paidOut}`,           inline: true },
@@ -749,8 +754,8 @@ async function handlePrMyStats(interaction) {
         value: pendingPayout
           ? '<:clockhour4:1507191510792142868> Payout request **pending review** by a PR Manager'
           : eligible
-            ? '<:circlecheck:1507191508066107532> **Eligible!** Click **Request Payout** to claim your 50 Robux'
-            : `<:circlex:1507191508657508503> Need **${needed}** more retained invite${needed !== 1 ? 's' : ''} (${unpaidRetained.length}/10)`,
+            ? `<:circlecheck:1507191508066107532> **Eligible!** Click **Request Payout** to claim your ${PR_ROBUX} Robux`
+            : `<:circlex:1507191508657508503> Need **${needed}** more retained invite${needed !== 1 ? 's' : ''} (${unpaidRetained.length}/${PR_REQUIRED})`,
         inline: false,
       },
     )
@@ -852,14 +857,14 @@ async function handlePrPayout(interaction) {
     ([, e]) => e.inviterId === userId && e.retained && !e.payoutId
   );
 
-  if (unpaidRetained.length < 10) {
-    const needed = 10 - unpaidRetained.length;
+  if (unpaidRetained.length < PR_REQUIRED) {
+    const needed = PR_REQUIRED - unpaidRetained.length;
     return interaction.editReply({
-      content: `<:circlex:1507191508657508503> You need **${needed} more retained invite${needed !== 1 ? 's' : ''}** before requesting a payout.\n\nCurrent: **${unpaidRetained.length}/10** retained invites.`,
+      content: `<:circlex:1507191508657508503> You need **${needed} more retained invite${needed !== 1 ? 's' : ''}** before requesting a payout.\n\nCurrent: **${unpaidRetained.length}/${PR_REQUIRED}** retained invites.`,
     });
   }
 
-  const toClaim  = unpaidRetained.slice(0, 10).map(([k]) => k);
+  const toClaim  = unpaidRetained.slice(0, PR_REQUIRED).map(([k]) => k);
   const payoutId = `payout_${generateId()}`;
 
   for (const uid of toClaim) invites[uid].payoutId = payoutId;
@@ -868,7 +873,7 @@ async function handlePrPayout(interaction) {
   payouts[payoutId] = {
     memberId: userId, memberTag: interaction.user.tag,
     requestedAt: new Date().toISOString(),
-    invitesClaimed: toClaim, retainedCount: 10,
+    invitesClaimed: toClaim, retainedCount: PR_REQUIRED,
     status: 'pending', reviewedBy: null, reviewedAt: null,
   };
   writePrPayouts(payouts);
@@ -883,7 +888,7 @@ async function handlePrPayout(interaction) {
         { name: 'Member',         value: `<@${userId}> (${interaction.user.tag})`,        inline: true },
         { name: 'Retained Count', value: `${toClaim.length} invites`,                     inline: true },
         { name: 'Payout ID',      value: `\`${payoutId}\``,                               inline: true },
-        { name: 'Amount',         value: '**50 Robux**',                                  inline: true },
+        { name: 'Amount',         value: `**${PR_ROBUX} Robux**`,                         inline: true },
         { name: 'Requested At',   value: `<t:${Math.floor(Date.now() / 1000)}:F>`,        inline: false },
       )
       .setFooter({ text: 'Use the buttons below to approve or deny' })
@@ -931,10 +936,10 @@ async function handlePrPayoutApprove(interaction, client) {
   const dmEmbed = new EmbedBuilder()
     .setColor(config.colors.success)
     .setTitle('<:Confetti:1507191514042994748> Payout Approved!')
-    .setDescription('Your payout request for **HowToERLC** has been approved! You will receive your **50 Robux** shortly. Thank you for your contributions to the PR Team!')
+    .setDescription(`Your payout request for **HowToERLC** has been approved! You will receive your **${PR_ROBUX} Robux** shortly. Thank you for your contributions to the PR Team!`)
     .addFields(
       { name: 'Retained Invites', value: `${payout.retainedCount}`, inline: true },
-      { name: 'Amount',           value: '50 Robux',                inline: true },
+      { name: 'Amount',           value: `${PR_ROBUX} Robux`,       inline: true },
       { name: 'Approved By',      value: interaction.user.tag,      inline: true },
     )
     .setFooter({ text: 'HowToERLC PR Team' })

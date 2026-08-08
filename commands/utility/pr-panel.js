@@ -49,11 +49,11 @@ module.exports = {
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
           `## ${e('HTELogo', '🤝')} PR Team, Your Personal Panel\n` +
-          'Track your invites, grab outreach templates, browse the handbook, and manage your payouts. ' +
+          '-# Track your invites, grab outreach templates, browse the handbook, and manage your payouts. ' +
           'This panel is **only visible to you**.\n\n' +
           `- **My Stats** shows your invite count and payout eligibility\n` +
           `- **Register Invite** links your permanent invite code to your account\n` +
-          `- **Request Payout** claims your **50 Robux** at 10 retained invites`
+          `- **Request Payout** claims your **${config.prPayout?.rewardRobux ?? 50} Robux** at ${config.prPayout?.requiredRetained ?? 5} retained invites`
         )
       )
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
