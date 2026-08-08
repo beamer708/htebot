@@ -2,10 +2,16 @@
 // panelContent.js and posts or refreshes it in place. Layout contract
 // (top to bottom inside ONE Container):
 //   banner MediaGallery → Separator → heading+intro TextDisplay → body
-//   TextDisplays → Separator → select row (optional) → ONE button row
+//   blocks → Separator → select row (optional) → ONE button row
 //   (optional) → footer MediaGallery (only if assets/banners/footer.png exists)
+//
+// Body blocks may be:
+//   - a string                → plain TextDisplay
+//   - { divider: true }       → Separator between logical sections
+//   - { text, button }        → Section with the button inline beside the text
+//                               (mid-embed CTA instead of bottom row)
 const {
-  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder,
+  ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, SectionBuilder,
   MediaGalleryBuilder, MediaGalleryItemBuilder,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder,
   MessageFlags, resolveColor,
@@ -69,7 +75,19 @@ function assemble(bannerFile, textBlocks, interactive) {
   }
 
   for (const block of textBlocks) {
-    container.addTextDisplayComponents(new TextDisplayBuilder().setContent(block));
+    if (typeof block === 'string') {
+      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(block));
+    } else if (block?.divider) {
+      container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+    } else if (block?.text && block?.button) {
+      container.addSectionComponents(
+        new SectionBuilder()
+          .addTextDisplayComponents(new TextDisplayBuilder().setContent(block.text))
+          .setButtonAccessory(block.button)
+      );
+    } else if (block?.text) {
+      container.addTextDisplayComponents(new TextDisplayBuilder().setContent(block.text));
+    }
   }
 
   if (interactive.select || interactive.buttons?.length) {

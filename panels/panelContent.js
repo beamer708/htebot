@@ -1,11 +1,18 @@
 // panels/panelContent.js — ALL panel copy lives here so wording can be edited
 // without touching component logic (panels/renderPanel.js, handlers/panelHandler.js).
 //
-// Conventions:
+// Formatting standard (applies to EVERY embed/panel the bot sends):
+//   - Headings ("#", "##") for titles and section titles.
+//   - "-# " subtext for descriptions and secondary/explanatory text.
+//   - Native "- " lists for any enumeration. Never emoji bullets.
+//   - Emojis: at most one tasteful emoji in a main title. No per-line emoji.
+//   - Separators between logical sections ({ divider: true } body blocks).
+//   - Mid-embed CTAs use { text, button } body blocks (V2 Sections) so a
+//     button can sit inline between content instead of at the bottom.
+//   - At most one Primary (blurple) button per message; the rest Secondary
+//     or Link. Link buttons cannot be blurple.
 //   - e('name', 'unicode') resolves a bot application emoji by name at render
 //     time, falling back to the known guild emoji set, then to the unicode.
-//   - Section labels are short bold lines, one emoji at the start where it fits.
-//   - Bold the key phrase inside a bullet, not whole sentences.
 //   - No em dashes anywhere.
 const config = require('../config.json');
 const { e } = require('../utils/appEmojis');
@@ -132,10 +139,10 @@ function getStarted() {
   return {
     heading: `## ${e('Target', '🚀')} Get Started`,
     intro:
-      'Listings are created on **howtoerlc.xyz** and showcased here **automatically**, ' +
+      '-# Listings are created on **howtoerlc.xyz** and showcased here automatically, ' +
       'each with a **View More** button that takes you straight to the full listing.',
     body: [
-      FORUMS.map(f => `> ${e(f.emojiName, f.emojiFallback)} **${f.label}**  ${f.line}`).join('\n'),
+      FORUMS.map(f => `- **${f.label}**  ${f.line}`).join('\n'),
     ],
     selectPlaceholder: 'Jump to a forum',
     websiteButtonLabel: 'Visit the Website',
@@ -151,13 +158,13 @@ function getStarted() {
 function managementHandbook() {
   return {
     heading: `## ${e('crown', '👑')} Management Handbook`,
-    intro: 'The standard for how **management** runs How To ERLC: duties, oversight, and conduct.',
+    intro: '-# The standard for how management runs How To ERLC: duties, oversight, and conduct.',
     selectPlaceholder: 'Browse the handbook',
     sections: {
       responsibilities: {
         label: 'Responsibilities', emojiName: 'Target', emojiFallback: '🎯',
         description: 'What management owns day to day',
-        title: `${e('Target', '🎯')} **Responsibilities**`,
+        title: `### Responsibilities`,
         content:
           `- **Own the direction of the server.** Management sets priorities, approves changes, and keeps every team aligned.\n` +
           `- **Review the queues daily.** Listings awaiting moderation, partnership requests, and escalated tickets should never sit longer than 24 hours.\n` +
@@ -168,7 +175,7 @@ function managementHandbook() {
       staff_oversight: {
         label: 'Staff Oversight', emojiName: 'usercheck', emojiFallback: '👥',
         description: 'Hiring, trials, activity, and corrections',
-        title: `${e('usercheck', '👥')} **Staff Oversight**`,
+        title: `### Staff Oversight`,
         content:
           `- **Run the hiring pipeline.** Review applications promptly and DM every applicant a decision.\n` +
           `- **Supervise trials.** Every new staff member starts on trial. Track their activity and moderation quality before assigning a final rank.\n` +
@@ -179,7 +186,7 @@ function managementHandbook() {
       partnerships_events: {
         label: 'Partnerships and Events', emojiName: 'Confetti', emojiFallback: '🎉',
         description: 'Campaigns, partners, and giveaways',
-        title: `${e('Confetti', '🎉')} **Partnerships and Events**`,
+        title: `### Partnerships and Events`,
         content:
           `- **Approve every partnership personally.** Check the server's size, activity, and content before signing off.\n` +
           `- **Own campaign planning.** Featured days, giveaway prizes, and timelines are locked in before a campaign is announced.\n` +
@@ -190,7 +197,7 @@ function managementHandbook() {
       moderation_escalation: {
         label: 'Moderation Escalation', emojiName: 'shieldcheck', emojiFallback: '🛡️',
         description: 'When issues go above staff',
-        title: `${e('shieldcheck', '🛡️')} **Moderation Escalation**`,
+        title: `### Moderation Escalation`,
         content:
           `- **Take the hard cases.** Bans, appeals, staff reports, and anything involving another staff member escalate to management.\n` +
           `- **Hear both sides.** No permanent action on an escalated case until the member has had a chance to respond.\n` +
@@ -201,7 +208,7 @@ function managementHandbook() {
       conduct: {
         label: 'Conduct', emojiName: 'HTELogo', emojiFallback: '🤝',
         description: 'The bar management holds itself to',
-        title: `${e('HTELogo', '🤝')} **Conduct**`,
+        title: `### Conduct`,
         content:
           `- **Hold the highest bar in the server.** Management follows every rule it enforces, visibly.\n` +
           `- **Stay calm in public.** Frustration goes in the management channel, never in member facing chats.\n` +
@@ -216,13 +223,13 @@ function managementHandbook() {
 function staffHandbook() {
   return {
     heading: `## ${e('shieldcheck', '🛡️')} Staff Handbook`,
-    intro: 'Everything a How To ERLC staff member needs: **expectations, tools, and how to grow** into a higher rank.',
+    intro: '-# Everything a How To ERLC staff member needs: expectations, tools, and how to grow into a higher rank.',
     selectPlaceholder: 'Browse the handbook',
     sections: {
       expectations: {
         label: 'Expectations and Activity', emojiName: 'Target', emojiFallback: '🎯',
         description: 'The baseline every staff member meets',
-        title: `${e('Target', '🎯')} **Expectations and Activity**`,
+        title: `### Expectations and Activity`,
         content:
           `- **Be present.** Check the server most days, respond to pings, and keep an eye on public channels.\n` +
           `- **Consistent activity is required going into 2.0**, especially advertising. Inactive staff will not carry a rank through the relaunch.\n` +
@@ -233,7 +240,7 @@ function staffHandbook() {
       moderation_basics: {
         label: 'Moderation Basics', emojiName: 'shieldcheck', emojiFallback: '🛡️',
         description: 'How to handle violations correctly',
-        title: `${e('shieldcheck', '🛡️')} **Moderation Basics**`,
+        title: `### Moderation Basics`,
         content:
           `- **Warn first for minor issues.** A verbal warning in channel or DM solves most problems.\n` +
           `- **Use the bot for formal action.** \`/warn\`, \`/mute\`, \`/kick\`, and \`/ban\` keep a record. Untracked punishments do not count.\n` +
@@ -244,7 +251,7 @@ function staffHandbook() {
       tickets: {
         label: 'Tickets', emojiName: 'Headset', emojiFallback: '🎧',
         description: 'Claiming, handling, and closing support tickets',
-        title: `${e('Headset', '🎧')} **Tickets**`,
+        title: `### Tickets`,
         content:
           `- **Claim before you help.** Click **Claim** so members are not answered by three people at once.\n` +
           `- **Solve, then close.** A ticket closes when the member's issue is resolved, not when the conversation gets slow.\n` +
@@ -255,7 +262,7 @@ function staffHandbook() {
       advertising: {
         label: 'Advertising Duties', emojiName: 'Megaphone', emojiFallback: '📣',
         description: 'Growing the server is part of the job',
-        title: `${e('Megaphone', '📣')} **Advertising Duties**`,
+        title: `### Advertising Duties`,
         content:
           `- **Advertising is a core duty**, not an extra. Every staff member posts ads on a regular schedule.\n` +
           `- **Use the approved templates** from the PR panel so our messaging stays consistent.\n` +
@@ -266,7 +273,7 @@ function staffHandbook() {
       trial_promotions: {
         label: 'Trial Process and Promotions', emojiName: 'crown', emojiFallback: '👑',
         description: 'How ranks are earned here',
-        title: `${e('crown', '👑')} **Trial Process and Promotions**`,
+        title: `### Trial Process and Promotions`,
         content:
           `- **Every new staff member starts on trial.** Your performance during the trial determines your **final rank**.\n` +
           `- **Trials measure three things:** activity, moderation quality, and advertising output.\n` +
@@ -281,13 +288,13 @@ function staffHandbook() {
 function prHandbook() {
   return {
     heading: `## ${e('Link', '🔗')} PR Handbook`,
-    intro: 'How the **PR team** grows How To ERLC: partnerships, outreach, and the standards behind both.',
+    intro: '-# How the PR team grows How To ERLC: partnerships, outreach, and the standards behind both.',
     selectPlaceholder: 'Browse the handbook',
     sections: {
       what_pr_does: {
         label: 'What PR Does', emojiName: 'Target', emojiFallback: '🎯',
         description: 'The PR team mission',
-        title: `${e('Target', '🎯')} **What PR Does**`,
+        title: `### What PR Does`,
         content:
           `- **PR grows the server.** Members with the <@&${config.roles.prTeam}> role find communities, open conversations, and bring them in.\n` +
           `- **Invites are tracked.** Register your permanent invite on the PR panel and the bot credits every join to you.\n` +
@@ -298,7 +305,7 @@ function prHandbook() {
       partnership_standards: {
         label: 'Partnership Standards', emojiName: 'shieldcheck', emojiFallback: '🛡️',
         description: 'What a server needs to partner with us',
-        title: `${e('shieldcheck', '🛡️')} **Partnership Standards**`,
+        title: `### Partnership Standards`,
         content:
           `- **ERLC or Roblox emergency services related.** That is the community we serve.\n` +
           `- **Active and real.** A partner server shows genuine member activity, not just a member count.\n` +
@@ -309,7 +316,7 @@ function prHandbook() {
       outreach_conduct: {
         label: 'Outreach and Conduct', emojiName: 'Megaphone', emojiFallback: '📣',
         description: 'How we approach other communities',
-        title: `${e('Megaphone', '📣')} **Outreach and Conduct**`,
+        title: `### Outreach and Conduct`,
         content:
           `- **Use the official templates** from the PR panel Assets menu. Consistent messaging builds the brand.\n` +
           `- **Ask before you post.** Get permission from a server's staff before advertising there.\n` +
@@ -320,7 +327,7 @@ function prHandbook() {
       premium_perks: {
         label: 'Premium Partner Perks', emojiName: 'crown', emojiFallback: '👑',
         description: 'What top partners receive',
-        title: `${e('crown', '👑')} **Premium Partner Perks**`,
+        title: `### Premium Partner Perks`,
         content:
           `- **Featured campaign days.** Premium partners headline official marketing campaigns and events.\n` +
           `- **Priority placement** in the directory and announcement shoutouts.\n` +

@@ -389,9 +389,9 @@ async function handleRolePanelButton(interaction) {
 // ── Staff handbook select menu ────────────────────────────────────────────────
 const STAFF_HANDBOOK = {
   role: {
-    title: '<:Target:1507191539892224211> Your Role',
+    title: 'Your Role',
     description:
-      'As a staff member at HowToERLC your job is to keep the server safe, welcoming, and on-topic at all times. ' +
+      '-# As a staff member at HowToERLC your job is to keep the server safe, welcoming, and on-topic at all times. ' +
       'You are the first line of response for rule violations, member questions, and support tickets.\n\n' +
       '- Monitor all public channels for rule violations\n' +
       '- Keep the advertising channels clean and compliant\n' +
@@ -401,29 +401,29 @@ const STAFF_HANDBOOK = {
       '-# When in doubt, escalate to a senior staff member or admin rather than acting alone.',
   },
   rules: {
-    title: '<:shieldcheck:1507191534003552277> Server & Advertising Rules',
+    title: 'Server and Advertising Rules',
     description:
       '**Server Rules**\n' +
-      'Watch for the following violations in all public channels:\n' +
-      '<:circlex:1507191508657508503> Disrespect, harassment, or hate speech toward any member\n' +
-      '<:circlex:1507191508657508503> Spam, excessive pinging, or flooding any channel\n' +
-      '<:circlex:1507191508657508503> Off-topic content or self-promotion outside designated channels\n' +
-      '<:circlex:1507191508657508503> Sharing content that violates Roblox or Discord ToS\n\n' +
+      '-# Watch for the following violations in all public channels:\n' +
+      '- Disrespect, harassment, or hate speech toward any member\n' +
+      '- Spam, excessive pinging, or flooding any channel\n' +
+      '- Off-topic content or self-promotion outside designated channels\n' +
+      '- Sharing content that violates Roblox or Discord ToS\n\n' +
       '**Advertising Rules**\n' +
-      'Advertisements must follow these rules or be removed immediately:\n' +
-      '<:circlex:1507191508657508503> Must be ERLC or Roblox emergency services related\n' +
-      '<:circlex:1507191508657508503> Must include a valid Discord invite link\n' +
-      '<:circlex:1507191508657508503> No recruiting members away from HowToERLC\n' +
-      '<:circlex:1507191508657508503> Paid promotions must be clearly disclosed\n\n' +
+      '-# Advertisements must follow these rules or be removed immediately:\n' +
+      '- Must be ERLC or Roblox emergency services related\n' +
+      '- Must include a valid Discord invite link\n' +
+      '- No recruiting members away from HowToERLC\n' +
+      '- Paid promotions must be clearly disclosed\n\n' +
       '**How to respond**\n' +
       '- Issue a verbal warning in the channel or via DM for minor violations\n' +
       '- Remove non-compliant advertisements immediately\n' +
       '- Escalate repeated violations to a senior staff member',
   },
   welcoming: {
-    title: '<:userplus:1507191546813091841> Welcoming Members',
+    title: 'Welcoming Members',
     description:
-      'First impressions matter. When a new member joins, make them feel welcome and help them get oriented.\n\n' +
+      '-# First impressions matter. When a new member joins, make them feel welcome and help them get oriented.\n\n' +
       '- Greet new members in the welcome channel if one is active\n' +
       '- If a member asks where to start, point them to the main dashboard and the website **howtoerlc.xyz**\n' +
       '- If a member is lost or confused, answer their question directly — do not just send a rules link\n' +
@@ -433,26 +433,26 @@ const STAFF_HANDBOOK = {
       '-# You do not need to greet every single member. Focus on those who ask questions or seem lost.',
   },
   tickets: {
-    title: '<:Headset:1507191521407926322> Support Tickets',
+    title: 'Support Tickets',
     description:
-      'Support tickets are opened by members who need help. As staff you are responsible for monitoring and responding to them.\n\n' +
+      '-# Support tickets are opened by members who need help. As staff you are responsible for monitoring and responding to them.\n\n' +
       '**How tickets work**\n' +
       '- When a ticket is created, a private channel is opened with the member and the staff team\n' +
       '- Click **Claim** to take ownership of the ticket — this hides it from other staff so there is no overlap\n' +
       '- Once resolved, click **Close** to close the ticket and delete the channel\n' +
       '- Use **Transcript** before closing if a record is needed\n\n' +
       '**When to action a ticket**\n' +
-      '<:circlecheck:1507191508066107532> Claim a ticket if you can fully resolve the issue\n' +
-      '<:circlecheck:1507191508066107532> Leave it open if a more qualified staff member should handle it\n' +
-      '<:circlex:1507191508657508503> Do not close a ticket without resolving the member\'s issue\n' +
-      '<:circlex:1507191508657508503> Do not share ticket contents outside of the ticket channel\n\n' +
+      '- Claim a ticket if you can fully resolve the issue\n' +
+      '- Leave it open if a more qualified staff member should handle it\n' +
+      '- Do not close a ticket without resolving the member\'s issue\n' +
+      '- Do not share ticket contents outside of the ticket channel\n\n' +
       '**Adding other members**\n' +
       'Use `/add @user` inside a ticket to give another member access if they are involved in the issue.',
   },
   commands: {
-    title: '<:clipboardlist:1507191509563473962> Bot Commands',
+    title: 'Bot Commands',
     description:
-      'As a staff member you have access to the following bot commands:\n\n' +
+      '-# As a staff member you have access to the following bot commands:\n\n' +
       '**Application Management**\n' +
       '- `/approve` — Approve a staff application and notify the applicant via DM\n' +
       '- `/deny` — Deny a staff application and notify the applicant via DM\n' +
@@ -485,16 +485,16 @@ async function handleStaffHandbook(interaction) {
 // ── Dashboard info select menu ────────────────────────────────────────────────
 const INFO_EMBEDS = {
   info_about: {
-    title: '<:howtoglogo:1494830728113033327> About HowToERLC',
-    description: 'HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox. We provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\n<:Link:1507191523094167573> Visit **howtoerlc.xyz** to submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
+    title: 'About HowToERLC',
+    description: '-# HowToERLC is the leading resource hub for ERLC community owners and builders on Roblox.\n\nWe provide free guides, templates, department structures, livery resources, and direct community support to help you build and run a successful ERLC server.\n\n-# Visit **howtoerlc.xyz** to submit staff applications, share suggestions, request partnerships, and access an AI assistant built specifically for ERLC.',
   },
   info_guidelines: {
-    title: '<:shieldcheck:1507191534003552277> Server Guidelines',
-    description: 'By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n<:circlecheck:1507191508066107532> **Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n\n<:circlecheck:1507191508066107532> **Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n\n<:circlex:1507191508657508503> **No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n\n<:circlecheck:1507191508066107532> **Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n\n- **Staff decisions are final.** Repeated violations will result in removal from the server.',
+    title: 'Server Guidelines',
+    description: '-# By being in this server you agree to follow these rules and Discord\'s Terms of Service.\n\n- **Be respectful.** Treat all members and staff with respect. Harassment, hate speech, and discrimination are not tolerated.\n- **Keep it relevant.** All content must relate to ERLC community building. Off-topic discussions belong in designated channels.\n- **No spam or self-promotion.** Unsolicited promotion and spam are not permitted outside of designated channels.\n- **Follow Roblox & Discord ToS.** All Roblox and Discord Terms of Service apply at all times.\n- **Staff decisions are final.** Repeated violations will result in removal from the server.',
   },
   info_advertising: {
-    title: '<:Megaphone:1507191527099596800> Advertising Guidelines',
-    description: 'Advertisements are permitted in the designated channel only and must follow these rules.\n\n<:circlecheck:1507191508066107532> **ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n\n<:circlex:1507191508657508503> **No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n\n<:circlecheck:1507191508066107532> **Valid invite required.** All advertisements must include a valid Discord invite link.\n\n- **Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
+    title: 'Advertising Guidelines',
+    description: '-# Advertisements are permitted in the designated channel only and must follow these rules.\n\n- **ERLC-related only.** Ads must be directly related to ERLC or Roblox emergency services communities.\n- **No direct recruiting.** Recruiting members away from this server is strictly prohibited.\n- **Valid invite required.** All advertisements must include a valid Discord invite link.\n- **Disclose sponsorships.** Paid or sponsored promotions must be clearly disclosed.\n\n-# Staff reserve the right to remove any advertisement at their discretion.',
   },
 };
 
@@ -633,71 +633,71 @@ async function handlePrHandbook(interaction) {
   if (value === 'role') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('<:Target:1507191539892224211> What is the PR Team?')
+      .setTitle('What is the PR Team?')
       .setDescription(
-        'The **HowToERLC PR (Public Relations) Team** is responsible for growing the server by building partnerships across the ERLC community.\n\n' +
+        '-# The HowToERLC PR (Public Relations) Team grows the server by building partnerships across the ERLC community.\n\n' +
         '**As a PR Team member, your job is to:**\n' +
-        '• Find and approach ERLC communities, servers, and players\n' +
-        '• Invite them to join HowToERLC using your personal invite link\n' +
-        '• Use the outreach templates in the **Assets** section for messaging\n' +
-        '• Represent HowToERLC professionally at all times\n\n' +
-        '**The PR Team Manager** monitors invite activity, reviews invite stats, and processes all payout requests.'
+        '- Find and approach ERLC communities, servers, and players\n' +
+        '- Invite them to join HowToERLC using your personal invite link\n' +
+        '- Use the outreach templates in the **Assets** section for messaging\n' +
+        '- Represent HowToERLC professionally at all times\n\n' +
+        '-# The PR Team Manager monitors invite activity, reviews invite stats, and processes all payout requests.'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
   } else if (value === 'invite_setup') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('<:Link:1507191523094167573> Invite Link Setup')
+      .setTitle('Invite Link Setup')
       .setDescription(
-        '**Step 1 — Create a permanent invite**\n' +
-        '• Right-click any channel → **Invite People**\n' +
-        '• Click **Edit invite link** → set expiry to **Never**\n' +
-        '• Copy your invite code (the part after `discord.gg/`)\n\n' +
-        '**Step 2 — Register it with the bot**\n' +
-        '• Click the **Register Invite** button on the PR Panel\n' +
-        '• Enter your invite code in the modal that appears\n' +
-        '• The bot will verify and link it to your account\n\n' +
-        '**Step 3 — Share it!**\n' +
-        '• Use the **Assets** menu for ready-to-use outreach templates\n' +
-        '• The bot automatically tracks everyone who joins via your link\n\n' +
-        '<:alerttriangle:1507191481906106398> Only **one invite code** per member. Contact a PR Manager to change yours.'
+        '**Step 1. Create a permanent invite**\n' +
+        '- Right-click any channel → **Invite People**\n' +
+        '- Click **Edit invite link** → set expiry to **Never**\n' +
+        '- Copy your invite code (the part after `discord.gg/`)\n\n' +
+        '**Step 2. Register it with the bot**\n' +
+        '- Click the **Register Invite** button on the PR Panel\n' +
+        '- Enter your invite code in the modal that appears\n' +
+        '- The bot will verify and link it to your account\n\n' +
+        '**Step 3. Share it**\n' +
+        '- Use the **Assets** menu for ready-to-use outreach templates\n' +
+        '- The bot automatically tracks everyone who joins via your link\n\n' +
+        '-# Only one invite code per member. Contact a PR Manager to change yours.'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
   } else if (value === 'payouts') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('<:Coin:1507191513418039388> Payout System')
+      .setTitle('Payout System')
       .setDescription(
-        '**Earning a Payout:**\n' +
-        '• Earn **50 Robux** for every **10 retained invites**\n' +
-        '• A "retained invite" = someone you invited who stayed **30+ days**\n\n' +
-        '**How to Claim:**\n' +
-        '1. Reach **10 retained invites** — check with **My Stats**\n' +
+        '**Earning a payout**\n' +
+        '- Earn **50 Robux** for every **10 retained invites**\n' +
+        '- A retained invite is someone you invited who stayed **30+ days**\n\n' +
+        '**How to claim**\n' +
+        '1. Reach **10 retained invites**, check with **My Stats**\n' +
         '2. Click **Request Payout** on the PR Panel\n' +
         '3. A **PR Manager** reviews your request in `#pr-logs`\n' +
         '4. Once approved, you will be contacted for your **50 Robux**\n\n' +
-        '**Rules:**\n' +
-        '• Members must stay **30 full days** to count as retained\n' +
-        '• After payout approval, your counter resets for the next 10\n' +
-        '• Do not submit duplicate payout requests'
+        '**Rules**\n' +
+        '- Members must stay **30 full days** to count as retained\n' +
+        '- After payout approval, your counter resets for the next 10\n' +
+        '- Do not submit duplicate payout requests'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
   } else if (value === 'tracking') {
     embed = new EmbedBuilder()
       .setColor(config.colors.info)
-      .setTitle('<:chartbar:1507191493603885256> Tracking & Stats')
+      .setTitle('Tracking and Stats')
       .setDescription(
-        '**How tracking works:**\n' +
-        '• When someone joins via your registered invite, the bot records the event\n' +
-        '• Each invited member starts a **30-day retention timer**\n' +
-        '• After 30 days still in server → **Retained** <:circlecheck:1507191508066107532>\n' +
-        '• If they leave before 30 days → **Lost** <:circlex:1507191508657508503>\n\n' +
-        '**Your Stats:**\n' +
-        '<:Select:1507191532875153519> **Total** — All who ever joined via your link\n' +
-        '<:circlecheck:1507191508066107532> **Retained** — Stayed 30+ days (count toward payout)\n' +
-        '<:clockhour4:1507191510792142868> **Pending** — Still within their 30-day window\n' +
-        '<:circlex:1507191508657508503> **Lost** — Left before 30 days\n\n' +
-        '**All activity is logged** in `#pr-logs` for the PR Manager to monitor.'
+        '**How tracking works**\n' +
+        '- When someone joins via your registered invite, the bot records the event\n' +
+        '- Each invited member starts a **30-day retention timer**\n' +
+        '- Still in the server after 30 days: **Retained**\n' +
+        '- Left before 30 days: **Lost**\n\n' +
+        '**Your stats**\n' +
+        '- **Total**: all who ever joined via your link\n' +
+        '- **Retained**: stayed 30+ days (count toward payout)\n' +
+        '- **Pending**: still within their 30-day window\n' +
+        '- **Lost**: left before 30 days\n\n' +
+        '-# All activity is logged in `#pr-logs` for the PR Manager to monitor.'
       )
       .setFooter({ text: 'HowToERLC PR Team Handbook' });
   }
