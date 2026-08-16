@@ -1,7 +1,13 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
-const db = new Database(path.join(__dirname, '..', 'data', 'db.sqlite'));
+const dataDir = path.join(__dirname, '..', 'data');
+// better-sqlite3 creates the db file but not its parent folder — ensure it
+// exists so a fresh deploy (where data/ was cleared) boots instead of crashing
+fs.mkdirSync(dataDir, { recursive: true });
+
+const db = new Database(path.join(dataDir, 'db.sqlite'));
 db.pragma('journal_mode = WAL');
 
 db.exec(`
