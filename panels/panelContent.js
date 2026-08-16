@@ -83,42 +83,42 @@ function serverRules() {
       { divider: true },
 
       `**1. General Conduct**\n` +
-      `-# Treat everyone with respect. No harassment, bullying, hate speech, or discrimination of any kind. Do not start or fuel drama, arguments belong in DMs or a ticket, not public channels.`,
+      `Treat everyone with respect. No harassment, bullying, hate speech, or discrimination of any kind. Do not start or fuel drama, arguments belong in DMs or a ticket, not public channels.`,
 
       `**2. Advertising**\n` +
-      `-# Advertising is allowed only in the designated advertising channels.\n` +
+      `Advertising is allowed only in the designated advertising channels.\n` +
       `- No advertising in DMs, ever\n` +
       `- No promoting other communities outside the designated channels\n` +
       `- Repeat offenders lose advertising access and may be removed from the server`,
 
       `**3. Content Standards**\n` +
-      `-# Keep everything appropriate for the whole community.\n` +
+      `Keep everything appropriate for the whole community.\n` +
       `- No NSFW or shock content in any channel, name, or profile\n` +
       `- No spam, flooding, or mass pinging\n` +
       `- No self-bots or automation on member accounts\n` +
       `- Usernames and avatars must be appropriate`,
 
       `**4. Marketplace and Listings**\n` +
-      `-# The marketplace runs on trust.\n` +
+      `The marketplace runs on trust.\n` +
       `- No scams or bait listings, deliver exactly what you sell\n` +
       `- No stolen assets and no reselling of stolen work\n` +
       `- Be honest in every listing: real previews, real prices, real ownership`,
 
       `**5. Respect Staff**\n` +
-      `-# Follow staff direction the first time. If you disagree with a decision, take it to a ticket, staff decisions stand until reviewed by management.`,
+      `Follow staff direction the first time. If you disagree with a decision, take it to a ticket, staff decisions stand until reviewed by management.`,
 
       `**6. No Exploiting, Leaking, or Doxxing**\n` +
-      `-# No exploiting bugs or systems, no leaking private content or personal information, no doxxing, and no malicious or disguised links. These are instant-ban offenses.`,
+      `No exploiting bugs or systems, no leaking private content or personal information, no doxxing, and no malicious or disguised links. These are instant-ban offenses.`,
 
       { divider: true },
 
       `**Platform Rules Are Mandatory**\n` +
-      `-# Everyone here must follow the **PRC (Police Roleplay Community / ER:LC) rules**, **Discord's Terms of Service and Community Guidelines**, and **Roblox's Terms of Service**. This is non-negotiable: a violation of PRC, Discord, or Roblox rules is a violation of ours and is punished here too.`,
+      `Everyone here must follow the **PRC (Police Roleplay Community / ER:LC) rules**, **Discord's Terms of Service and Community Guidelines**, and **Roblox's Terms of Service**. This is non-negotiable: a violation of PRC, Discord, or Roblox rules is a violation of ours and is punished here too.`,
 
       { divider: true },
 
       `**Consequences**\n` +
-      `-# Violations earn warnings, mutes, or bans depending on severity and history. **A ban from this server is an ecosystem ban**: you lose the website, your listings, and every How To ERLC feature with it.`,
+      `Violations earn warnings, mutes, or bans depending on severity and history. **A ban from this server is an ecosystem ban**: you lose the website, your listings, and every How To ERLC feature with it.`,
     ],
     ticketButtonLabel: 'Open a Ticket',
   };
@@ -145,7 +145,7 @@ function marketingCampaigns() {
       {
         text:
           `${e('Confetti', '🎉')} **How to start**\n` +
-          `-# Purchase a paid ad and set up your campaign in a couple of clicks.`,
+          `Purchase a paid ad and set up your campaign in a couple of clicks.`,
         buttonKey: 'purchase',
       },
     ],
@@ -208,17 +208,17 @@ function community() {
       { divider: true },
 
       `**How to take part**\n` +
-      `-# Most giveaways and events are announced right here with entry instructions attached, usually a button or reaction. No purchases, no catches. Just be a member.`,
+      `Most giveaways and events are announced right here with entry instructions attached, usually a button or reaction. No purchases, no catches. Just be a member.`,
 
       {
         text:
           `**Want a heads-up?**\n` +
-          `-# Grab the notification roles in <#${NOTIFY_ROLES_CHANNEL_ID}> so you never miss a drop.`,
+          `Grab the notification roles in <#${NOTIFY_ROLES_CHANNEL_ID}> so you never miss a drop.`,
         buttonKey: 'notifyRoles',
       },
 
       `**Hosting something with us?**\n` +
-      `-# Partners and creators can run giveaways or events through the server. Open a ticket to pitch it.`,
+      `Partners and creators can run giveaways or events through the server. Open a ticket to pitch it.`,
 
       { divider: true },
 
@@ -428,7 +428,7 @@ function trialStaff() {
       { divider: true },
 
       `**1. Know the expectations**\n` +
-      `-# Be active most days, stay professional in every channel, and follow the staff handbook. Your trial starts the day you are accepted and runs for **2 to 3 weeks**. The rank that fits you best is determined by your activity and effort in the staff team.`,
+      `Be active most days, stay professional in every channel, and follow the staff handbook. Your trial starts the day you are accepted and runs for **2 to 3 weeks**. The rank that fits you best is determined by your activity and effort in the staff team.`,
 
       `**2. Do the work you're evaluated on**\n` +
       `- **Moderation**: handle violations correctly and log actions through the bot\n` +
@@ -436,13 +436,13 @@ function trialStaff() {
       `- **Advertising or invites**: depending on your track, post ads on schedule or bring in invites through the PR program`,
 
       `**3. Hit the minimums**\n` +
-      `-# Spend **at least 30 minutes a day in the server**, starting conversations and interacting with the community, with no unexplained absences. Going quiet for a week without notice can end the trial early.`,
+      `Spend **at least 30 minutes a day in the server**, starting conversations and interacting with the community, with no unexplained absences. Going quiet for a week without notice can end the trial early.`,
 
       `**4. Get evaluated**\n` +
-      `-# At the end of your trial, management reviews your activity, moderation quality, and conduct, with input from the senior staff you worked with.`,
+      `At the end of your trial, management reviews your activity, moderation quality, and conduct, with input from the senior staff you worked with.`,
 
       `**5. Get promoted**\n` +
-      `-# Pass the evaluation and management signs off on your promotion to your full rank. Either way you get a decision and feedback, trials never just drag on.`,
+      `Pass the evaluation and management signs off on your promotion to your full rank. Either way you get a decision and feedback, trials never just drag on.`,
 
       { divider: true },
 
@@ -475,22 +475,22 @@ function staffPromotions() {
       { divider: true },
 
       `**Consistent activity**\n` +
-      `-# Show up most days and be visible in public channels. Consistency over weeks beats bursts of activity.`,
+      `Show up most days and be visible in public channels. Consistency over weeks beats bursts of activity.`,
 
       `**Handle tickets well**\n` +
-      `-# Claim tickets, resolve the actual issue, and close them cleanly. Members leaving tickets happy is one of the strongest signals we track.`,
+      `Claim tickets, resolve the actual issue, and close them cleanly. Members leaving tickets happy is one of the strongest signals we track.`,
 
       `**Hit your advertising and invite goals**\n` +
-      `-# Post ads on schedule and grow your tracked invites through the PR program. Growth work counts as much as moderation.`,
+      `Post ads on schedule and grow your tracked invites through the PR program. Growth work counts as much as moderation.`,
 
       `**Professionalism and conduct**\n` +
-      `-# Stay calm in public, enforce rules fairly, and represent How To ERLC well everywhere, including other servers.`,
+      `Stay calm in public, enforce rules fairly, and represent How To ERLC well everywhere, including other servers.`,
 
       `**Help members and take initiative**\n` +
-      `-# Answer questions without being asked, spot problems before they grow, and propose improvements instead of waiting for direction.`,
+      `Answer questions without being asked, spot problems before they grow, and propose improvements instead of waiting for direction.`,
 
       `**A clean record and good feedback**\n` +
-      `-# No active warnings, and positive feedback from management and the staff you work with.`,
+      `No active warnings, and positive feedback from management and the staff you work with.`,
 
       { divider: true },
 
