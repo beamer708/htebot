@@ -3,12 +3,11 @@
 // wrapped so a failed reply or missing channel never crashes the bot.
 const {
   ContainerBuilder, TextDisplayBuilder,
-  ActionRowBuilder, StringSelectMenuBuilder,
   MessageFlags, resolveColor,
 } = require('discord.js');
 const config = require('../config.json');
-const { emojiObject } = require('../utils/appEmojis');
 const content = require('../panels/panelContent');
+const { handleNotifRolesButton } = require('./notifRoles');
 
 const ACCENT = resolveColor(config.colors.primary || '#4ade80');
 const EPHEMERAL_V2 = MessageFlags.Ephemeral | MessageFlags.IsComponentsV2;
@@ -65,33 +64,6 @@ async function handleHandbookSection(interaction, handbook) {
   return safeReply(interaction, sectionCard(section.title, section.content));
 }
 
-// ── Dashboard: Notification Roles button → ephemeral roles menu ───────────────
-// Reuses the existing "rolepanel:notifications" select handler unchanged.
-async function handleRolesButton(interaction) {
-  const options = [
-    { label: 'Change Log',    description: 'Get notified about change logs',      value: config.roles.notifications.updates || 'updates',           emojiName: 'Bell',      emojiFallback: '🔔' },
-    { label: 'New Resources', description: 'Get notified when resources drop',    value: config.roles.notifications.resources || 'resources',       emojiName: 'Book',      emojiFallback: '📚' },
-    { label: 'Announcements', description: 'Get notified about announcements',    value: config.roles.notifications.announcements || 'announcements', emojiName: 'Megaphone', emojiFallback: '📣' },
-  ].map(o => {
-    const built = { label: o.label, description: o.description, value: o.value };
-    const emoji = emojiObject(o.emojiName, o.emojiFallback);
-    if (emoji) built.emoji = emoji;
-    return built;
-  });
-
-  const menu = new StringSelectMenuBuilder()
-    .setCustomId('rolepanel:notifications')
-    .setPlaceholder('Choose your notification roles')
-    .setMinValues(0).setMaxValues(options.length)
-    .addOptions(options);
-
-  return safeReply(interaction, {
-    content: 'Pick the notifications you want. Selecting toggles the role on, deselecting removes it.',
-    components: [new ActionRowBuilder().addComponents(menu)],
-    flags: MessageFlags.Ephemeral,
-  });
-}
-
 // ── Router (customId prefix "panelsel") ───────────────────────────────────────
 async function handlePanelInteraction(interaction) {
   try {
@@ -105,7 +77,7 @@ async function handlePanelInteraction(interaction) {
     }
 
     if (interaction.isButton()) {
-      if (action === 'roles') return await handleRolesButton(interaction);
+      if (action === 'roles') return await handleNotifRolesButton(interaction);
     }
   } catch (err) {
     console.error('[PanelHandler] Error:', err);

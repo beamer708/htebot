@@ -23,6 +23,7 @@ const { handlePanelInteraction } = require('./panelHandler');
 const { handleStickyInteraction } = require('./stickyHandler');
 const { handleTrialButton } = require('./trialHandler');
 const { handleDashboardInteraction } = require('./panelDashboard');
+const { handleNotifRoleToggle, TOGGLE_PREFIX: NOTIFROLE_PREFIX } = require('./notifRoles');
 
 const dataPath = (file) => path.join(__dirname, '..', 'data', file);
 
@@ -1046,7 +1047,8 @@ module.exports = async (interaction, client) => {
   // would skip this try/catch, and an unhandled rejection kills the process.
   try {
     if (interaction.isButton()) {
-      // Listing moderation buttons use underscore customIds (listing_approve_{id})
+      // Underscore-customId buttons (matched before the ':' prefix routing)
+      if (interaction.customId.startsWith(NOTIFROLE_PREFIX))       return await handleNotifRoleToggle(interaction);
       if (interaction.customId.startsWith(LISTING_APPROVE_PREFIX)) return await handleListingApprove(interaction, client);
       if (interaction.customId.startsWith(LISTING_DENY_PREFIX))    return await handleListingDenyButton(interaction);
 
